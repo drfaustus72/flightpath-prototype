@@ -5,13 +5,32 @@
     "handle": "maya_flies",
     "bio": "Student pilot at HFA. Working toward my first solo cross-country.",
     "homeAirport": "KHHR",
-    "certificates": ["student"],
+    "certificates": [
+      "student"
+    ],
     "totalHours": 34,
+    "hoursSource": "self_reported",
+    "flightReviewOn": null,
     "cfi": null,
     "isMinor": false,
-    "visibility": { "homeAirport": "public", "certificates": "public", "totalHours": "followers", "homeSchool": "public", "achievements": "public", "activity": "followers", "airportMap": "public" },
-    "subscription": { "pilotPro": false, "cfiPro": false },
-    "demoPersona": { "label": "Student pilot", "description": "Maya · Pilot Pro seat sponsored by her school", "order": 0 }
+    "visibility": {
+      "homeAirport": "public",
+      "certificates": "public",
+      "totalHours": "followers",
+      "homeSchool": "public",
+      "achievements": "public",
+      "activity": "followers",
+      "airportMap": "public"
+    },
+    "subscription": {
+      "pilotPro": false,
+      "cfiPro": false
+    },
+    "demoPersona": {
+      "label": "Student pilot",
+      "description": "Maya \u00b7 Pilot Pro seat sponsored by her school",
+      "order": 0
+    }
   },
   {
     "id": "acct-dan",
@@ -19,13 +38,41 @@
     "handle": "cfi_dan",
     "bio": "CFI/CFII at Hawthorne Flight Academy. Coastal and mountain flying.",
     "homeAirport": "KHHR",
-    "certificates": ["private", "instrument", "commercial"],
+    "certificates": [
+      "private",
+      "instrument",
+      "commercial"
+    ],
     "totalHours": 1450,
-    "cfi": { "verified": true, "ratings": ["CFI", "CFII"], "independent": false },
+    "hoursSource": "logbook_verified",
+    "flightReviewOn": "2025-09-18",
+    "cfi": {
+      "verified": true,
+      "ratings": [
+        "CFI",
+        "CFII"
+      ],
+      "independent": false
+    },
     "isMinor": false,
-    "visibility": { "homeAirport": "public", "certificates": "public", "totalHours": "public", "homeSchool": "public", "achievements": "public", "activity": "followers", "airportMap": "public" },
-    "subscription": { "pilotPro": false, "cfiPro": false },
-    "demoPersona": { "label": "CFI", "description": "Dan · staff CFI, CFI Pro included by his school", "order": 1 }
+    "visibility": {
+      "homeAirport": "public",
+      "certificates": "public",
+      "totalHours": "public",
+      "homeSchool": "public",
+      "achievements": "public",
+      "activity": "followers",
+      "airportMap": "public"
+    },
+    "subscription": {
+      "pilotPro": false,
+      "cfiPro": false
+    },
+    "demoPersona": {
+      "label": "CFI",
+      "description": "Dan \u00b7 staff CFI, CFI Pro included by his school",
+      "order": 1
+    }
   },
   {
     "id": "acct-alex",
@@ -33,13 +80,32 @@
     "handle": "alex_hfa",
     "bio": "Operations at Hawthorne Flight Academy.",
     "homeAirport": "KHHR",
-    "certificates": ["private"],
+    "certificates": [
+      "private"
+    ],
     "totalHours": 220,
+    "hoursSource": "self_reported",
+    "flightReviewOn": "2025-02-11",
     "cfi": null,
     "isMinor": false,
-    "visibility": { "homeAirport": "public", "certificates": "public", "totalHours": "followers", "homeSchool": "public", "achievements": "public", "activity": "followers", "airportMap": "public" },
-    "subscription": { "pilotPro": false, "cfiPro": false },
-    "demoPersona": { "label": "School admin", "description": "Alex · admin of a School Pro school", "order": 2 }
+    "visibility": {
+      "homeAirport": "public",
+      "certificates": "public",
+      "totalHours": "followers",
+      "homeSchool": "public",
+      "achievements": "public",
+      "activity": "followers",
+      "airportMap": "public"
+    },
+    "subscription": {
+      "pilotPro": false,
+      "cfiPro": false
+    },
+    "demoPersona": {
+      "label": "School admin",
+      "description": "Alex \u00b7 admin of a School Pro school",
+      "order": 2
+    }
   },
   {
     "id": "acct-jordan",
@@ -47,13 +113,32 @@
     "handle": "jordan_r",
     "bio": "Private pilot, weekend flyer. Collecting SoCal airports.",
     "homeAirport": "KTOA",
-    "certificates": ["private"],
+    "certificates": [
+      "private"
+    ],
     "totalHours": 118,
+    "hoursSource": "self_reported",
+    "flightReviewOn": "2024-12-05",
     "cfi": null,
     "isMinor": false,
-    "visibility": { "homeAirport": "public", "certificates": "public", "totalHours": "followers", "homeSchool": "public", "achievements": "public", "activity": "followers", "airportMap": "public" },
-    "subscription": { "pilotPro": false, "cfiPro": false },
-    "demoPersona": { "label": "Free pilot", "description": "Jordan · Pilot Free, home school on School Basic", "order": 3 }
+    "visibility": {
+      "homeAirport": "public",
+      "certificates": "public",
+      "totalHours": "followers",
+      "homeSchool": "public",
+      "achievements": "public",
+      "activity": "followers",
+      "airportMap": "public"
+    },
+    "subscription": {
+      "pilotPro": false,
+      "cfiPro": false
+    },
+    "demoPersona": {
+      "label": "Free pilot",
+      "description": "Jordan \u00b7 Pilot Free, home school on School Basic",
+      "order": 3
+    }
   },
   {
     "id": "acct-priya",
@@ -61,12 +146,37 @@
     "handle": "priya_cfi",
     "bio": "Independent CFI at Santa Monica and Hawthorne.",
     "homeAirport": "KSMO",
-    "certificates": ["private", "instrument", "commercial", "multi_engine"],
+    "certificates": [
+      "private",
+      "instrument",
+      "commercial",
+      "multi_engine"
+    ],
     "totalHours": 980,
-    "cfi": { "verified": true, "ratings": ["CFI", "MEI"], "independent": true },
+    "hoursSource": "self_reported",
+    "flightReviewOn": "2026-03-02",
+    "cfi": {
+      "verified": true,
+      "ratings": [
+        "CFI",
+        "MEI"
+      ],
+      "independent": true
+    },
     "isMinor": false,
-    "visibility": { "homeAirport": "public", "certificates": "public", "totalHours": "public", "homeSchool": "public", "achievements": "public", "activity": "followers", "airportMap": "public" },
-    "subscription": { "pilotPro": false, "cfiPro": false },
+    "visibility": {
+      "homeAirport": "public",
+      "certificates": "public",
+      "totalHours": "public",
+      "homeSchool": "public",
+      "achievements": "public",
+      "activity": "followers",
+      "airportMap": "public"
+    },
+    "subscription": {
+      "pilotPro": false,
+      "cfiPro": false
+    },
     "demoPersona": null
   },
   {
@@ -75,12 +185,27 @@
     "handle": "sam_p",
     "bio": "",
     "homeAirport": "KHHR",
-    "certificates": ["student"],
+    "certificates": [
+      "student"
+    ],
     "totalHours": 12,
+    "hoursSource": "self_reported",
+    "flightReviewOn": null,
     "cfi": null,
     "isMinor": true,
-    "visibility": { "homeAirport": "private", "certificates": "private", "totalHours": "private", "homeSchool": "private", "achievements": "private", "activity": "private", "airportMap": "private" },
-    "subscription": { "pilotPro": false, "cfiPro": false },
+    "visibility": {
+      "homeAirport": "private",
+      "certificates": "private",
+      "totalHours": "private",
+      "homeSchool": "private",
+      "achievements": "private",
+      "activity": "private",
+      "airportMap": "private"
+    },
+    "subscription": {
+      "pilotPro": false,
+      "cfiPro": false
+    },
     "demoPersona": null
   },
   {
@@ -89,12 +214,36 @@
     "handle": "kim_coastal",
     "bio": "Chief instructor, Coastal Aviation Training.",
     "homeAirport": "KTOA",
-    "certificates": ["private", "instrument", "commercial"],
+    "certificates": [
+      "private",
+      "instrument",
+      "commercial"
+    ],
     "totalHours": 3100,
-    "cfi": { "verified": true, "ratings": ["CFI", "CFII"], "independent": false },
+    "hoursSource": "logbook_verified",
+    "flightReviewOn": "2025-06-20",
+    "cfi": {
+      "verified": true,
+      "ratings": [
+        "CFI",
+        "CFII"
+      ],
+      "independent": false
+    },
     "isMinor": false,
-    "visibility": { "homeAirport": "public", "certificates": "public", "totalHours": "public", "homeSchool": "public", "achievements": "public", "activity": "followers", "airportMap": "public" },
-    "subscription": { "pilotPro": false, "cfiPro": false },
+    "visibility": {
+      "homeAirport": "public",
+      "certificates": "public",
+      "totalHours": "public",
+      "homeSchool": "public",
+      "achievements": "public",
+      "activity": "followers",
+      "airportMap": "public"
+    },
+    "subscription": {
+      "pilotPro": false,
+      "cfiPro": false
+    },
     "demoPersona": null
   }
 ]

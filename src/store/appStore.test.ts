@@ -63,12 +63,14 @@ describe('app store', () => {
     const first = store.getState().logFlight(imported.draft, choices)
     expect(first.flight.pilotId).toBe('acct-maya')
     expect(first.flight.caption).toBe('Lunch at DZ')
-    expect(first.earned.map((a) => a.code)).toEqual(['badge:first_flight', 'stamp:KHHR', 'stamp:KAVX'])
-    expect(store.getState().logFlight(imported.draft, choices).earned).toEqual([])
+    expect(first.newAirports.map((a) => a.icao)).toEqual(['KHHR', 'KAVX'])
+    expect(first.newBadges.map((b) => b.code)).toEqual(['first_flight'])
+    const second = store.getState().logFlight(imported.draft, choices)
+    expect(second.newAirports).toEqual([])
+    expect(second.newBadges).toEqual([])
 
     const reloaded = createAppStore(world)
     expect(reloaded.getState().world.flights).toHaveLength(2)
-    expect(reloaded.getState().world.achievements).toHaveLength(3)
   })
 
   it('marks a tagged sim session pending; only a school admin or staff CFI can confirm it', async () => {
@@ -78,10 +80,11 @@ describe('app store', () => {
     const r = importTrack(kml, 'sim.kml', world.airports)
     if (!r.ok) throw new Error(r.error)
     const store = createAppStore(world)
-    const { flight, earned } = store
+    const { flight, newAirports, newBadges } = store
       .getState()
       .logFlight(r.draft, { caption: '', routeVisibility: 'full', clubId: 'club-hfa', postVisibility: 'public' })
-    expect(earned).toEqual([])
+    expect(newAirports).toEqual([])
+    expect(newBadges.map((b) => b.code)).toEqual(['first_sim'])
     expect(flight.simConfirmation?.status).toBe('pending')
 
     expect(() => store.getState().reviewSimSession(flight.id, 'confirmed')).toThrow('Only an admin or staff CFI')
@@ -89,6 +92,18 @@ describe('app store', () => {
     store.getState().reviewSimSession(flight.id, 'confirmed')
     const saved = store.getState().world.flights.find((f) => f.id === flight.id)
     expect(saved?.simConfirmation).toMatchObject({ status: 'confirmed', byAccountId: 'acct-dan' })
+  })
+
+  it('updates logbook details; a changed total becomes self-reported again', () => {
+    const store = createAppStore(seedWorld())
+    store.getState().setActiveAccount('acct-dan') // logbook verified
+    store.getState().updateLogbook({ totalHours: 1450, flightReviewOn: '2026-10-01' })
+    let dan = store.getState().world.accounts.find((a) => a.id === 'acct-dan')
+    expect(dan).toMatchObject({ hoursSource: 'logbook_verified', flightReviewOn: '2026-10-01' })
+    store.getState().updateLogbook({ totalHours: 1500, flightReviewOn: null })
+    dan = store.getState().world.accounts.find((a) => a.id === 'acct-dan')
+    expect(dan).toMatchObject({ totalHours: 1500, hoursSource: 'self_reported', flightReviewOn: null })
+    expect(() => store.getState().updateLogbook({ totalHours: -1, flightReviewOn: null })).toThrow('between 0')
   })
 
   it("refuses to tag a club the pilot doesn't belong to", async () => {

@@ -1,12 +1,12 @@
 import { FileUp, Info, Loader2 } from 'lucide-react'
 import { useId, useRef, useState, type ChangeEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
-import { earnsStampsAndBadges } from '../../domain/achievements'
 import { offersSchoolPlans } from '../../domain/clubs'
 import type { PostChoices } from '../../domain/flights'
 import { type FlightDraft, importTrack } from '../../domain/track/importTrack'
 import { MAX_FILE_BYTES } from '../../domain/track/parse'
 import { synthesize, toGpx } from '../../domain/track/synth'
+import { recognitionFor } from '../../domain/recognition'
 import { homeSchoolOf } from '../../domain/world'
 import { useActive, useWorld } from '../../store/hooks'
 import { useAppStore } from '../../store/storeContext'
@@ -136,10 +136,12 @@ function Review({ draft, onDiscard }: { draft: FlightDraft; onDiscard: () => voi
   })
   const set = <K extends keyof PostChoices>(key: K, value: PostChoices[K]) => setChoices((c) => ({ ...c, [key]: value }))
 
-  const stamped = new Set(world.achievements.filter((a) => a.pilotId === account.id).map((a) => a.code))
+  const visited = new Set(recognitionFor(world, account.id).airports.map((a) => a.icao))
   const save = () => {
-    const { flight, earned } = logFlight(draft, choices)
-    navigate(`/flights/${flight.id}`, { state: { earnedCodes: earned.map((a) => a.code) } })
+    const { flight, newAirports, newBadges } = logFlight(draft, choices)
+    navigate(`/flights/${flight.id}`, {
+      state: { newAirports: newAirports.map((a) => a.icao), newBadges: newBadges.map((b) => b.code) },
+    })
   }
 
   return (
@@ -176,7 +178,7 @@ function Review({ draft, onDiscard }: { draft: FlightDraft; onDiscard: () => voi
         ) : (
           <ul className="flex flex-wrap gap-2">
             {draft.airportsVisited.map((icao) => {
-              const isNew = earnsStampsAndBadges(draft) && !stamped.has(`stamp:${icao}`)
+              const isNew = !draft.isSimulator && !visited.has(icao)
               return (
                 <li key={icao} className="flex items-center gap-2 rounded-full border border-hairline bg-surface py-1 pr-3 pl-3">
                   <Ident>{icao}</Ident>

@@ -1,6 +1,7 @@
 import { MonitorPlay } from 'lucide-react'
 import { Link } from 'react-router'
 import { formatDuration, routeForViewer } from '../../domain/flights'
+import { recognitionFor } from '../../domain/recognition'
 import type { Flight } from '../../domain/types'
 import { useActive, useWorld } from '../../store/hooks'
 import { RouteSketch } from '../../ui/RouteSketch'
@@ -11,7 +12,7 @@ export function FlightCard({ flight }: { flight: Flight }) {
   const { account } = useActive()
   const pilot = world.accounts.find((a) => a.id === flight.pilotId)
   const route = routeForViewer(flight, account.id)
-  const stamps = world.achievements.filter((a) => a.flightId === flight.id && a.kind === 'stamp')
+  const stamps = recognitionFor(world, flight.pilotId).airports.filter((a) => a.firstFlightId === flight.id)
 
   return (
     <article className="rounded-[var(--radius-panel)] border border-hairline bg-surface">

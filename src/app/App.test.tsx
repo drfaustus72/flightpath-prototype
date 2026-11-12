@@ -47,7 +47,7 @@ describe('app shell', () => {
 
   it('shows Pilot Pro progress for the sponsored student and a Pro gate for the free pilot', async () => {
     renderApp('/progress')
-    expect(await screen.findByText(/XP and ranks are coming/)).toBeInTheDocument()
+    expect(await screen.findByText(/XP comes with missions/)).toBeInTheDocument()
     const user = await switchTo('Free pilot')
     await user.click(screen.getByRole('link', { name: 'Progress' }))
     expect(await screen.findByText('Part of Pilot Pro')).toBeInTheDocument()

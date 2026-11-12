@@ -6,6 +6,7 @@ import { adminClubsOf, homeSchoolOf } from '../../domain/world'
 import { useActive, useWorld } from '../../store/hooks'
 import { AirportMark } from '../../ui/AirportMark'
 import { Ident, Panel, PlanBadge } from '../../ui/primitives'
+import { LogbookPanel } from './LogbookPanel'
 
 const certificateNames: Record<string, string> = {
   student: 'Student',
@@ -66,20 +67,16 @@ export function ProfileScreen() {
         )}
       </Panel>
 
-      <dl className="grid grid-cols-2 gap-3">
+      <dl>
         <Panel>
           <dt className="text-[13px] text-ink-muted">Certificates</dt>
           <dd className="font-semibold">
             {account.certificates.map((c) => certificateNames[c] ?? c).join(', ') || 'None yet'}
           </dd>
         </Panel>
-        <Panel>
-          <dt className="text-[13px] text-ink-muted">Total hours</dt>
-          <dd className="text-[20px] font-bold">
-            <Ident>{account.totalHours.toLocaleString('en-US')}</Ident>
-          </dd>
-        </Panel>
       </dl>
+
+      <LogbookPanel key={account.id} account={account} />
 
       {adminClubs.length > 0 && (
         <section aria-labelledby="manage-title">

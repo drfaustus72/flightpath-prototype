@@ -21,8 +21,9 @@ test.describe('M1 log a flight', () => {
     await expect(page.getByRole('article').filter({ hasText: 'Catalina lunch run' })).toBeVisible()
 
     await nav.getByRole('link', { name: 'Progress' }).click()
-    await expect(page.getByRole('heading', { name: /Airport stamps · 2/ })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Airports · 2/ })).toBeVisible()
     await expect(page.getByText('First flight logged')).toBeVisible()
+    await expect(page.getByText('First 50 nm cross-country')).toHaveCount(0) // Catalina is ~31 nm
 
     // Logging the same airports again earns nothing new.
     await nav.getByRole('link', { name: 'Log flight' }).click()

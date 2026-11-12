@@ -9,6 +9,8 @@ export function makeAccount(overrides: Partial<Account> = {}): Account {
     homeAirport: 'KHHR',
     certificates: ['student'],
     totalHours: 10,
+    hoursSource: 'self_reported',
+    flightReviewOn: null,
     cfi: null,
     isMinor: false,
     visibility: {},

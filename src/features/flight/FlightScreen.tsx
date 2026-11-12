@@ -1,6 +1,7 @@
 import { Info, MonitorPlay } from 'lucide-react'
 import { useLocation, useParams } from 'react-router'
 import { canViewFlight, routeForViewer } from '../../domain/flights'
+import { recognitionFor } from '../../domain/recognition'
 import { useActive, useWorld } from '../../store/hooks'
 import { AirportMark } from '../../ui/AirportMark'
 import { ButtonLink, EmptyState, Ident, ScreenTitle } from '../../ui/primitives'
@@ -27,9 +28,11 @@ export function FlightScreen() {
   const pilot = world.accounts.find((a) => a.id === flight.pilotId)
   const club = world.clubs.find((c) => c.id === flight.clubId)
   const route = routeForViewer(flight, account.id)
-  const earnedNow = new Set((location.state as { earnedCodes?: string[] } | null)?.earnedCodes ?? [])
-  const earned = world.achievements.filter((a) => a.flightId === flight.id)
-  const newStamps = earned.filter((a) => a.kind === 'stamp' && earnedNow.has(a.code))
+  const justLogged = new Set((location.state as { newAirports?: string[] } | null)?.newAirports ?? [])
+  const recognition = recognitionFor(world, flight.pilotId)
+  const firstVisits = recognition.airports.filter((a) => a.firstFlightId === flight.id)
+  const earnedBadges = recognition.badges.filter((b) => b.flightId === flight.id)
+  const newStamps = firstVisits.filter((a) => justLogged.has(a.icao))
 
   return (
     <div className="flex flex-col gap-5">
@@ -42,13 +45,13 @@ export function FlightScreen() {
             <p className="font-semibold text-magenta">{newStamps.length === 1 ? 'New stamp' : `${newStamps.length} new stamps`}</p>
             <p className="text-[20px] font-bold">
               {newStamps.map((s, i) => (
-                <span key={s.code}>
+                <span key={s.icao}>
                   {i > 0 && ', '}
                   <Ident>{s.icao}</Ident>
                 </span>
               ))}
             </p>
-            <p className="text-[14px] text-ink-muted">{newStamps.map((s) => s.title).join(', ')}</p>
+            <p className="text-[14px] text-ink-muted">{newStamps.map((s) => s.name).join(', ')}</p>
           </div>
         </section>
       )}
@@ -100,15 +103,20 @@ export function FlightScreen() {
         </section>
       )}
 
-      {earned.length > 0 && (
+      {(firstVisits.length > 0 || earnedBadges.length > 0) && (
         <section aria-labelledby="earned-title">
           <h2 id="earned-title" className="mb-2 font-semibold">
             Earned on this flight
           </h2>
           <ul className="flex flex-wrap gap-2">
-            {earned.map((a) => (
-              <li key={a.code} className="rounded-full border border-hairline bg-surface px-3 py-1 text-[14px]">
-                {a.kind === 'stamp' ? <Ident>{a.icao}</Ident> : a.title}
+            {firstVisits.map((a) => (
+              <li key={a.icao} className="rounded-full border border-magenta/30 bg-magenta-tint px-3 py-1 text-[14px] text-magenta">
+                <Ident>{a.icao}</Ident> stamp
+              </li>
+            ))}
+            {earnedBadges.map((b) => (
+              <li key={b.code} className="rounded-full border border-hairline bg-surface px-3 py-1 text-[14px]">
+                {b.title}
               </li>
             ))}
           </ul>

@@ -62,7 +62,11 @@ export const accountSchema = z.object({
   bio: z.string(),
   homeAirport: icao,
   certificates: z.array(certificateSchema),
+  /** Logbook total entered at sign-up. Labeled self-reported until verified by a logbook upload. */
   totalHours: z.number().nonnegative(),
+  hoursSource: z.enum(['self_reported', 'logbook_verified']),
+  /** Date of the last flight review (14 CFR 61.56), as entered by the pilot. Shown as information, never as currency. */
+  flightReviewOn: isoDate.nullable(),
   cfi: cfiProfileSchema.nullable(),
   isMinor: z.boolean(),
   /** Partial: fields not listed use the product defaults from the brief. */
@@ -105,6 +109,7 @@ export const airportSchema = z.object({
   name: z.string().min(1),
   city: z.string().min(1),
   state: z.string().length(2),
+  country: z.string().length(2),
   lat: z.number().min(-90).max(90),
   lon: z.number().min(-180).max(180),
   elevationFt: z.number(),
@@ -170,15 +175,19 @@ export const flightSchema = z.object({
   createdAt: isoDateTime,
 })
 
+/**
+ * Stored achievements are only the ones someone must verify: training milestones (M2) and
+ * missions (M3). Stamps and "candy" badges are derived from flights (see domain/recognition.ts).
+ */
 export const achievementSchema = z.object({
   id,
   pilotId: id,
-  kind: z.enum(['stamp', 'badge']),
-  /** Stable key: "stamp:KAVX", "badge:first_flight". One per pilot. */
-  code: z.string().regex(/^(stamp|badge):[A-Za-z0-9_]+$/),
+  kind: z.enum(['milestone', 'mission']),
+  /** Stable key: "milestone:first_solo", "mission:airport_in_the_sky". One per pilot. */
+  code: z.string().regex(/^(milestone|mission):[A-Za-z0-9_]+$/),
   title: z.string().min(1),
   icao: icao.nullable(),
-  flightId: id,
+  flightId: id.nullable(),
   earnedAt: isoDateTime,
 })
 

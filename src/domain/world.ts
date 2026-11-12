@@ -103,7 +103,7 @@ export function checkIntegrity(world: World): string[] {
   }
   for (const a of world.achievements) {
     if (!accounts.has(a.pilotId)) errors.push(`achievement ${a.id}: unknown pilot ${a.pilotId}`)
-    if (!flightIds.has(a.flightId)) errors.push(`achievement ${a.id}: unknown flight ${a.flightId}`)
+    if (a.flightId !== null && !flightIds.has(a.flightId)) errors.push(`achievement ${a.id}: unknown flight ${a.flightId}`)
     if (a.icao !== null && !airports.has(a.icao)) errors.push(`achievement ${a.id}: unknown airport ${a.icao}`)
   }
 

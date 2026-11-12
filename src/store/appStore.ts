@@ -1,13 +1,14 @@
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
-import { awardForFlight, canConfirmSimSession } from '../domain/achievements'
+import { canConfirmSimSession } from '../domain/achievements'
 import { type PostChoices, createFlight } from '../domain/flights'
 import type { FlightDraft } from '../domain/track/importTrack'
-import type { Achievement, Flight, World } from '../domain/types'
+import { type AirportRecord, type Badge, newlyEarned, recognitionFor } from '../domain/recognition'
+import type { Flight, World } from '../domain/types'
 import { demoPersonas, loadWorld } from '../domain/world'
 
 /** Bump whenever the persisted shape changes. Old state is discarded and reset to seed. */
-export const STORAGE_VERSION = 3
+export const STORAGE_VERSION = 4
 export const STORAGE_KEY = 'flightpath-demo'
 
 export interface AppState {
@@ -15,8 +16,10 @@ export interface AppState {
   seedFingerprint: string
   activeAccountId: string
   setActiveAccount: (accountId: string) => void
-  /** Saves a flight for the active persona and returns it with any stamps and badges it earned. */
-  logFlight: (draft: FlightDraft, choices: PostChoices) => { flight: Flight; earned: Achievement[] }
+  /** Saves a flight for the active persona and returns it with the airports and badges it newly earned. */
+  logFlight: (draft: FlightDraft, choices: PostChoices) => { flight: Flight; newAirports: AirportRecord[]; newBadges: Badge[] }
+  /** The active pilot updates the logbook details they entered at sign-up. */
+  updateLogbook: (entry: { totalHours: number; flightReviewOn: string | null }) => void
   /** A school admin or staff CFI confirms or declines a simulator session tagged to their school. */
   reviewSimSession: (flightId: string, decision: 'confirmed' | 'declined') => void
   resetDemo: () => void
@@ -121,15 +124,35 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
             if (!member) throw new Error(`Can't tag a club you don't belong to: ${choices.clubId}`)
           }
           const flight = createFlight(draft, choices, activeAccountId, crypto.randomUUID(), new Date().toISOString())
-          const earned = awardForFlight(flight, draft.airportsVisited, world.achievements, world.airports)
+          const next = { ...world, flights: [...world.flights, flight] }
+          const earned = newlyEarned(recognitionFor(world, activeAccountId), recognitionFor(next, activeAccountId))
+          set({ world: next })
+          return { flight, newAirports: earned.airports, newBadges: earned.badges }
+        },
+        updateLogbook: ({ totalHours, flightReviewOn }) => {
+          if (!Number.isFinite(totalHours) || totalHours < 0 || totalHours > 100_000) {
+            throw new Error(`Total hours must be between 0 and 100,000 (got ${totalHours})`)
+          }
+          if (flightReviewOn !== null && !/^\d{4}-\d{2}-\d{2}$/.test(flightReviewOn)) {
+            throw new Error(`Flight review date must be YYYY-MM-DD (got ${flightReviewOn})`)
+          }
+          const { world, activeAccountId } = get()
           set({
             world: {
               ...world,
-              flights: [...world.flights, flight],
-              achievements: [...world.achievements, ...earned],
+              accounts: world.accounts.map((a) =>
+                a.id !== activeAccountId
+                  ? a
+                  : {
+                      ...a,
+                      totalHours,
+                      // Changing the total un-verifies it until a new logbook upload.
+                      hoursSource: totalHours === a.totalHours ? a.hoursSource : 'self_reported',
+                      flightReviewOn,
+                    },
+              ),
             },
           })
-          return { flight, earned }
         },
         reviewSimSession: (flightId, decision) => {
           const { world, activeAccountId } = get()
