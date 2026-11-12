@@ -83,6 +83,12 @@ describe('landing detection', () => {
     expect(r.departure).toBeNull()
   })
 
+  it('escapes track names when writing GPX', () => {
+    const gpx = toGpx(synthesize([{ kind: 'ground', at: 'KHHR', sec: 8 }], airports, START), 'Tom & Jerry <test>')
+    const r = importTrack(gpx, 'x.gpx', airports)
+    expect(r.ok && r.draft.title).toBe('Tom & Jerry <test>')
+  })
+
   it('round-trips a synthetic track through GPX and the full importer', () => {
     const points = synthesize(
       [

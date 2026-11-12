@@ -81,6 +81,9 @@ function pointAlong(path: readonly [number, number][], segLen: readonly number[]
   return [end[0], end[1]]
 }
 
+const escapeXml = (s: string) =>
+  s.replace(/[<>&"']/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[c] ?? c)
+
 /** Serializes points as GPX so samples go through the same import path as uploads. */
 export function toGpx(points: readonly TrackPoint[], name: string): string {
   const pts = points
@@ -90,5 +93,5 @@ export function toGpx(points: readonly TrackPoint[], name: string): string {
       return `<trkpt lat="${p.lat.toFixed(6)}" lon="${p.lon.toFixed(6)}">${ele}${time}</trkpt>`
     })
     .join('')
-  return `<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Flightpath sample" xmlns="http://www.topografix.com/GPX/1/1"><trk><name>${name}</name><trkseg>${pts}</trkseg></trk></gpx>`
+  return `<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Flightpath sample" xmlns="http://www.topografix.com/GPX/1/1"><trk><name>${escapeXml(name)}</name><trkseg>${pts}</trkseg></trk></gpx>`
 }

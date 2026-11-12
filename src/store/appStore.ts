@@ -57,7 +57,14 @@ export const safeLocalStorage: StateStorage = {
       return null
     }
   },
-  setItem: (name, value) => localStorage.setItem(name, value),
+  setItem(name, value) {
+    try {
+      localStorage.setItem(name, value)
+    } catch (error) {
+      // Quota exceeded or storage disabled (e.g. private browsing): keep working in memory.
+      console.warn('[flightpath] Could not save demo state; changes will last until reload.', error)
+    }
+  },
   removeItem: (name) => localStorage.removeItem(name),
 }
 

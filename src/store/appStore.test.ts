@@ -85,6 +85,17 @@ describe('app store', () => {
     ).toThrow("Can't tag a club")
   })
 
+  it('keeps working in memory when storage is full', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('full', 'QuotaExceededError')
+    })
+    const store = createAppStore(seedWorld())
+    store.getState().setActiveAccount('acct-dan')
+    expect(store.getState().activeAccountId).toBe('acct-dan')
+    expect(warn).toHaveBeenCalled()
+  })
+
   it('resets corrupt JSON in storage with a warning', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     localStorage.setItem(STORAGE_KEY, '{not json')
