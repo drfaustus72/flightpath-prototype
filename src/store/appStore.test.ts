@@ -39,6 +39,52 @@ describe('app store', () => {
     expect(store.getState().activeAccountId).toBe('acct-maya')
   })
 
+  it('logs a flight for the active persona, awards stamps once, and persists it', async () => {
+    const { importTrack } = await import('../domain/track/importTrack')
+    const { synthesize, toGpx } = await import('../domain/track/synth')
+    const world = seedWorld()
+    const gpx = toGpx(
+      synthesize(
+        [
+          { kind: 'ground', at: 'KHHR', sec: 200 },
+          { kind: 'fly', from: 'KHHR', to: 'KAVX', cruiseFt: 4500, kt: 110 },
+          { kind: 'ground', at: 'KAVX', sec: 200 },
+        ],
+        world.airports,
+        '2026-11-08T17:00:00Z',
+      ),
+      'Catalina',
+    )
+    const imported = importTrack(gpx, 'c.gpx', world.airports)
+    if (!imported.ok) throw new Error(imported.error)
+    const choices = { caption: ' Lunch at DZ ', routeVisibility: 'full', clubId: 'club-hfa', postVisibility: 'public' } as const
+
+    const store = createAppStore(world)
+    const first = store.getState().logFlight(imported.draft, choices)
+    expect(first.flight.pilotId).toBe('acct-maya')
+    expect(first.flight.caption).toBe('Lunch at DZ')
+    expect(first.earned.map((a) => a.code)).toEqual(['badge:first_flight', 'stamp:KHHR', 'stamp:KAVX'])
+    expect(store.getState().logFlight(imported.draft, choices).earned).toEqual([])
+
+    const reloaded = createAppStore(world)
+    expect(reloaded.getState().world.flights).toHaveLength(2)
+    expect(reloaded.getState().world.achievements).toHaveLength(3)
+  })
+
+  it("refuses to tag a club the pilot doesn't belong to", async () => {
+    const { importTrack } = await import('../domain/track/importTrack')
+    const store = createAppStore(seedWorld())
+    const r = importTrack(
+      '<gpx xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg><trkpt lat="33.9" lon="-118.3"/><trkpt lat="33.91" lon="-118.3"/></trkseg></trk></gpx>',
+      'x.gpx',
+      seedWorld().airports,
+    )
+    if (!r.ok) throw new Error(r.error)
+    expect(() =>
+      store.getState().logFlight(r.draft, { caption: '', routeVisibility: 'full', clubId: 'club-coastal', postVisibility: 'public' }),
+    ).toThrow("Can't tag a club")
+  })
+
   it('resets corrupt JSON in storage with a warning', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     localStorage.setItem(STORAGE_KEY, '{not json')

@@ -1,6 +1,6 @@
 @import '@fontsource-variable/public-sans';
-@import '@fontsource/b612-mono/400.css';
-@import '@fontsource/b612-mono/700.css';
+@import '@fontsource/b612/400.css';
+@import '@fontsource/b612/700.css';
 @import 'tailwindcss';
 
 /*
@@ -21,7 +21,7 @@
   --color-danger: #b3261e;
 
   --font-sans: 'Public Sans Variable', system-ui, sans-serif;
-  --font-ident: 'B612 Mono', ui-monospace, monospace;
+  --font-ident: 'B612', var(--font-sans);
 
   --radius-control: 10px;
   --radius-panel: 16px;
@@ -41,6 +41,21 @@
   :focus-visible {
     outline: 2px solid var(--color-chart-blue);
     outline-offset: 2px;
+  }
+}
+
+/* The one orchestrated moment: a new airport stamp lands like a rubber stamp. */
+@keyframes stamp {
+  0% {
+    transform: scale(1.8) rotate(-18deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(0.92) rotate(4deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
   }
 }
 

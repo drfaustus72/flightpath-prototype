@@ -1,6 +1,9 @@
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
-import type { World } from '../domain/types'
+import { awardForFlight } from '../domain/achievements'
+import { type PostChoices, createFlight } from '../domain/flights'
+import type { FlightDraft } from '../domain/track/importTrack'
+import type { Achievement, Flight, World } from '../domain/types'
 import { demoPersonas, loadWorld } from '../domain/world'
 
 /** Bump whenever the persisted shape changes. Old state is discarded and reset to seed. */
@@ -12,6 +15,8 @@ export interface AppState {
   seedFingerprint: string
   activeAccountId: string
   setActiveAccount: (accountId: string) => void
+  /** Saves a flight for the active persona and returns it with any stamps and badges it earned. */
+  logFlight: (draft: FlightDraft, choices: PostChoices) => { flight: Flight; earned: Achievement[] }
   resetDemo: () => void
 }
 
@@ -97,6 +102,25 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
             throw new Error(`Unknown account: ${accountId}`)
           }
           set({ activeAccountId: accountId })
+        },
+        logFlight: (draft, choices) => {
+          const { world, activeAccountId } = get()
+          if (choices.clubId !== null) {
+            const member = world.memberships.some(
+              (m) => m.accountId === activeAccountId && m.clubId === choices.clubId && m.status === 'active',
+            )
+            if (!member) throw new Error(`Can't tag a club you don't belong to: ${choices.clubId}`)
+          }
+          const flight = createFlight(draft, choices, activeAccountId, crypto.randomUUID(), new Date().toISOString())
+          const earned = awardForFlight(flight, draft.airportsVisited, world.achievements, world.airports)
+          set({
+            world: {
+              ...world,
+              flights: [...world.flights, flight],
+              achievements: [...world.achievements, ...earned],
+            },
+          })
+          return { flight, earned }
         },
         resetDemo: () => set(seed()),
       }),

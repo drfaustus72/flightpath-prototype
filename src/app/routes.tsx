@@ -1,6 +1,7 @@
 import { Navigate, type RouteObject } from 'react-router'
 import { ExploreScreen } from '../features/explore/ExploreScreen'
 import { FeedScreen } from '../features/feed/FeedScreen'
+import { FlightScreen } from '../features/flight/FlightScreen'
 import { LogFlightScreen } from '../features/log/LogFlightScreen'
 import { ProfileScreen } from '../features/profile/ProfileScreen'
 import { ProgressScreen } from '../features/progress/ProgressScreen'
@@ -18,6 +19,7 @@ export const routes: RouteObject[] = [
       { path: 'log', element: <LogFlightScreen /> },
       { path: 'progress', element: <ProgressScreen /> },
       { path: 'profile', element: <ProfileScreen /> },
+      { path: 'flights/:flightId', element: <FlightScreen /> },
       { path: 'school/:clubId', element: <SchoolConsoleScreen /> },
       { path: '*', element: <NotFoundScreen /> },
     ],

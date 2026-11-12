@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 
 /** Aviation identifiers (ICAO codes, hours) set in the cockpit-display face. */
 export function Ident({ children }: { children: ReactNode }) {
-  return <span className="font-ident tracking-wide">{children}</span>
+  return <span className="font-ident tabular-nums">{children}</span>
 }
 
 type Tone = 'primary' | 'secondary' | 'danger'
