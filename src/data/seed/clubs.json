@@ -1,0 +1,6 @@
+[
+  { "id": "club-hfa", "name": "Hawthorne Flight Academy", "kind": "flight_school", "plan": "school_pro", "claimed": true, "homeAirport": "KHHR", "website": null, "initials": "HFA" },
+  { "id": "club-coastal", "name": "Coastal Aviation Training", "kind": "flight_school", "plan": "school_basic", "claimed": true, "homeAirport": "KTOA", "website": null, "initials": "CAT" },
+  { "id": "club-desert", "name": "Desert Wings Flight School", "kind": "flight_school", "plan": "school_basic", "claimed": false, "homeAirport": "KPSP", "website": null, "initials": "DW" },
+  { "id": "club-taildraggers", "name": "SoCal Taildraggers", "kind": "community", "plan": "community", "claimed": true, "homeAirport": "KCNO", "website": null, "initials": "ST" }
+]

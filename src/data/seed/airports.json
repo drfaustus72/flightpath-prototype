@@ -1,0 +1,15 @@
+[
+  { "icao": "KHHR", "name": "Hawthorne Municipal", "city": "Hawthorne", "state": "CA", "lat": 33.9228, "lon": -118.3352, "elevationFt": 66 },
+  { "icao": "KTOA", "name": "Zamperini Field", "city": "Torrance", "state": "CA", "lat": 33.8034, "lon": -118.3396, "elevationFt": 103 },
+  { "icao": "KLGB", "name": "Long Beach", "city": "Long Beach", "state": "CA", "lat": 33.8177, "lon": -118.1516, "elevationFt": 60 },
+  { "icao": "KSMO", "name": "Santa Monica Municipal", "city": "Santa Monica", "state": "CA", "lat": 34.0158, "lon": -118.4513, "elevationFt": 177 },
+  { "icao": "KVNY", "name": "Van Nuys", "city": "Van Nuys", "state": "CA", "lat": 34.2098, "lon": -118.49, "elevationFt": 802 },
+  { "icao": "KAVX", "name": "Catalina", "city": "Avalon", "state": "CA", "lat": 33.4049, "lon": -118.4158, "elevationFt": 1602 },
+  { "icao": "KCMA", "name": "Camarillo", "city": "Camarillo", "state": "CA", "lat": 34.2137, "lon": -119.0943, "elevationFt": 77 },
+  { "icao": "KSBA", "name": "Santa Barbara Municipal", "city": "Santa Barbara", "state": "CA", "lat": 34.4262, "lon": -119.8404, "elevationFt": 13 },
+  { "icao": "KSNA", "name": "John Wayne", "city": "Santa Ana", "state": "CA", "lat": 33.6757, "lon": -117.8682, "elevationFt": 56 },
+  { "icao": "KCNO", "name": "Chino", "city": "Chino", "state": "CA", "lat": 33.9747, "lon": -117.6366, "elevationFt": 650 },
+  { "icao": "KPSP", "name": "Palm Springs International", "city": "Palm Springs", "state": "CA", "lat": 33.8297, "lon": -116.5067, "elevationFt": 477 },
+  { "icao": "L35", "name": "Big Bear City", "city": "Big Bear City", "state": "CA", "lat": 34.2638, "lon": -116.856, "elevationFt": 6752 },
+  { "icao": "KMMH", "name": "Mammoth Yosemite", "city": "Mammoth Lakes", "state": "CA", "lat": 37.6241, "lon": -118.8378, "elevationFt": 7135 }
+]
