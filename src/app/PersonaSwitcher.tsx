@@ -58,6 +58,10 @@ export function PersonaSwitcher() {
         ref={dialog}
         aria-labelledby="persona-title"
         onClose={() => setConfirmingReset(false)}
+        onClick={(e) => {
+          // A click on the dialog element itself (not its content) is a click on the backdrop.
+          if (e.target === e.currentTarget) close()
+        }}
         className="m-auto mb-0 w-full max-w-lg rounded-t-[var(--radius-panel)] bg-surface p-0 text-ink backdrop:bg-ink/40 sm:mb-auto sm:rounded-[var(--radius-panel)]"
       >
         <div className="flex items-center justify-between border-b border-hairline px-4 py-3">

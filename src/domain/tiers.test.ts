@@ -117,6 +117,20 @@ describe('school tiers', () => {
     expect(canInClub(c, 'school.brandedPosts', 'club-test')).toBe(true)
   })
 
+  it('treats a flying club on School Pro like a school', () => {
+    const c = ctx({ account: makeAccount(), clubs: [makeClub({ kind: 'flying_club' })], memberships: [admin] })
+    expect(canInClub(c, 'school.dashboard', 'club-test')).toBe(true)
+  })
+
+  it('gives community clubs no school tools', () => {
+    const c = ctx({
+      account: makeAccount(),
+      clubs: [makeClub({ kind: 'community', plan: 'community' })],
+      memberships: [admin],
+    })
+    expect(canInClub(c, 'school.editPage', 'club-test')).toBe(false)
+  })
+
   it('denies non-admins, other clubs, unclaimed pages and unknown clubs', () => {
     const member = ctx({ account: makeAccount(), clubs: [makeClub()], memberships: [makeMembership()] })
     expect(canInClub(member, 'school.editPage', 'club-test')).toBe(false)

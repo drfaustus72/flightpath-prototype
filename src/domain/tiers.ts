@@ -1,3 +1,4 @@
+import { offersSchoolPlans } from './clubs'
 import type { Account, Club, Membership, World } from './types'
 
 /**
@@ -122,7 +123,7 @@ export function can(ctx: AccessContext, feature: AccountFeature): boolean {
 
 export function canInClub(ctx: AccessContext, feature: ClubFeature, clubId: string): boolean {
   const club = clubById(ctx, clubId)
-  if (!club || club.kind !== 'flight_school' || !club.claimed) return false
+  if (!club || !offersSchoolPlans(club) || !club.claimed) return false
   const isAdmin = activeMembershipsOf(ctx).some((m) => m.clubId === clubId && m.roles.includes('admin'))
   if (!isAdmin) return false
   const requirement: ClubRequirement = CLUB_FEATURES[feature]

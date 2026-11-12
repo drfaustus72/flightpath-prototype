@@ -1,5 +1,6 @@
 import { worldSchema } from './schemas'
-import type { Account, Club, World } from './types'
+import { offersSchoolPlans } from './clubs'
+import type { Account, World } from './types'
 
 export type LoadResult = { ok: true; world: World } | { ok: false; errors: string[] }
 
@@ -53,9 +54,8 @@ export function checkIntegrity(world: World): string[] {
 
   for (const c of world.clubs) {
     if (!airports.has(c.homeAirport)) errors.push(`club ${c.id}: unknown home airport ${c.homeAirport}`)
-    const isSchool = c.kind === 'flight_school'
-    if (isSchool === (c.plan === 'community')) {
-      errors.push(`club ${c.id}: flight schools need a school plan; other clubs use "community"`)
+    if (offersSchoolPlans(c) === (c.plan === 'community')) {
+      errors.push(`club ${c.id}: flight schools and flying clubs need a school plan; community clubs use "community"`)
     }
   }
 
@@ -72,7 +72,7 @@ export function checkIntegrity(world: World): string[] {
     if (m.status === 'active') activePairs.push(`${m.accountId}→${m.clubId}`)
     if (m.status === 'active' && m.isHomeSchool) {
       homeSchoolsByAccount.set(m.accountId, (homeSchoolsByAccount.get(m.accountId) ?? 0) + 1)
-      if (club && club.kind !== 'flight_school') errors.push(`membership ${m.id}: home school must be a flight school`)
+      if (club && !offersSchoolPlans(club)) errors.push(`membership ${m.id}: home school must be a flight school or flying club`)
     }
     if (m.roles.includes('staff_cfi') && account && !isVerified(account)) {
       errors.push(`membership ${m.id}: staff_cfi requires a verified CFI account`)
@@ -80,8 +80,8 @@ export function checkIntegrity(world: World): string[] {
     if (m.roles.includes('admin') && club && !club.claimed) {
       errors.push(`membership ${m.id}: an unclaimed school page cannot have admins`)
     }
-    if (m.sponsoredPilotPro && club && club.kind !== 'flight_school') {
-      errors.push(`membership ${m.id}: only flight schools can sponsor Pilot Pro seats`)
+    if (m.sponsoredPilotPro && club && club.plan !== 'school_pro') {
+      errors.push(`membership ${m.id}: only School Pro clubs can sponsor Pilot Pro seats`)
     }
   }
   for (const d of duplicates(activePairs)) errors.push(`memberships: more than one active membership for ${d}`)
@@ -123,9 +123,3 @@ export function adminClubsOf(world: World, accountId: string) {
   return world.clubs.filter((c) => ids.has(c.id) && c.claimed)
 }
 
-/** Display name for a club's tier. */
-export function clubPlanName(club: Club): string {
-  if (club.kind !== 'flight_school') return 'Community club'
-  if (!club.claimed) return 'Unclaimed school page'
-  return club.plan === 'school_pro' ? 'School Pro' : 'School Basic'
-}

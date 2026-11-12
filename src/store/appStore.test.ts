@@ -1,15 +1,18 @@
 import { describe, expect, it, vi } from 'vitest'
 import { seedResult } from '../data/seed'
 import type { World } from '../domain/types'
-import { STORAGE_KEY, STORAGE_VERSION, createAppStore } from './appStore'
+import { STORAGE_KEY, STORAGE_VERSION, createAppStore, seedFingerprint } from './appStore'
 
 function seedWorld(): World {
   if (!seedResult.ok) throw new Error('seed invalid')
   return seedResult.world
 }
 
-const save = (state: unknown, version = STORAGE_VERSION) =>
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ state, version }))
+const save = (state: Record<string, unknown>, version = STORAGE_VERSION) =>
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({ state: { seedFingerprint: seedFingerprint(seedWorld()), ...state }, version }),
+  )
 
 describe('app store', () => {
   it('starts on the first demo persona', () => {
@@ -57,6 +60,14 @@ describe('app store', () => {
     save({ world: { accounts: [] }, activeAccountId: 'acct-dan' })
     const store = createAppStore(seedWorld())
     expect(store.getState().world.accounts.length).toBe(seedWorld().accounts.length)
+    expect(warn).toHaveBeenCalled()
+  })
+
+  it('resets state saved from different seed data', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    save({ world: seedWorld(), activeAccountId: 'acct-dan', seedFingerprint: 'old-seed' })
+    const store = createAppStore(seedWorld())
+    expect(store.getState().activeAccountId).toBe('acct-maya')
     expect(warn).toHaveBeenCalled()
   })
 

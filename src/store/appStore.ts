@@ -9,12 +9,27 @@ export const STORAGE_KEY = 'flightpath-demo'
 
 export interface AppState {
   world: World
+  seedFingerprint: string
   activeAccountId: string
   setActiveAccount: (accountId: string) => void
   resetDemo: () => void
 }
 
-type Persisted = Pick<AppState, 'world' | 'activeAccountId'>
+type Persisted = Pick<AppState, 'world' | 'activeAccountId'> & { seedFingerprint: string }
+
+/**
+ * FNV-1a hash of the seed data. Saved state from a different seed (e.g. after a new
+ * build adds flights) is discarded, so testers always see the current demo data.
+ */
+export function seedFingerprint(world: World): string {
+  const text = JSON.stringify(world)
+  let hash = 0x811c9dc5
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i)
+    hash = Math.imul(hash, 0x01000193)
+  }
+  return (hash >>> 0).toString(16)
+}
 
 function defaultAccountId(world: World): string {
   const first = demoPersonas(world)[0] ?? world.accounts[0]
@@ -48,6 +63,10 @@ export const safeLocalStorage: StateStorage = {
 export function reconcilePersisted(persisted: unknown, seed: Persisted): Persisted {
   if (typeof persisted !== 'object' || persisted === null) return seed
   const candidate = persisted as Partial<Persisted>
+  if (candidate.seedFingerprint !== seed.seedFingerprint) {
+    console.warn('[flightpath] Demo data has changed since this state was saved; resetting to seed.')
+    return seed
+  }
   const loaded = loadWorld(candidate.world)
   if (!loaded.ok) {
     console.warn('[flightpath] Saved demo state failed validation; resetting to seed.', loaded.errors)
@@ -58,11 +77,16 @@ export function reconcilePersisted(persisted: unknown, seed: Persisted): Persist
     loaded.world.accounts.some((a) => a.id === candidate.activeAccountId)
       ? candidate.activeAccountId
       : defaultAccountId(loaded.world)
-  return { world: loaded.world, activeAccountId }
+  return { world: loaded.world, activeAccountId, seedFingerprint: seed.seedFingerprint }
 }
 
 export function createAppStore(seedWorld: World, storage: StateStorage = safeLocalStorage) {
-  const seed = (): Persisted => ({ world: structuredClone(seedWorld), activeAccountId: defaultAccountId(seedWorld) })
+  const fingerprint = seedFingerprint(seedWorld)
+  const seed = (): Persisted => ({
+    world: structuredClone(seedWorld),
+    activeAccountId: defaultAccountId(seedWorld),
+    seedFingerprint: fingerprint,
+  })
 
   return createStore<AppState>()(
     persist(
@@ -80,7 +104,7 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
         name: STORAGE_KEY,
         version: STORAGE_VERSION,
         storage: createJSONStorage(() => storage),
-        partialize: (s): Persisted => ({ world: s.world, activeAccountId: s.activeAccountId }),
+        partialize: (s): Persisted => ({ world: s.world, activeAccountId: s.activeAccountId, seedFingerprint: s.seedFingerprint }),
         migrate: (_persisted, fromVersion) => {
           console.warn(`[flightpath] Saved demo state is version ${fromVersion}, expected ${STORAGE_VERSION}; resetting to seed.`)
           return seed()

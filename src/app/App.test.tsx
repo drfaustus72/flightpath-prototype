@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { RouterProvider, createMemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import { seedResult } from '../data/seed'
-import { STORAGE_KEY, STORAGE_VERSION } from '../store/appStore'
+import { STORAGE_KEY, STORAGE_VERSION, seedFingerprint } from '../store/appStore'
 import { StoreProvider } from '../store/StoreProvider'
 import { routes } from './routes'
 
@@ -76,7 +76,10 @@ describe('app shell', () => {
     // Priya (independent CFI) is not a demo persona; restore her as the saved active account.
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ state: { world: seedResult.world, activeAccountId: 'acct-priya' }, version: STORAGE_VERSION }),
+      JSON.stringify({
+        state: { world: seedResult.world, activeAccountId: 'acct-priya', seedFingerprint: seedFingerprint(seedResult.world) },
+        version: STORAGE_VERSION,
+      }),
     )
     renderApp('/profile')
     expect(await screen.findByText(/No home school/)).toBeInTheDocument()

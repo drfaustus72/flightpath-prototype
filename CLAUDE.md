@@ -37,7 +37,7 @@ e2e/          Playwright smoke tests, one per demo script
 
 - Domain logic is pure TypeScript in `src/domain/` and is tested there; components stay thin.
 - Seed data is validated with zod at load. A validation failure renders a visible error screen; never fail silently.
-- Persisted state carries `STORAGE_VERSION`. Bump it when the persisted shape changes; mismatched or corrupt state resets to seed with a console warning.
+- Persisted state carries `STORAGE_VERSION` and a fingerprint of the seed data. Bump `STORAGE_VERSION` when the persisted shape changes; a version or seed mismatch, or corrupt state, resets to seed with a console warning.
 - The active persona is selected via the persona switcher; all screens derive from the active account.
 
 ## Conventions
