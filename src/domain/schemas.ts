@@ -110,9 +110,72 @@ export const airportSchema = z.object({
   elevationFt: z.number(),
 })
 
+const isoDateTime = z.iso.datetime()
+const lonLat = z.tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)])
+
+export const landingSchema = z.object({
+  /** Null when the landing was not within range of any known airport. */
+  icao: icao.nullable(),
+  kind: z.enum(['full_stop', 'touch_and_go']),
+  lon: z.number(),
+  lat: z.number(),
+  at: isoDateTime.nullable(),
+})
+
+export const flightStatsSchema = z.object({
+  distanceNm: z.number().nonnegative(),
+  durationSec: z.number().nonnegative().nullable(),
+  airborneSec: z.number().nonnegative().nullable(),
+  maxAltitudeFt: z.number().nullable(),
+  maxGroundspeedKt: z.number().nonnegative().nullable(),
+})
+
+export const flightSchema = z.object({
+  id,
+  pilotId: id,
+  title: z.string().min(1),
+  startedAt: isoDateTime.nullable(),
+  /** Where the track came from: the export app and the GPS source it reported. */
+  source: z.object({
+    fileName: z.string(),
+    app: z.string().nullable(),
+    gpsSource: z.string().nullable(),
+  }),
+  isSimulator: z.boolean(),
+  stats: flightStatsSchema,
+  departure: icao.nullable(),
+  arrival: icao.nullable(),
+  landings: z.array(landingSchema),
+  /** Simplified route for display and storage; never the raw track. */
+  route: z.array(lonLat).min(2),
+  /** Notes from import, e.g. "3 GPS glitches removed". */
+  importNotes: z.array(z.string()),
+  caption: z.string(),
+  /** full: whole route; hide_ends: first/last 1 nm hidden; hidden: no map shown to others. */
+  routeVisibility: z.enum(['full', 'hide_ends', 'hidden']),
+  /** School or club this flight is tagged to, e.g. a school's simulator session. */
+  clubId: id.nullable(),
+  postVisibility: z.enum(['public', 'followers', 'private']),
+  createdAt: isoDateTime,
+})
+
+export const achievementSchema = z.object({
+  id,
+  pilotId: id,
+  kind: z.enum(['stamp', 'badge']),
+  /** Stable key: "stamp:KAVX", "badge:first_flight". One per pilot. */
+  code: z.string().regex(/^(stamp|badge):[A-Za-z0-9_]+$/),
+  title: z.string().min(1),
+  icao: icao.nullable(),
+  flightId: id,
+  earnedAt: isoDateTime,
+})
+
 export const worldSchema = z.object({
   accounts: z.array(accountSchema).min(1),
   clubs: z.array(clubSchema),
   memberships: z.array(membershipSchema),
   airports: z.array(airportSchema).min(1),
+  flights: z.array(flightSchema),
+  achievements: z.array(achievementSchema),
 })

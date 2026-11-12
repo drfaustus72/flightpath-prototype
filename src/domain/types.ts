@@ -1,6 +1,10 @@
 import type { z } from 'zod'
 import type {
   accountSchema,
+  achievementSchema,
+  flightSchema,
+  flightStatsSchema,
+  landingSchema,
   airportSchema,
   clubPlanSchema,
   clubSchema,
@@ -20,3 +24,7 @@ export type Airport = z.infer<typeof airportSchema>
 export type ProfileField = z.infer<typeof profileFieldSchema>
 export type Visibility = z.infer<typeof visibilitySchema>
 export type World = z.infer<typeof worldSchema>
+export type Flight = z.infer<typeof flightSchema>
+export type FlightStats = z.infer<typeof flightStatsSchema>
+export type Landing = z.infer<typeof landingSchema>
+export type Achievement = z.infer<typeof achievementSchema>

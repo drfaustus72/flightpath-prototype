@@ -84,6 +84,26 @@ export function checkIntegrity(world: World): string[] {
       errors.push(`membership ${m.id}: only School Pro clubs can sponsor Pilot Pro seats`)
     }
   }
+  const flightIds = new Set(world.flights.map((f) => f.id))
+  for (const d of duplicates(world.flights.map((f) => f.id))) errors.push(`flights: duplicate id ${d}`)
+  for (const f of world.flights) {
+    if (!accounts.has(f.pilotId)) errors.push(`flight ${f.id}: unknown pilot ${f.pilotId}`)
+    for (const code of [f.departure, f.arrival, ...f.landings.map((l) => l.icao)]) {
+      if (code !== null && !airports.has(code)) errors.push(`flight ${f.id}: unknown airport ${code}`)
+    }
+    if (f.clubId !== null && !clubs.has(f.clubId)) errors.push(`flight ${f.id}: unknown club ${f.clubId}`)
+  }
+
+  for (const d of duplicates(world.achievements.map((a) => a.id))) errors.push(`achievements: duplicate id ${d}`)
+  for (const d of duplicates(world.achievements.map((a) => `${a.pilotId}/${a.code}`))) {
+    errors.push(`achievements: ${d} awarded more than once`)
+  }
+  for (const a of world.achievements) {
+    if (!accounts.has(a.pilotId)) errors.push(`achievement ${a.id}: unknown pilot ${a.pilotId}`)
+    if (!flightIds.has(a.flightId)) errors.push(`achievement ${a.id}: unknown flight ${a.flightId}`)
+    if (a.icao !== null && !airports.has(a.icao)) errors.push(`achievement ${a.id}: unknown airport ${a.icao}`)
+  }
+
   for (const d of duplicates(activePairs)) errors.push(`memberships: more than one active membership for ${d}`)
   for (const [accountId, n] of homeSchoolsByAccount) {
     if (n > 1) errors.push(`account ${accountId}: more than one active home school`)
