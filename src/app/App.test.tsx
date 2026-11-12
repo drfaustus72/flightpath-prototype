@@ -50,7 +50,7 @@ describe('app shell', () => {
     expect(await screen.findByText(/XP comes with missions/)).toBeInTheDocument()
     const user = await switchTo('Free pilot')
     await user.click(screen.getByRole('link', { name: 'Progress' }))
-    expect(await screen.findByText('Part of Pilot Pro')).toBeInTheDocument()
+    expect(await screen.findByText('Part of School Pro')).toBeInTheDocument()
   })
 
   it('opens the School Pro console only for the school admin', async () => {

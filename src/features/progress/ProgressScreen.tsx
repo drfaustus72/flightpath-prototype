@@ -108,8 +108,9 @@ export function ProgressScreen() {
           body="You earn XP by completing missions and achievements, once your school verifies them. Missions arrive in the next build."
         />
       ) : (
-        <ProGate plan="Pilot Pro">
-          Missions, XP and ranks: earn XP for missions and achievements your school verifies.
+        <ProGate plan="School Pro">
+          XP comes with membership at a School Pro flight school. Your school verifies the missions and achievements that
+          earn it.
         </ProGate>
       )}
     </div>

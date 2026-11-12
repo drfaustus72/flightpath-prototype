@@ -9,6 +9,7 @@ import {
   hasCfiPro,
   hasPilotPro,
   planLabels,
+  xpSchoolsOf,
 } from './tiers'
 
 const ctx = (partial: Partial<AccessContext> & Pick<AccessContext, 'account'>): AccessContext => ({
@@ -61,6 +62,29 @@ describe('pilot tiers', () => {
         }),
       ),
     ).toBe(false)
+  })
+})
+
+describe('XP (school-bound)', () => {
+  it('comes with membership at a School Pro school, not with Pilot Pro', () => {
+    const proSchool = ctx({ account: makeAccount(), clubs: [makeClub()], memberships: [makeMembership()] })
+    expect(can(proSchool, 'progress.xp')).toBe(true)
+    expect(xpSchoolsOf(proSchool).map((c) => c.id)).toEqual(['club-test'])
+
+    const paidProNoSchool = ctx({ account: makeAccount({ subscription: { pilotPro: true, cfiPro: false } }) })
+    expect(can(paidProNoSchool, 'progress.xp')).toBe(false)
+    expect(can(paidProNoSchool, 'progress.pathways')).toBe(true)
+  })
+
+  it('is not available at School Basic schools or after leaving', () => {
+    const basic = ctx({ account: makeAccount(), clubs: [makeClub({ plan: 'school_basic' })], memberships: [makeMembership()] })
+    expect(can(basic, 'progress.xp')).toBe(false)
+    const left = ctx({
+      account: makeAccount(),
+      clubs: [makeClub()],
+      memberships: [makeMembership({ status: 'former', endedOn: '2026-06-01' })],
+    })
+    expect(can(left, 'progress.xp')).toBe(false)
   })
 })
 

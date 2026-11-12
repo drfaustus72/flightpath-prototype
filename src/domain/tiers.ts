@@ -10,6 +10,8 @@ import type { Account, Club, Membership, World } from './types'
  *  - pilot_pro:  Pilot Pro (paid, school-sponsored seat, or via CFI Pro)
  *  - cfi:        verified CFI role (free — sign-off authority is never paywalled)
  *  - cfi_pro:    verified CFI with CFI Pro (paid, or staff CFI at a School Pro school)
+ *  - school_pro_member: active member of a School Pro school. XP is school-bound: it is earned
+ *    and held at that school and comes with the School Pro account, not with Pilot Pro.
  *
  * Club requirements (the account must be an active admin of that club):
  *  - school_admin:     any flight school page (School Basic or Pro)
@@ -25,8 +27,8 @@ export const ACCOUNT_FEATURES = {
   'media.basicCard': 'pilot_free',
   'clubs.join': 'pilot_free',
 
-  'progress.xp': 'pilot_pro',
-  'progress.ranks': 'pilot_pro',
+  'progress.xp': 'school_pro_member',
+  'progress.ranks': 'school_pro_member',
   'progress.pathways': 'pilot_pro',
   'progress.advisor': 'pilot_pro',
   'progress.challenges': 'pilot_pro',
@@ -59,7 +61,7 @@ export const CLUB_FEATURES = {
   'school.sponsorSeats': 'school_pro_admin',
 } as const satisfies Record<string, ClubRequirement>
 
-export type AccountRequirement = 'pilot_free' | 'pilot_pro' | 'cfi' | 'cfi_pro'
+export type AccountRequirement = 'pilot_free' | 'pilot_pro' | 'cfi' | 'cfi_pro' | 'school_pro_member'
 export type ClubRequirement = 'school_admin' | 'school_pro_admin'
 export type AccountFeature = keyof typeof ACCOUNT_FEATURES
 export type ClubFeature = keyof typeof CLUB_FEATURES
@@ -118,7 +120,15 @@ export function can(ctx: AccessContext, feature: AccountFeature): boolean {
       return isVerifiedCfi(ctx.account)
     case 'cfi_pro':
       return hasCfiPro(ctx)
+    case 'school_pro_member':
+      return xpSchoolsOf(ctx).length > 0
   }
+}
+
+/** School Pro schools where this account earns and holds XP. */
+export function xpSchoolsOf(ctx: AccessContext): Club[] {
+  const ids = new Set(activeMembershipsOf(ctx).map((m) => m.clubId))
+  return ctx.clubs.filter((c) => ids.has(c.id) && c.plan === 'school_pro' && c.claimed)
 }
 
 export function canInClub(ctx: AccessContext, feature: ClubFeature, clubId: string): boolean {

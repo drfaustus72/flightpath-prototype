@@ -14,7 +14,7 @@ Product source of truth: the Flightpath Project Brief (claude.ai project). Roadm
 ## Product rules (non-negotiable)
 
 1. **Tier gating lives in one place.** `src/domain/tiers.ts` maps every gated feature to the plans that unlock it. UI calls `can(account, feature)`; never compare plan names in components.
-2. **Tiers:** Pilot Free / Pilot Pro · CFI (free verified role) / CFI Pro (includes all Pilot Pro features) · School Basic (free page, member count only, no feed, no perks, no dashboard) / School Pro (includes CFI Pro for staff CFIs).
+2. **Tiers:** Pilot Free / Pilot Pro · CFI (free verified role) / CFI Pro (includes all Pilot Pro features) · School Basic (free page, member count only, no feed, no perks, no dashboard) / School Pro (includes CFI Pro for staff CFIs, and XP for its members: XP is school-bound, held per school, never transferred, and not part of Pilot Pro).
 3. **CFI sign-off authority is never paywalled.** Any verified CFI can sign off flights they instructed and milestones for linked students. No self-verification. Every sign-off is logged and revocable, and is labeled as a platform verification, not an FAA endorsement.
 4. **No leaderboards for speed, altitude, ceiling or risk.** Challenges reward experience, proficiency and good decisions (a no-go can earn recognition).
 5. **Minors default to private** with discovery off. Medical class and age are never shown.
