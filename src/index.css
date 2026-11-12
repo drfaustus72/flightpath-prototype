@@ -1,0 +1,54 @@
+@import '@fontsource-variable/public-sans';
+@import '@fontsource/b612-mono/400.css';
+@import '@fontsource/b612-mono/700.css';
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Palette drawn from VFR sectional charts:
+ * chart paper, chart ink, Class B blue, airport magenta, grid hairlines.
+ * Components use these via Tailwind utilities (bg-paper, text-ink, …); no raw hex elsewhere.
+ */
+@theme {
+  --color-paper: #f6f8f5;
+  --color-surface: #ffffff;
+  --color-ink: #13233f;
+  --color-ink-muted: #51607a;
+  --color-chart-blue: #1e5ba8;
+  --color-chart-blue-tint: #e3ecf7;
+  --color-magenta: #9e1f6b;
+  --color-magenta-tint: #f6e4ee;
+  --color-hairline: #c9d2da;
+  --color-danger: #b3261e;
+
+  --font-sans: 'Public Sans Variable', system-ui, sans-serif;
+  --font-ident: 'B612 Mono', ui-monospace, monospace;
+
+  --radius-control: 10px;
+  --radius-panel: 16px;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-chart-blue);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

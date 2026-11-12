@@ -1,5 +1,5 @@
 import { worldSchema } from './schemas'
-import type { Account, World } from './types'
+import type { Account, Club, World } from './types'
 
 export type LoadResult = { ok: true; world: World } | { ok: false; errors: string[] }
 
@@ -121,4 +121,11 @@ export function adminClubsOf(world: World, accountId: string) {
       .map((m) => m.clubId),
   )
   return world.clubs.filter((c) => ids.has(c.id) && c.claimed)
+}
+
+/** Display name for a club's tier. */
+export function clubPlanName(club: Club): string {
+  if (club.kind !== 'flight_school') return 'Community club'
+  if (!club.claimed) return 'Unclaimed school page'
+  return club.plan === 'school_pro' ? 'School Pro' : 'School Basic'
 }
