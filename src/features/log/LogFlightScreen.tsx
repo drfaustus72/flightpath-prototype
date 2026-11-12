@@ -238,7 +238,7 @@ function Review({ draft, onDiscard }: { draft: FlightDraft; onDiscard: () => voi
               ))}
             </select>
             {draft.isSimulator && (
-              <span className="text-[13px] text-ink-muted">Tag your school if this session was in its simulator. Tagged sessions count toward XP.</span>
+              <span className="text-[13px] text-ink-muted">Tag your school if this session was in its simulator. Once the school confirms it, it counts toward XP.</span>
             )}
           </label>
         )}

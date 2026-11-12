@@ -9,7 +9,10 @@ import { computeStats } from './stats'
 const SIMULATOR_SOURCE = /x-?plane|msfs|flight ?sim|prepar3d|p3d|aerofly|simulator|redbird|frasca/i
 
 /** Everything about a flight that comes from the file; the pilot adds caption and sharing choices. */
-export type FlightDraft = Omit<Flight, 'id' | 'pilotId' | 'caption' | 'routeVisibility' | 'clubId' | 'postVisibility' | 'createdAt'> & {
+export type FlightDraft = Omit<
+  Flight,
+  'id' | 'pilotId' | 'caption' | 'routeVisibility' | 'clubId' | 'simConfirmation' | 'postVisibility' | 'createdAt'
+> & {
   airportsVisited: string[]
 }
 

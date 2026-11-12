@@ -155,6 +155,17 @@ export const flightSchema = z.object({
   routeVisibility: z.enum(['full', 'hide_ends', 'hidden']),
   /** School or club this flight is tagged to, e.g. a school's simulator session. */
   clubId: id.nullable(),
+  /**
+   * Simulator sessions tagged to a school need the school's confirmation (an admin or staff CFI)
+   * before they count toward XP. Null for real flights and untagged sessions.
+   */
+  simConfirmation: z
+    .object({
+      status: z.enum(['pending', 'confirmed', 'declined']),
+      byAccountId: id.nullable(),
+      at: isoDateTime.nullable(),
+    })
+    .nullable(),
   postVisibility: z.enum(['public', 'followers', 'private']),
   createdAt: isoDateTime,
 })

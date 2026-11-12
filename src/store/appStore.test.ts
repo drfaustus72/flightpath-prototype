@@ -71,6 +71,26 @@ describe('app store', () => {
     expect(reloaded.getState().world.achievements).toHaveLength(3)
   })
 
+  it('marks a tagged sim session pending; only a school admin or staff CFI can confirm it', async () => {
+    const { importTrack } = await import('../domain/track/importTrack')
+    const { default: kml } = await import('../test/fixtures/foreflight-kemt-kpoc-sim.kml?raw')
+    const world = seedWorld()
+    const r = importTrack(kml, 'sim.kml', world.airports)
+    if (!r.ok) throw new Error(r.error)
+    const store = createAppStore(world)
+    const { flight, earned } = store
+      .getState()
+      .logFlight(r.draft, { caption: '', routeVisibility: 'full', clubId: 'club-hfa', postVisibility: 'public' })
+    expect(earned).toEqual([])
+    expect(flight.simConfirmation?.status).toBe('pending')
+
+    expect(() => store.getState().reviewSimSession(flight.id, 'confirmed')).toThrow('Only an admin or staff CFI')
+    store.getState().setActiveAccount('acct-dan') // staff CFI at HFA
+    store.getState().reviewSimSession(flight.id, 'confirmed')
+    const saved = store.getState().world.flights.find((f) => f.id === flight.id)
+    expect(saved?.simConfirmation).toMatchObject({ status: 'confirmed', byAccountId: 'acct-dan' })
+  })
+
   it("refuses to tag a club the pilot doesn't belong to", async () => {
     const { importTrack } = await import('../domain/track/importTrack')
     const store = createAppStore(seedWorld())

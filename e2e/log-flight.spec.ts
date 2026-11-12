@@ -37,8 +37,10 @@ test.describe('M1 log a flight', () => {
     await expect(page.getByText('3 GPS glitches removed from the track.')).toBeVisible()
     await expect(page.getByText(/Simulator session \(X-Plane\)/)).toBeVisible()
     await expect(page.getByText('New stamp')).toHaveCount(0)
+    await page.getByLabel('Tag a school or club').selectOption({ label: 'Hawthorne Flight Academy' })
     await page.getByRole('button', { name: 'Save flight' }).click()
     await expect(page.getByText('Simulator session', { exact: true })).toBeVisible()
+    await expect(page.getByText(/Waiting for Hawthorne Flight Academy to confirm/)).toBeVisible()
     await expect(page.getByText(/new stamp/i)).toHaveCount(0)
   })
 

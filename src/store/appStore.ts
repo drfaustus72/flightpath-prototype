@@ -1,13 +1,13 @@
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
-import { awardForFlight } from '../domain/achievements'
+import { awardForFlight, canConfirmSimSession } from '../domain/achievements'
 import { type PostChoices, createFlight } from '../domain/flights'
 import type { FlightDraft } from '../domain/track/importTrack'
 import type { Achievement, Flight, World } from '../domain/types'
 import { demoPersonas, loadWorld } from '../domain/world'
 
 /** Bump whenever the persisted shape changes. Old state is discarded and reset to seed. */
-export const STORAGE_VERSION = 2
+export const STORAGE_VERSION = 3
 export const STORAGE_KEY = 'flightpath-demo'
 
 export interface AppState {
@@ -17,6 +17,8 @@ export interface AppState {
   setActiveAccount: (accountId: string) => void
   /** Saves a flight for the active persona and returns it with any stamps and badges it earned. */
   logFlight: (draft: FlightDraft, choices: PostChoices) => { flight: Flight; earned: Achievement[] }
+  /** A school admin or staff CFI confirms or declines a simulator session tagged to their school. */
+  reviewSimSession: (flightId: string, decision: 'confirmed' | 'declined') => void
   resetDemo: () => void
 }
 
@@ -128,6 +130,19 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
             },
           })
           return { flight, earned }
+        },
+        reviewSimSession: (flightId, decision) => {
+          const { world, activeAccountId } = get()
+          const flight = world.flights.find((f) => f.id === flightId)
+          if (!flight) throw new Error(`Unknown flight: ${flightId}`)
+          if (!canConfirmSimSession(flight, activeAccountId, world.memberships)) {
+            throw new Error('Only an admin or staff CFI of the tagged school can review this session')
+          }
+          const reviewed = {
+            ...flight,
+            simConfirmation: { status: decision, byAccountId: activeAccountId, at: new Date().toISOString() },
+          }
+          set({ world: { ...world, flights: world.flights.map((f) => (f.id === flightId ? reviewed : f)) } })
         },
         resetDemo: () => set(seed()),
       }),

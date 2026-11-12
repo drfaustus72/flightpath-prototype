@@ -9,18 +9,38 @@ export function earnsStampsAndBadges(flight: Pick<Flight, 'isSimulator'>): boole
 /**
  * XP (Pilot Pro, M3): real flights always earn it. A simulator session earns it only when
  * tagged to a flight school or flying club the pilot actively belongs to — e.g. a session
- * in the school's sim as part of training.
+ * in the school's sim — AND the school has confirmed it.
  */
 export function earnsXp(
-  flight: Pick<Flight, 'isSimulator' | 'clubId' | 'pilotId'>,
+  flight: Pick<Flight, 'isSimulator' | 'clubId' | 'pilotId' | 'simConfirmation'>,
   clubs: readonly Club[],
   memberships: readonly Membership[],
 ): boolean {
   if (!flight.isSimulator) return true
-  if (flight.clubId === null) return false
+  if (flight.clubId === null || flight.simConfirmation?.status !== 'confirmed') return false
   const club = clubs.find((c) => c.id === flight.clubId)
   if (!club || !offersSchoolPlans(club)) return false
   return memberships.some((m) => m.accountId === flight.pilotId && m.clubId === club.id && m.status === 'active')
+}
+
+/**
+ * Who may confirm a simulator session: an active admin or staff CFI of the tagged school,
+ * never the pilot who logged it.
+ */
+export function canConfirmSimSession(
+  flight: Pick<Flight, 'isSimulator' | 'clubId' | 'pilotId' | 'simConfirmation'>,
+  accountId: string,
+  memberships: readonly Membership[],
+): boolean {
+  if (!flight.isSimulator || flight.clubId === null || flight.simConfirmation === null) return false
+  if (accountId === flight.pilotId) return false
+  return memberships.some(
+    (m) =>
+      m.accountId === accountId &&
+      m.clubId === flight.clubId &&
+      m.status === 'active' &&
+      (m.roles.includes('admin') || m.roles.includes('staff_cfi')),
+  )
 }
 
 const MILESTONE_BADGES: { code: string; title: string; airports: number }[] = [

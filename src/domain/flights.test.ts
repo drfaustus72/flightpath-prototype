@@ -21,6 +21,7 @@ const flight = (over: Partial<Flight> = {}): Flight => ({
   caption: '',
   routeVisibility: 'full',
   clubId: null,
+  simConfirmation: null,
   postVisibility: 'public',
   createdAt: '2026-11-08T18:00:00.000Z',
   ...over,

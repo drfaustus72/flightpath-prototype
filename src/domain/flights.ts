@@ -59,12 +59,14 @@ export type PostChoices = Pick<Flight, 'caption' | 'routeVisibility' | 'clubId' 
 
 /** Turns an imported draft plus the pilot's sharing choices into a stored flight. */
 export function createFlight(
-  draft: { airportsVisited: string[] } & Omit<Flight, 'id' | 'pilotId' | 'createdAt' | keyof PostChoices>,
+  draft: { airportsVisited: string[] } & Omit<Flight, 'id' | 'pilotId' | 'createdAt' | 'simConfirmation' | keyof PostChoices>,
   choices: PostChoices,
   pilotId: string,
   id: string,
   createdAt: string,
 ): Flight {
   const { airportsVisited: _visited, ...rest } = draft
-  return { ...rest, ...choices, caption: choices.caption.trim(), id, pilotId, createdAt }
+  const simConfirmation =
+    draft.isSimulator && choices.clubId !== null ? { status: 'pending' as const, byAccountId: null, at: null } : null
+  return { ...rest, ...choices, caption: choices.caption.trim(), simConfirmation, id, pilotId, createdAt }
 }

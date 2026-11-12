@@ -92,6 +92,9 @@ export function checkIntegrity(world: World): string[] {
       if (code !== null && !airports.has(code)) errors.push(`flight ${f.id}: unknown airport ${code}`)
     }
     if (f.clubId !== null && !clubs.has(f.clubId)) errors.push(`flight ${f.id}: unknown club ${f.clubId}`)
+    if ((f.simConfirmation !== null) !== (f.isSimulator && f.clubId !== null)) {
+      errors.push(`flight ${f.id}: simConfirmation is required exactly for simulator sessions tagged to a club`)
+    }
   }
 
   for (const d of duplicates(world.achievements.map((a) => a.id))) errors.push(`achievements: duplicate id ${d}`)

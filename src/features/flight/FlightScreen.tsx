@@ -65,6 +65,13 @@ export function FlightScreen() {
             <MonitorPlay size={14} aria-hidden="true" /> Simulator session
           </p>
         )}
+        {flight.simConfirmation && club && (
+          <p className="mt-2 text-[14px] text-ink-muted">
+            {flight.simConfirmation.status === 'pending' && `Waiting for ${club.name} to confirm this session before it counts toward XP.`}
+            {flight.simConfirmation.status === 'confirmed' && `Confirmed by ${club.name}.`}
+            {flight.simConfirmation.status === 'declined' && `${club.name} didn’t confirm this session, so it doesn’t count toward XP.`}
+          </p>
+        )}
       </div>
 
       {flight.caption && <p className="max-w-[60ch] text-[17px]">{flight.caption}</p>}
