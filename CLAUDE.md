@@ -19,7 +19,8 @@ Product source of truth: the Flightpath Project Brief (claude.ai project). Roadm
 4. **No leaderboards for speed, altitude, ceiling or risk.** Challenges reward experience, proficiency and good decisions (a no-go can earn recognition).
 5. **Minors default to private** with discovery off. Medical class and age are never shown.
 6. **Readiness is never certified by an algorithm.** Advisor copy suggests; the CFI decides.
-7. **Simulator sessions** never earn stamps or badges. They earn XP only when tagged to a school or flying club the pilot belongs to AND confirmed by that school's admin or staff CFI (never the pilot).
+7. **XP comes only from missions and achievements, and the pilot's school must verify each one.** A logged flight earns no XP by itself. Simulator sessions never earn stamps or flight badges; a session tagged to the pilot's school and confirmed by its admin or staff CFI (never the pilot) can count toward a mission or achievement.
+   Stamps and "candy" badges are derived from flights (`domain/recognition.ts`), never stored; stored achievements are only things someone verifies. Currency-like info (90-day landings, flight review due) is always labeled as information, not a currency determination.
 8. **Rewards/discounts are out of scope** until aviation counsel reviews (§61.113). Perks UI may exist only as a School Pro placeholder.
 9. **Demo data is fictional.** No real schools, people or tail numbers in seed data.
 
