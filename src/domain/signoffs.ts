@@ -66,8 +66,9 @@ export function signoffClubFor(world: World, cfiId: string, studentId: string): 
   return m ? (world.clubs.find((c) => c.id === m.clubId) ?? null) : null
 }
 
-/** Pilot and accepted instructor only: debriefs are private. */
+/** Pilot and accepted instructor only: debriefs are private, and need an accepted instructor to exist. */
 export function canReadDebrief(accountId: string, flight: Flight): boolean {
+  if (flight.instructor?.status !== 'accepted') return false
   return accountId === flight.pilotId || isAcceptedInstructor(flight, accountId)
 }
 

@@ -5,7 +5,8 @@ import { SIGNOFF_DISCLAIMER, milestoneTitle } from '../../domain/milestones'
 import { inboxCount, inboxFor, linkedStudentsOf, signoffClubFor } from '../../domain/signoffs'
 import { accountById } from '../../domain/social'
 import { isVerifiedCfi } from '../../domain/tiers'
-import type { Flight, SignoffRequest } from '../../domain/types'
+import { missionsToVerify } from '../../domain/missions'
+import type { Flight, Mission, SignoffRequest } from '../../domain/types'
 import { useActive, useWorld } from '../../store/hooks'
 import { useAppStore } from '../../store/storeContext'
 import { Avatar } from '../../ui/Avatar'
@@ -28,6 +29,7 @@ export function InboxScreen() {
   }
 
   const inbox = inboxFor(world, account.id)
+  const missions = missionsToVerify(world, account.id)
   const students = linkedStudentsOf(world, account.id)
 
   return (
@@ -37,12 +39,20 @@ export function InboxScreen() {
         <p className="mt-1 text-[14px] text-ink-muted">Sign-offs are {SIGNOFF_DISCLAIMER.charAt(0).toLowerCase() + SIGNOFF_DISCLAIMER.slice(1)}</p>
       </div>
 
-      {inboxCount(inbox) === 0 && <EmptyState title="You’re all caught up" body="New sign-off requests, instructor tags and simulator sessions to confirm show up here." />}
+      {inboxCount(inbox) + missions.length === 0 && <EmptyState title="You’re all caught up" body="New sign-off requests, instructor tags and simulator sessions to confirm show up here." />}
 
       {inbox.milestoneRequests.length > 0 && (
         <Section title="Milestones to verify">
           {inbox.milestoneRequests.map((r) => (
             <MilestoneRequest key={r.id} request={r} />
+          ))}
+        </Section>
+      )}
+
+      {missions.length > 0 && (
+        <Section title="Missions to verify">
+          {missions.map(({ flight, mission }) => (
+            <MissionToVerifyRow key={`${flight.id}-${mission.code}`} flight={flight} mission={mission} />
           ))}
         </Section>
       )}
@@ -196,6 +206,27 @@ function SimSession({ flight }: { flight: Flight }) {
           </Button>
           <Button onClick={() => review(flight.id, 'declined')}>Decline</Button>
         </div>
+      </Panel>
+    </li>
+  )
+}
+
+export function MissionToVerifyRow({ flight, mission }: { flight: Flight; mission: Mission }) {
+  const world = useWorld()
+  const verifyMission = useAppStore((s) => s.verifyMission)
+  const club = world.clubs.find((c) => c.id === flight.clubId)
+  return (
+    <li>
+      <Panel className="flex flex-col gap-3">
+        <p>
+          <span className="font-semibold">{accountById(world, flight.pilotId)?.displayName}</span> completed{' '}
+          <span className="font-semibold">{mission.title}</span>.
+        </p>
+        <FlightLink flight={flight} />
+        <p className="text-[13px] text-ink-muted">Verifying adds {mission.xp} XP at {club?.name}. Open the flight to check the track first.</p>
+        <Button tone="primary" className="self-start" onClick={() => verifyMission(flight.id, mission.code)}>
+          Verify {mission.title}
+        </Button>
       </Panel>
     </li>
   )

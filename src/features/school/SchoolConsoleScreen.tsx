@@ -1,6 +1,8 @@
 import { useParams } from 'react-router'
 import { type ClubFeature, canInClub } from '../../domain/tiers'
+import { missionsToVerify } from '../../domain/missions'
 import { activeMemberCount } from '../../domain/world'
+import { MissionToVerifyRow } from '../cfi/InboxScreen'
 import { useActive, useWorld } from '../../store/hooks'
 import { ProGate } from '../../ui/ProGate'
 import { ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
@@ -49,6 +51,8 @@ export function SchoolConsoleScreen() {
         </p>
       </Panel>
 
+      {isPro && <MissionsQueue clubId={club.id} />}
+
       {isPro ? (
         <section aria-labelledby="pro-tools">
           <h2 id="pro-tools" className="mb-2 font-semibold">
@@ -74,5 +78,27 @@ export function SchoolConsoleScreen() {
         </ProGate>
       )}
     </div>
+  )
+}
+
+function MissionsQueue({ clubId }: { clubId: string }) {
+  const world = useWorld()
+  const { account } = useActive()
+  const queue = missionsToVerify(world, account.id).filter((x) => x.flight.clubId === clubId)
+  return (
+    <section aria-labelledby="mission-queue" className="flex flex-col gap-2">
+      <h2 id="mission-queue" className="font-semibold">
+        Missions to verify
+      </h2>
+      {queue.length === 0 ? (
+        <p className="text-ink-muted">Nothing waiting. Missions your members complete in your aircraft show up here.</p>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {queue.map(({ flight, mission }) => (
+            <MissionToVerifyRow key={`${flight.id}-${mission.code}`} flight={flight} mission={mission} />
+          ))}
+        </ul>
+      )}
+    </section>
   )
 }

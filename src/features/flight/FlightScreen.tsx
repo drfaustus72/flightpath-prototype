@@ -10,6 +10,8 @@ import { ButtonLink, EmptyState, Ident, ScreenTitle } from '../../ui/primitives'
 import { FlightMap } from './FlightMap'
 import { FlightStats } from './FlightStats'
 import { DebriefThread, FlightSignoff, TagAnswer } from './FlightTraining'
+import { ShareCard } from '../missions/AchievementCard'
+import { FlightMissions } from '../missions/FlightMissions'
 import { Comments } from '../social/Comments'
 import { FlightPeople } from '../social/FlightPeople'
 import { PersonLink } from '../social/PersonLink'
@@ -138,6 +140,9 @@ export function FlightScreen() {
           </ul>
         </section>
       )}
+
+      <FlightMissions flight={flight} />
+      <ShareCard flight={flight} />
 
       <FlightSignoff flight={flight} />
       <DebriefThread flight={flight} />

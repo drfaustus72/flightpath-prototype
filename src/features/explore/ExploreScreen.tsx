@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react'
+import { ChevronRight, Search } from 'lucide-react'
 import { type ReactNode, useState } from 'react'
 import { Link } from 'react-router'
 import { clubPlanName } from '../../domain/clubs'
@@ -73,7 +73,19 @@ export function ExploreScreen() {
           )}
         </div>
       ) : (
-        <Suggestions />
+        <>
+          <Link
+            to="/missions"
+            className="flex min-h-16 items-center justify-between gap-3 rounded-[var(--radius-panel)] border border-magenta/30 bg-magenta-tint px-4 py-3"
+          >
+            <span>
+              <span className="block font-semibold text-magenta">Missions</span>
+              <span className="block text-[14px] text-ink-muted">{world.missions.length} Southern California flights with a story and something to learn</span>
+            </span>
+            <ChevronRight size={20} aria-hidden="true" className="text-magenta" />
+          </Link>
+          <Suggestions />
+        </>
       )}
     </div>
   )
@@ -144,7 +156,7 @@ function Suggestions() {
         </ul>
       )}
       <p className="mt-2 text-[14px] text-ink-muted">
-        Missions, airport pages and a directory of schools and CFIs near <Ident>{account.homeAirport}</Ident> come in a later build.
+        Airport pages and a directory of schools and CFIs near <Ident>{account.homeAirport}</Ident> come in a later build.
       </p>
     </section>
   )

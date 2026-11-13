@@ -121,6 +121,7 @@ describe('requests and debriefs', () => {
     expect(canReadDebrief('dan', taught('dan'))).toBe(true)
     expect(canReadDebrief('dan', taught('dan', 'pending'))).toBe(false)
     expect(canReadDebrief('free', taught('dan'))).toBe(false)
+    expect(canReadDebrief('stu', makeFlight({ pilotId: 'stu' }))).toBe(false)
   })
 })
 

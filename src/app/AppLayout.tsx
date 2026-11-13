@@ -1,6 +1,7 @@
 import { Compass, Gauge, Inbox, Plus, Rows3, UserRound } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { NavLink, Outlet } from 'react-router'
+import { missionsToVerify } from '../domain/missions'
 import { inboxCount, inboxFor } from '../domain/signoffs'
 import { isVerifiedCfi } from '../domain/tiers'
 import { useActive, useWorld } from '../store/hooks'
@@ -19,7 +20,7 @@ function useTabs(): Tab[] {
   const world = useWorld()
   const { account } = useActive()
   if (!isVerifiedCfi(account)) return [feed, explore, log, progress, profile]
-  const count = inboxCount(inboxFor(world, account.id))
+  const count = inboxCount(inboxFor(world, account.id)) + missionsToVerify(world, account.id).length
   return [feed, explore, log, { to: '/inbox', label: 'Inbox', icon: <Inbox size={22} aria-hidden="true" />, count }, profile]
 }
 

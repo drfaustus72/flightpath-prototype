@@ -27,6 +27,8 @@ export interface Advice {
   /** e.g. "Next on Private Pilot Cross-Country: step 1 of 5". */
   context: string
   reasons: string[]
+  /** The mission's prerequisites, to talk through with the CFI. */
+  beforeYouGo: string[]
   /** Always present: who makes the call. */
   handoff: string
 }
@@ -55,7 +57,6 @@ export function adviceFor(world: World, pilotId: string): Advice | null {
     const nm = distanceFromHome(world, pilotId, m)
     const list = [...extra]
     if (nm !== null && nm > 0) list.push(`About ${nm} nm from ${pilot.homeAirport}.`)
-    if (m.prerequisites.length > 0) list.push(`Before you go: ${m.prerequisites.join('; ').toLowerCase()}.`)
     return list
   }
 
@@ -69,7 +70,8 @@ export function adviceFor(world: World, pilotId: string): Advice | null {
       return {
         mission: step.mission,
         context: `Next on ${pathway.title}: step ${index + 1} of ${steps.length}`,
-        reasons: reasons(step.mission, done > 0 ? [`You've completed ${done} of ${steps.length} steps.`] : []),
+        reasons: reasons(step.mission, done > 0 ? [`You’ve completed ${done} of ${steps.length} steps.`] : []),
+        beforeYouGo: step.mission.prerequisites,
         handoff,
       }
     }
@@ -83,5 +85,11 @@ export function adviceFor(world: World, pilotId: string): Advice | null {
     .map((s) => ({ s, nm: distanceFromHome(world, pilotId, s.mission) ?? Infinity }))
     .sort((a, b) => a.nm - b.nm)[0]
   if (!nearest) return null
-  return { mission: nearest.s.mission, context: 'A mission to try next', reasons: reasons(nearest.s.mission, []), handoff }
+  return {
+    mission: nearest.s.mission,
+    context: 'A mission to try next',
+    reasons: reasons(nearest.s.mission, []),
+    beforeYouGo: nearest.s.mission.prerequisites,
+    handoff,
+  }
 }

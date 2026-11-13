@@ -1,12 +1,11 @@
 import { CalendarClock, PlaneLanding } from 'lucide-react'
 import { type ReactNode, useState } from 'react'
 import { type Badge, flightReviewStatus, landingsWithin, recognitionFor } from '../../domain/recognition'
-import { can } from '../../domain/tiers'
 import { useActive, useWorld } from '../../store/hooks'
 import { AirportMark } from '../../ui/AirportMark'
-import { ProGate } from '../../ui/ProGate'
 import { ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
 import { MilestonesPanel } from './MilestonesPanel'
+import { AdvisorCard, ChallengesPanel, PathwayPanel, XpPanel } from './ProgressionPanels'
 
 const SOURCE_LABEL: Record<Badge['source'], string | null> = {
   tracked: null,
@@ -18,7 +17,7 @@ const fmtDate = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString
 
 export function ProgressScreen() {
   const world = useWorld()
-  const { account, access } = useActive()
+  const { account } = useActive()
   // Captured once per visit so render stays pure.
   const [now] = useState(() => new Date())
   const r = recognitionFor(world, account.id)
@@ -30,6 +29,8 @@ export function ProgressScreen() {
   return (
     <div className="flex flex-col gap-6">
       <ScreenTitle>Progress</ScreenTitle>
+
+      <AdvisorCard />
 
       <dl className="grid grid-cols-4 gap-2">
         <Stat label="Flights" value={r.flights} />
@@ -65,7 +66,10 @@ export function ProgressScreen() {
         </p>
       </Panel>
 
+      <XpPanel />
+      <PathwayPanel />
       <MilestonesPanel />
+      <ChallengesPanel />
 
       {r.airports.length === 0 ? (
         <EmptyState
@@ -105,17 +109,6 @@ export function ProgressScreen() {
       {activity.length > 0 && <BadgeList title="Badges" badges={activity} />}
       {hours.length > 0 && <BadgeList title="Hours" badges={hours} />}
 
-      {can(access, 'progress.xp') ? (
-        <EmptyState
-          title="XP comes with missions"
-          body="You earn XP by completing missions and achievements, once your school verifies them. Missions arrive in the next build."
-        />
-      ) : (
-        <ProGate plan="School Pro">
-          XP comes with membership at a School Pro flight school. Your school verifies the missions and achievements that
-          earn it.
-        </ProGate>
-      )}
     </div>
   )
 }
