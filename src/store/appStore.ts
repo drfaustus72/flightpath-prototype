@@ -5,6 +5,7 @@ import { type PostChoices, createFlight } from '../domain/flights'
 import type { FlightDraft } from '../domain/track/importTrack'
 import { type AirportRecord, type Badge, newlyEarned, recognitionFor } from '../domain/recognition'
 import { canTagInstructor } from '../domain/signoffs'
+import * as missionOps from '../domain/missionOps'
 import * as ops from '../domain/socialOps'
 import type { Flight, MilestoneCode, ProfileLevel, Report, World } from '../domain/types'
 import { isBlocked } from '../domain/visibility'
@@ -44,6 +45,13 @@ export interface AppState {
   block: (accountId: string) => void
   unblock: (accountId: string) => void
   report: (target: Report['target'], reason: Report['reason']) => void
+
+  // Missions, challenges and no-gos (domain/missionOps.ts).
+  verifyMission: (flightId: string, missionCode: string) => void
+  revokeMissionVerification: (verificationId: string, reason: string) => void
+  joinChallenge: (code: string) => void
+  leaveChallenge: (code: string) => void
+  recordNoGo: (entry: { from: string; to: string | null; reason: string }) => void
 
   resetDemo: () => void
 }
@@ -222,6 +230,11 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
         block: (id) => act((w, me, c) => ops.block(w, me, id, c)),
         unblock: (id) => act((w, me) => ops.unblock(w, me, id)),
         report: (target, reason) => act((w, me, c) => ops.report(w, me, target, reason, c)),
+        verifyMission: (flightId, code) => act((w, me, c) => missionOps.verifyMission(w, me, flightId, code, c)),
+        revokeMissionVerification: (id, reason) => act((w, me, c) => missionOps.revokeMissionVerification(w, me, id, reason, c)),
+        joinChallenge: (code) => act((w, me, c) => missionOps.joinChallenge(w, me, code, c)),
+        leaveChallenge: (code) => act((w, me) => missionOps.leaveChallenge(w, me, code)),
+        recordNoGo: (entry) => act((w, me, c) => missionOps.recordNoGo(w, me, entry, c)),
         resetDemo: () => set(seed()),
         }
       },

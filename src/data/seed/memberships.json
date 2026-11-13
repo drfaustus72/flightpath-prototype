@@ -100,7 +100,7 @@
     ],
     "status": "active",
     "isHomeSchool": true,
-    "sponsoredPilotPro": false,
+    "sponsoredPilotPro": true,
     "startedOn": "2025-09-01",
     "endedOn": null
   }

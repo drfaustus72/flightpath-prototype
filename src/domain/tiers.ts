@@ -29,6 +29,7 @@ export const ACCOUNT_FEATURES = {
 
   'progress.xp': 'school_pro_member',
   'progress.ranks': 'school_pro_member',
+  'progress.missions': 'pilot_pro',
   'progress.pathways': 'pilot_pro',
   'progress.advisor': 'pilot_pro',
   'progress.challenges': 'pilot_pro',
