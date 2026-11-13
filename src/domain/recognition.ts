@@ -128,6 +128,9 @@ export function recognitionFor(world: World, pilotId: string): Recognition {
     }
   }
 
+  // Recognizing a no-go is part of good airmanship (CLAUDE.md rule 4). Badge only, never XP.
+  if (world.noGos.some((n) => n.pilotId === pilotId)) award('good_call', 'Good Call', 'activity', 'self_reported', null)
+
   const airports = [...records.values()]
   return {
     airports,

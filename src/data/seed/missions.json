@@ -105,12 +105,12 @@
     "code": "lax_sfra",
     "title": "LAX Special Flight Rules Area",
     "theme": "urban",
-    "label": "adventure",
+    "label": "cfi_verified",
     "story": "Fly straight over the LAX runways on the Special Flight Rules Area route, with the published altitudes and self-announced position reports.",
     "objectives": [
       "Study the SFRA procedures and altitudes on the terminal area chart",
       "Self-announce on the SFRA frequency",
-      "Cross the SFRA box over LAX"
+      "Fly the SFRA route over LAX with your CFI, who verifies it"
     ],
     "prerequisites": [
       "SFRA briefing with your CFI"
@@ -120,13 +120,7 @@
     "xp": 200,
     "simEligible": false,
     "requirements": {
-      "cfiOnly": false,
-      "crossesBox": [
-        -118.44,
-        33.92,
-        -118.37,
-        33.96
-      ]
+      "cfiOnly": true
     }
   },
   {

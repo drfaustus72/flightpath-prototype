@@ -240,7 +240,7 @@ function checkMissionIntegrity(
   for (const m of world.missions) {
     const r = m.requirements
     for (const code of r.landAtAny ?? []) if (!airports.has(code)) errors.push(`mission ${m.code}: unknown airport ${code}`)
-    const checks = [r.landAtAny, r.minDistanceFromDepartureNm, r.minTotalNm, r.minFullStopAirports, r.minFieldElevationFt, r.crossesBox]
+    const checks = [r.landAtAny, r.minDistanceFromDepartureNm, r.minTotalNm, r.minFullStopAirports, r.minFieldElevationFt]
     const hasCheck = checks.some((c) => c !== undefined)
     if (hasCheck === r.cfiOnly) errors.push(`mission ${m.code}: needs track checks, or cfiOnly with none`)
   }

@@ -304,7 +304,6 @@ export const reportSchema = z.object({
 })
 
 const missionCode = z.string().regex(/^[a-z0-9_]{2,40}$/)
-const bbox = z.tuple([z.number(), z.number(), z.number(), z.number()]) // west, south, east, north
 
 /**
  * What a track must show for a mission to count as complete. Every listed check must pass.
@@ -320,8 +319,6 @@ export const missionRequirementsSchema = z.object({
   minFullStopAirports: z.number().int().min(2).optional(),
   /** Lands at an airport at or above this field elevation. */
   minFieldElevationFt: z.number().optional(),
-  /** The route passes through this box (e.g. the LAX Special Flight Rules Area). */
-  crossesBox: bbox.optional(),
   cfiOnly: z.boolean(),
 })
 
