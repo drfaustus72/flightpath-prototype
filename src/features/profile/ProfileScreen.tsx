@@ -1,82 +1,38 @@
-import { ChevronRight } from 'lucide-react'
-import { Link } from 'react-router'
-import { planLabels } from '../../domain/tiers'
 import { clubPlanName } from '../../domain/clubs'
-import { adminClubsOf, homeSchoolOf } from '../../domain/world'
+import { isVerifiedCfi, planLabels } from '../../domain/tiers'
+import { adminClubsOf } from '../../domain/world'
 import { useActive, useWorld } from '../../store/hooks'
-import { AirportMark } from '../../ui/AirportMark'
-import { Ident, Panel, PlanBadge } from '../../ui/primitives'
 import { LogbookPanel } from './LogbookPanel'
-
-const certificateNames: Record<string, string> = {
-  student: 'Student',
-  sport: 'Sport',
-  recreational: 'Recreational',
-  private: 'Private',
-  instrument: 'Instrument',
-  commercial: 'Commercial',
-  multi_engine: 'Multi-engine',
-  atp: 'ATP',
-}
+import { LinkRow, ProfileLevelPicker, ShareProfile, WaitingForYou } from './OwnProfileSections'
+import { LandedMap, ProfileFacts, ProfileHeader, TrophyCase } from './ProfileParts'
 
 export function ProfileScreen() {
   const world = useWorld()
   const { account, access } = useActive()
-  const airport = world.airports.find((a) => a.icao === account.homeAirport)
-  const homeSchool = homeSchoolOf(world, account.id)
   const adminClubs = adminClubsOf(world, account.id)
 
   return (
     <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="text-[26px] leading-tight font-bold tracking-tight">{account.displayName}</h1>
-        <p className="text-ink-muted">@{account.handle}</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {planLabels(access).map((l) => (
-            <PlanBadge key={l}>{l}</PlanBadge>
-          ))}
-        </div>
-        {account.bio && <p className="mt-3 max-w-[60ch]">{account.bio}</p>}
-        {account.isMinor && (
-          <p className="mt-3 text-[14px] text-ink-muted">This profile is private. Only approved followers can see it.</p>
-        )}
+      <ProfileHeader owner={account} badges={planLabels(access)} />
+      <div className="flex flex-wrap gap-2">
+        <ShareProfile />
       </div>
 
-      <Panel className="flex items-center gap-4">
-        <AirportMark />
-        <div>
-          <p className="text-[13px] text-ink-muted">Home airport</p>
-          <p className="text-[22px] font-bold">
-            <Ident>{account.homeAirport}</Ident>
-          </p>
-          {airport && <p className="text-[14px] text-ink-muted">{airport.name}, {airport.city}</p>}
-        </div>
-      </Panel>
-
-      <Panel>
-        <p className="text-[13px] text-ink-muted">Home school</p>
-        {homeSchool ? (
-          <>
-            <p className="text-[17px] font-semibold">{homeSchool.name}</p>
-            <p className="text-[14px] text-ink-muted">
-              {clubPlanName(homeSchool)} · <Ident>{homeSchool.homeAirport}</Ident>
-            </p>
-          </>
-        ) : (
-          <p className="text-ink-muted">No home school. Add one to show where you train.</p>
-        )}
-      </Panel>
-
-      <dl>
-        <Panel>
-          <dt className="text-[13px] text-ink-muted">Certificates</dt>
-          <dd className="font-semibold">
-            {account.certificates.map((c) => certificateNames[c] ?? c).join(', ') || 'None yet'}
-          </dd>
-        </Panel>
-      </dl>
-
+      <WaitingForYou />
+      <ProfileLevelPicker />
+      <ProfileFacts owner={account} />
       <LogbookPanel key={account.id} account={account} />
+      <TrophyCase owner={account} />
+      <LandedMap owner={account} />
+
+      {isVerifiedCfi(account) && (
+        <section aria-labelledby="own-flying-title" className="flex flex-col gap-2">
+          <h2 id="own-flying-title" className="font-semibold">
+            Your own flying
+          </h2>
+          <LinkRow to="/progress" title="Progress" detail="Stamps, badges, milestones and recent flying" />
+        </section>
+      )}
 
       {adminClubs.length > 0 && (
         <section aria-labelledby="manage-title">
@@ -86,16 +42,7 @@ export function ProfileScreen() {
           <ul className="flex flex-col gap-2">
             {adminClubs.map((c) => (
               <li key={c.id}>
-                <Link
-                  to={`/school/${c.id}`}
-                  className="flex min-h-14 items-center justify-between rounded-[var(--radius-panel)] border border-hairline bg-surface px-4"
-                >
-                  <span>
-                    <span className="block font-semibold">{c.name}</span>
-                    <span className="block text-[14px] text-ink-muted">{clubPlanName(c)}</span>
-                  </span>
-                  <ChevronRight size={20} aria-hidden="true" />
-                </Link>
+                <LinkRow to={`/school/${c.id}`} title={c.name} detail={clubPlanName(c)} />
               </li>
             ))}
           </ul>

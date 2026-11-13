@@ -30,7 +30,7 @@ function renderApp(path = '/') {
 async function switchTo(label: string) {
   const user = userEvent.setup()
   await user.click(screen.getByRole('button', { name: /viewing as/i }))
-  const dialog = screen.getByRole('dialog', { hidden: true })
+  const dialog = screen.getByRole('dialog', { name: /view the demo as/i, hidden: true })
   await user.click(within(dialog).getByRole('button', { name: new RegExp(label, 'i'), hidden: true }))
   return user
 }

@@ -6,6 +6,7 @@ import { useActive, useWorld } from '../../store/hooks'
 import { AirportMark } from '../../ui/AirportMark'
 import { ProGate } from '../../ui/ProGate'
 import { ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
+import { MilestonesPanel } from './MilestonesPanel'
 
 const SOURCE_LABEL: Record<Badge['source'], string | null> = {
   tracked: null,
@@ -63,6 +64,8 @@ export function ProgressScreen() {
           From your logged flights and the date you entered. This is information, not a currency determination: check your logbook and endorsements.
         </p>
       </Panel>
+
+      <MilestonesPanel />
 
       {r.airports.length === 0 ? (
         <EmptyState

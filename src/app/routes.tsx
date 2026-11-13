@@ -1,9 +1,11 @@
 import { Navigate, type RouteObject } from 'react-router'
+import { InboxScreen } from '../features/cfi/InboxScreen'
 import { ExploreScreen } from '../features/explore/ExploreScreen'
 import { FeedScreen } from '../features/feed/FeedScreen'
 import { FlightScreen } from '../features/flight/FlightScreen'
 import { LogFlightScreen } from '../features/log/LogFlightScreen'
 import { ProfileScreen } from '../features/profile/ProfileScreen'
+import { PublicProfileScreen } from '../features/profile/PublicProfileScreen'
 import { ProgressScreen } from '../features/progress/ProgressScreen'
 import { SchoolConsoleScreen } from '../features/school/SchoolConsoleScreen'
 import { AppLayout } from './AppLayout'
@@ -19,6 +21,8 @@ export const routes: RouteObject[] = [
       { path: 'log', element: <LogFlightScreen /> },
       { path: 'progress', element: <ProgressScreen /> },
       { path: 'profile', element: <ProfileScreen /> },
+      { path: 'inbox', element: <InboxScreen /> },
+      { path: 'u/:handle', element: <PublicProfileScreen /> },
       { path: 'flights/:flightId', element: <FlightScreen /> },
       { path: 'school/:clubId', element: <SchoolConsoleScreen /> },
       { path: '*', element: <NotFoundScreen /> },
