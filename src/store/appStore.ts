@@ -12,7 +12,7 @@ import { isBlocked } from '../domain/visibility'
 import { demoPersonas, loadWorld } from '../domain/world'
 
 /** Bump whenever the persisted shape changes. Old state is discarded and reset to seed. */
-export const STORAGE_VERSION = 7
+export const STORAGE_VERSION = 8
 export const STORAGE_KEY = 'flightpath-demo'
 
 export interface AppState {

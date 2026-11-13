@@ -16,7 +16,7 @@ import type { Signoff, World } from './types'
 
 const student = makeAccount({ id: 'stu', handle: 'stu' })
 const dan = makeCfi({ id: 'dan', handle: 'dan' })
-const unverified = makeCfi({ id: 'unv', handle: 'unv', cfi: { verified: false, ratings: ['CFI'], independent: true } })
+const unverified = makeCfi({ id: 'unv', handle: 'unv', cfi: { verified: false, ratings: ['CFI'], independent: true, listed: true } })
 // A free verified CFI: no CFI Pro, no paid plan. Sign-off authority must still work.
 const freeCfi = makeCfi({ id: 'free', handle: 'free', subscription: { pilotPro: false, cfiPro: false } })
 const link = (cfiId: string, studentId = 'stu') => ({ id: `l-${cfiId}`, cfiId, studentId, status: 'active' as const, since: '2026-01-01' })

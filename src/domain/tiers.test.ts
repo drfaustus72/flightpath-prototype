@@ -114,7 +114,7 @@ describe('CFI tiers', () => {
   it('gives an unverified CFI no CFI features, even if paying for CFI Pro', () => {
     const c = ctx({
       account: makeCfi({
-        cfi: { verified: false, ratings: ['CFI'], independent: true },
+        cfi: { verified: false, ratings: ['CFI'], independent: true, listed: true },
         subscription: { pilotPro: false, cfiPro: true },
       }),
     })

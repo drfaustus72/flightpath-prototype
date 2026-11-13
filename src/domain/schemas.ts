@@ -47,6 +47,8 @@ export const cfiProfileSchema = z.object({
   verified: z.boolean(),
   ratings: z.array(cfiRatingSchema).min(1),
   independent: z.boolean(),
+  /** Listed in the CFI directory (on by default). Turning it off never affects sign-off authority. */
+  listed: z.boolean(),
 })
 
 export const subscriptionSchema = z.object({
@@ -85,6 +87,8 @@ export const accountSchema = z.object({
 
 export const clubPlanSchema = z.enum(['school_basic', 'school_pro', 'community'])
 
+export const trainingOfferedSchema = z.enum(['private', 'instrument', 'commercial', 'multi_engine', 'cfi', 'tailwheel'])
+
 export const clubSchema = z.object({
   id,
   name: z.string().min(1),
@@ -95,6 +99,9 @@ export const clubSchema = z.object({
   homeAirport: icao,
   website: z.url().nullable(),
   initials: z.string().min(1).max(3),
+  about: z.string(),
+  /** Training the school offers; drives the nearby directory's filter. */
+  trainingOffered: z.array(trainingOfferedSchema),
 })
 
 export const membershipRoleSchema = z.enum(['member', 'staff_cfi', 'admin'])

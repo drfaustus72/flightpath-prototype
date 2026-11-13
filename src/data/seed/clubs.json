@@ -1,6 +1,107 @@
 [
-  { "id": "club-hfa", "name": "Hawthorne Flight Academy", "kind": "flight_school", "plan": "school_pro", "claimed": true, "homeAirport": "KHHR", "website": null, "initials": "HFA" },
-  { "id": "club-coastal", "name": "Coastal Aviation Training", "kind": "flight_school", "plan": "school_basic", "claimed": true, "homeAirport": "KTOA", "website": null, "initials": "CAT" },
-  { "id": "club-desert", "name": "Desert Wings Flight School", "kind": "flight_school", "plan": "school_basic", "claimed": false, "homeAirport": "KPSP", "website": null, "initials": "DW" },
-  { "id": "club-taildraggers", "name": "SoCal Taildraggers", "kind": "community", "plan": "community", "claimed": true, "homeAirport": "KCNO", "website": null, "initials": "ST" }
+  {
+    "id": "club-hfa",
+    "name": "Hawthorne Flight Academy",
+    "kind": "flight_school",
+    "plan": "school_pro",
+    "claimed": true,
+    "homeAirport": "KHHR",
+    "website": "https://hawthorneflight.example",
+    "initials": "HFA",
+    "about": "Part 61 school on the Hawthorne ramp. Six Cessna 172s, a Redbird simulator and a cross-country program built around Southern California destinations.",
+    "trainingOffered": [
+      "private",
+      "instrument",
+      "commercial",
+      "cfi"
+    ]
+  },
+  {
+    "id": "club-coastal",
+    "name": "Coastal Aviation Training",
+    "kind": "flight_school",
+    "plan": "school_basic",
+    "claimed": true,
+    "homeAirport": "KTOA",
+    "website": "https://coastalaviation.example",
+    "initials": "CAT",
+    "about": "Small school at Torrance with a tailwheel Citabria and two Archers.",
+    "trainingOffered": [
+      "private",
+      "tailwheel"
+    ]
+  },
+  {
+    "id": "club-desert",
+    "name": "Desert Wings Flight School",
+    "kind": "flight_school",
+    "plan": "school_basic",
+    "claimed": false,
+    "homeAirport": "KPSP",
+    "website": "https://desertwings.example",
+    "initials": "DW",
+    "about": "",
+    "trainingOffered": [
+      "private",
+      "instrument"
+    ]
+  },
+  {
+    "id": "club-taildraggers",
+    "name": "SoCal Taildraggers",
+    "kind": "community",
+    "plan": "community",
+    "claimed": true,
+    "homeAirport": "KCNO",
+    "website": null,
+    "initials": "ST",
+    "about": "Pilots who fly conventional-gear airplanes, from Cubs to Pitts. Monthly breakfast fly-outs.",
+    "trainingOffered": []
+  },
+  {
+    "id": "club-smo",
+    "name": "Santa Monica Air School",
+    "kind": "flight_school",
+    "plan": "school_basic",
+    "claimed": true,
+    "homeAirport": "KSMO",
+    "website": "https://smoairschool.example",
+    "initials": "SMA",
+    "about": "Instrument and commercial training with a glass-cockpit fleet.",
+    "trainingOffered": [
+      "private",
+      "instrument",
+      "commercial",
+      "multi_engine"
+    ]
+  },
+  {
+    "id": "club-valley",
+    "name": "Valley Aero Club",
+    "kind": "flying_club",
+    "plan": "school_basic",
+    "claimed": true,
+    "homeAirport": "KVNY",
+    "website": "https://valleyaeroclub.example",
+    "initials": "VAC",
+    "about": "Member-owned flying club with four aircraft and low hourly rates.",
+    "trainingOffered": [
+      "private"
+    ]
+  },
+  {
+    "id": "club-chino",
+    "name": "Chino Flight Center",
+    "kind": "flight_school",
+    "plan": "school_basic",
+    "claimed": false,
+    "homeAirport": "KCNO",
+    "website": "https://chinoflight.example",
+    "initials": "CFC",
+    "about": "",
+    "trainingOffered": [
+      "private",
+      "multi_engine"
+    ]
+  }
 ]

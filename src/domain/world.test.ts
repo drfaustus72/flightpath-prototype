@@ -60,7 +60,7 @@ describe('loadWorld', () => {
     const w = clone()
     w.memberships.push({ ...w.memberships[0]!, id: 'mem-x', accountId: 'acct-nobody' })
     const priya = w.accounts.find((a) => a.id === 'acct-priya')
-    if (priya) priya.cfi = { verified: false, ratings: ['CFI'], independent: true }
+    if (priya) priya.cfi = { verified: false, ratings: ['CFI'], independent: true, listed: true }
     w.memberships.push({ ...w.memberships[0]!, id: 'mem-y', accountId: 'acct-priya', roles: ['staff_cfi'], isHomeSchool: false })
     w.memberships.push({ ...w.memberships[0]!, id: 'mem-z', clubId: 'club-desert', roles: ['admin'], isHomeSchool: false })
     const sam = w.accounts.find((a) => a.id === 'acct-sam')

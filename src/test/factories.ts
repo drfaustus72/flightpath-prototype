@@ -28,7 +28,7 @@ export function makeCfi(overrides: Partial<Account> = {}): Account {
     handle: 'test_cfi',
     certificates: ['private', 'instrument', 'commercial'],
     totalHours: 900,
-    cfi: { verified: true, ratings: ['CFI'], independent: true },
+    cfi: { verified: true, ratings: ['CFI'], independent: true, listed: true },
     ...overrides,
   })
 }
@@ -43,6 +43,8 @@ export function makeClub(overrides: Partial<Club> = {}): Club {
     homeAirport: 'KHHR',
     website: null,
     initials: 'TF',
+    about: '',
+    trainingOffered: ['private'],
     ...overrides,
   }
 }

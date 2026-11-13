@@ -53,7 +53,8 @@
         "CFI",
         "CFII"
       ],
-      "independent": false
+      "independent": false,
+      "listed": true
     },
     "isMinor": false,
     "visibility": {
@@ -165,7 +166,8 @@
         "CFI",
         "MEI"
       ],
-      "independent": true
+      "independent": true,
+      "listed": true
     },
     "isMinor": false,
     "visibility": {
@@ -234,7 +236,8 @@
         "CFI",
         "CFII"
       ],
-      "independent": false
+      "independent": false,
+      "listed": true
     },
     "isMinor": false,
     "visibility": {

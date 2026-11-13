@@ -58,7 +58,7 @@ describe('xpSummary', () => {
 
   it('stays with the old school when a pilot switches; the new school starts at 0', () => {
     const w = seed()
-    w.clubs.push({ id: 'club-new', name: 'Bayside Flight Center', kind: 'flight_school', plan: 'school_pro', claimed: true, homeAirport: 'KTOA', website: null, initials: 'BFC' })
+    w.clubs.push({ id: 'club-new', name: 'Bayside Flight Center', kind: 'flight_school', plan: 'school_pro', claimed: true, homeAirport: 'KTOA', website: null, initials: 'BFC', about: '', trainingOffered: ['private'] })
     w.memberships = w.memberships.map((m) => (m.id === 'mem-lena-hfa' ? { ...m, status: 'former' as const, isHomeSchool: false, endedOn: '2026-11-12' } : m))
     w.memberships.push({ id: 'mem-lena-new', accountId: 'acct-lena', clubId: 'club-new', roles: ['member'], status: 'active', isHomeSchool: true, sponsoredPilotPro: false, startedOn: '2026-11-12', endedOn: null })
     expect(xpSummary(w, 'acct-lena').map((s) => [s.club.id, s.xp])).toEqual([['club-new', 0]])
