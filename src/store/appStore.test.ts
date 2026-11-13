@@ -169,4 +169,34 @@ describe('app store', () => {
     const store = createAppStore(seedWorld())
     expect(store.getState().activeAccountId).toBe('acct-maya')
   })
+
+  it('acts as the active persona and persists social actions', () => {
+    const store = createAppStore(seedWorld())
+    store.getState().setActiveAccount('acct-jordan')
+    store.getState().follow('acct-maya')
+    store.getState().toggleProps('flt-maya-dual-xc')
+    const reloaded = createAppStore(seedWorld())
+    const w = reloaded.getState().world
+    expect(w.follows.some((f) => f.followerId === 'acct-jordan' && f.followeeId === 'acct-maya')).toBe(true)
+    expect(w.props.some((p) => p.accountId === 'acct-jordan' && p.flightId === 'flt-maya-dual-xc')).toBe(true)
+  })
+
+  it('refuses a sign-off from someone who is not the instructor', () => {
+    const store = createAppStore(seedWorld())
+    expect(() => store.getState().signOffFlight('flt-maya-dual-xc', '')).toThrow("Can't sign off")
+  })
+
+  it("refuses to tag an unverified pilot as a flight's instructor", async () => {
+    const { importTrack } = await import('../domain/track/importTrack')
+    const { synthesize, toGpx } = await import('../domain/track/synth')
+    const world = seedWorld()
+    const gpx = toGpx(synthesize([{ kind: 'ground', at: 'KHHR', sec: 60 }, { kind: 'fly', from: 'KHHR', to: 'KTOA', cruiseFt: 2000, kt: 90 }, { kind: 'ground', at: 'KTOA', sec: 60 }], world.airports, '2026-11-12T17:00:00Z'), 'x')
+    const r = importTrack(gpx, 'x.gpx', world.airports)
+    if (!r.ok) throw new Error(r.error)
+    const store = createAppStore(world)
+    const choices = { caption: '', routeVisibility: 'full' as const, clubId: null, postVisibility: 'public' as const, flewWithIds: [] }
+    expect(() => store.getState().logFlight(r.draft, { ...choices, instructorId: 'acct-lena' })).toThrow('instructor')
+    const { flight } = store.getState().logFlight(r.draft, { ...choices, instructorId: 'acct-dan' })
+    expect(flight.instructor).toEqual({ accountId: 'acct-dan', status: 'pending' })
+  })
 })

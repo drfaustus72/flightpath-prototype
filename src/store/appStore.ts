@@ -4,7 +4,10 @@ import { canConfirmSimSession } from '../domain/achievements'
 import { type PostChoices, createFlight } from '../domain/flights'
 import type { FlightDraft } from '../domain/track/importTrack'
 import { type AirportRecord, type Badge, newlyEarned, recognitionFor } from '../domain/recognition'
-import type { Flight, World } from '../domain/types'
+import { canTagInstructor } from '../domain/signoffs'
+import * as ops from '../domain/socialOps'
+import type { Flight, MilestoneCode, ProfileLevel, Report, World } from '../domain/types'
+import { isBlocked } from '../domain/visibility'
 import { demoPersonas, loadWorld } from '../domain/world'
 
 /** Bump whenever the persisted shape changes. Old state is discarded and reset to seed. */
@@ -22,6 +25,26 @@ export interface AppState {
   updateLogbook: (entry: { totalHours: number; flightReviewOn: string | null }) => void
   /** A school admin or staff CFI confirms or declines a simulator session tagged to their school. */
   reviewSimSession: (flightId: string, decision: 'confirmed' | 'declined') => void
+
+  // Social layer and CFI sign-offs. All act as the active persona; rules live in domain/socialOps.ts.
+  setProfileLevel: (level: ProfileLevel) => void
+  follow: (accountId: string) => void
+  unfollow: (accountId: string) => void
+  answerFollowRequest: (followerId: string, approve: boolean) => void
+  toggleProps: (flightId: string) => void
+  addComment: (flightId: string, text: string) => void
+  answerTag: (flightId: string, accept: boolean) => void
+  addDebrief: (flightId: string, text: string) => void
+  signOffFlight: (flightId: string, note: string) => void
+  signOffMilestone: (studentId: string, milestone: MilestoneCode, note: string) => void
+  revokeSignoff: (signoffId: string, reason: string) => void
+  requestSignoff: (cfiId: string, milestone: MilestoneCode) => void
+  declineSignoffRequest: (requestId: string) => void
+  claimMilestone: (milestone: MilestoneCode) => void
+  block: (accountId: string) => void
+  unblock: (accountId: string) => void
+  report: (target: Report['target'], reason: Report['reason']) => void
+
   resetDemo: () => void
 }
 
@@ -107,7 +130,13 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
 
   return createStore<AppState>()(
     persist(
-      (set, get) => ({
+      (set, get) => {
+        /** Runs a domain transition as the active persona with a fresh id and timestamp. */
+        const act = (fn: (world: World, actorId: string, ctx: ops.OpContext) => World) => {
+          const { world, activeAccountId } = get()
+          set({ world: fn(world, activeAccountId, { id: crypto.randomUUID(), now: new Date().toISOString() }) })
+        }
+        return {
         ...seed(),
         setActiveAccount: (accountId) => {
           if (!get().world.accounts.some((a) => a.id === accountId)) {
@@ -117,6 +146,14 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
         },
         logFlight: (draft, choices) => {
           const { world, activeAccountId } = get()
+          if (choices.instructorId !== null && !canTagInstructor(world, activeAccountId, choices.instructorId)) {
+            throw new Error(`Can't tag ${choices.instructorId} as instructor`)
+          }
+          for (const id of choices.flewWithIds) {
+            if (id === activeAccountId || !world.accounts.some((a) => a.id === id) || isBlocked(world, activeAccountId, id)) {
+              throw new Error(`Can't tag ${id} on this flight`)
+            }
+          }
           if (choices.clubId !== null) {
             const member = world.memberships.some(
               (m) => m.accountId === activeAccountId && m.clubId === choices.clubId && m.status === 'active',
@@ -167,8 +204,26 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
           }
           set({ world: { ...world, flights: world.flights.map((f) => (f.id === flightId ? reviewed : f)) } })
         },
+        setProfileLevel: (level) => act((w, me) => ops.setProfileLevel(w, me, level)),
+        follow: (id) => act((w, me, c) => ops.follow(w, me, id, c)),
+        unfollow: (id) => act((w, me) => ops.unfollow(w, me, id)),
+        answerFollowRequest: (followerId, approve) => act((w, me) => ops.answerFollowRequest(w, me, followerId, approve)),
+        toggleProps: (flightId) => act((w, me, c) => ops.toggleProps(w, me, flightId, c)),
+        addComment: (flightId, text) => act((w, me, c) => ops.addComment(w, me, flightId, text, c)),
+        answerTag: (flightId, accept) => act((w, me) => ops.answerTag(w, me, flightId, accept)),
+        addDebrief: (flightId, text) => act((w, me, c) => ops.addDebrief(w, me, flightId, text, c)),
+        signOffFlight: (flightId, note) => act((w, me, c) => ops.signOffFlight(w, me, flightId, note, c)),
+        signOffMilestone: (studentId, milestone, note) => act((w, me, c) => ops.signOffMilestone(w, me, studentId, milestone, note, c)),
+        revokeSignoff: (signoffId, reason) => act((w, me, c) => ops.revokeSignoff(w, me, signoffId, reason, c)),
+        requestSignoff: (cfiId, milestone) => act((w, me, c) => ops.requestSignoff(w, me, cfiId, milestone, c)),
+        declineSignoffRequest: (requestId) => act((w, me) => ops.declineSignoffRequest(w, me, requestId)),
+        claimMilestone: (milestone) => act((w, me, c) => ops.claimMilestone(w, me, milestone, c)),
+        block: (id) => act((w, me, c) => ops.block(w, me, id, c)),
+        unblock: (id) => act((w, me) => ops.unblock(w, me, id)),
+        report: (target, reason) => act((w, me, c) => ops.report(w, me, target, reason, c)),
         resetDemo: () => set(seed()),
-      }),
+        }
+      },
       {
         name: STORAGE_KEY,
         version: STORAGE_VERSION,
