@@ -9,7 +9,8 @@ import { homeSchoolOf } from './world'
  *  - Discoverable pilots appear in search and suggestions.
  *  - Public pilots appear only on an exact @handle match.
  *  - Private pilots and minors never appear.
- *  - Verified CFIs are listed as instructors whatever their personal profile level.
+ *  - Verified CFIs who keep their directory listing on are listed as instructors whatever their
+ *    personal profile level.
  *  - Blocking hides both people from each other.
  */
 
@@ -35,7 +36,8 @@ export function search(world: World, viewerId: string, raw: string): SearchResul
 
   const visible = world.accounts.filter((a) => a.id !== viewerId && !a.isMinor && !isBlocked(world, viewerId, a.id))
 
-  const cfis = visible.filter((a) => isVerifiedCfi(a) && matches(a))
+  // Unlisted CFIs are found only the way any pilot is: by their own profile level.
+  const cfis = visible.filter((a) => isVerifiedCfi(a) && a.cfi?.listed === true && matches(a))
   const cfiIds = new Set(cfis.map((a) => a.id))
   const pilots = visible.filter(
     (a) =>

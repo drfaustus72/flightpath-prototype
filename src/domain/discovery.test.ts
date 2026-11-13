@@ -34,6 +34,12 @@ describe('search', () => {
     expect(ids(r.pilots)).toEqual([])
   })
 
+  it('drops a CFI who turned their listing off back to their personal profile level', () => {
+    const unlisted = { ...cfi, cfi: cfi.cfi ? { ...cfi.cfi, listed: false } : null }
+    const world = makeWorld({ accounts: [me, unlisted] })
+    expect(search(world, 'me', 'carla')).toEqual({ pilots: [], cfis: [], clubs: [] })
+  })
+
   it('finds schools by name or airport, and ignores one-letter queries', () => {
     const clubs = [makeClub({ id: 's', name: 'Hawthorne Flight Academy' })]
     expect(ids(search(w({ clubs }), 'me', 'hawthorne').clubs)).toEqual(['s'])
