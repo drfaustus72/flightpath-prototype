@@ -1,9 +1,107 @@
 [
-  {"id": "mem-maya-hfa", "accountId": "acct-maya", "clubId": "club-hfa", "roles": ["member"], "status": "active", "isHomeSchool": true, "sponsoredPilotPro": true, "startedOn": "2026-03-02", "endedOn": null},
-  {"id": "mem-dan-hfa", "accountId": "acct-dan", "clubId": "club-hfa", "roles": ["staff_cfi"], "status": "active", "isHomeSchool": true, "sponsoredPilotPro": false, "startedOn": "2024-06-10", "endedOn": null},
-  {"id": "mem-alex-hfa", "accountId": "acct-alex", "clubId": "club-hfa", "roles": ["admin"], "status": "active", "isHomeSchool": true, "sponsoredPilotPro": false, "startedOn": "2023-01-15", "endedOn": null},
-  {"id": "mem-jordan-coastal", "accountId": "acct-jordan", "clubId": "club-coastal", "roles": ["member"], "status": "active", "isHomeSchool": true, "sponsoredPilotPro": false, "startedOn": "2024-02-01", "endedOn": null},
-  {"id": "mem-jordan-taildraggers", "accountId": "acct-jordan", "clubId": "club-taildraggers", "roles": ["member"], "status": "active", "isHomeSchool": false, "sponsoredPilotPro": false, "startedOn": "2025-08-20", "endedOn": null},
-  {"id": "mem-sam-hfa", "accountId": "acct-sam", "clubId": "club-hfa", "roles": ["member"], "status": "active", "isHomeSchool": true, "sponsoredPilotPro": false, "startedOn": "2026-09-01", "endedOn": null},
-  {"id": "mem-kim-coastal", "accountId": "acct-kim", "clubId": "club-coastal", "roles": ["admin", "staff_cfi"], "status": "active", "isHomeSchool": true, "sponsoredPilotPro": false, "startedOn": "2019-05-01", "endedOn": null}
+  {
+    "id": "mem-maya-hfa",
+    "accountId": "acct-maya",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": true,
+    "startedOn": "2026-03-02",
+    "endedOn": null
+  },
+  {
+    "id": "mem-dan-hfa",
+    "accountId": "acct-dan",
+    "clubId": "club-hfa",
+    "roles": [
+      "staff_cfi"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2024-06-10",
+    "endedOn": null
+  },
+  {
+    "id": "mem-alex-hfa",
+    "accountId": "acct-alex",
+    "clubId": "club-hfa",
+    "roles": [
+      "admin"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2023-01-15",
+    "endedOn": null
+  },
+  {
+    "id": "mem-jordan-coastal",
+    "accountId": "acct-jordan",
+    "clubId": "club-coastal",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2024-02-01",
+    "endedOn": null
+  },
+  {
+    "id": "mem-jordan-taildraggers",
+    "accountId": "acct-jordan",
+    "clubId": "club-taildraggers",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": false,
+    "sponsoredPilotPro": false,
+    "startedOn": "2025-08-20",
+    "endedOn": null
+  },
+  {
+    "id": "mem-sam-hfa",
+    "accountId": "acct-sam",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2026-09-01",
+    "endedOn": null
+  },
+  {
+    "id": "mem-kim-coastal",
+    "accountId": "acct-kim",
+    "clubId": "club-coastal",
+    "roles": [
+      "admin",
+      "staff_cfi"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2019-05-01",
+    "endedOn": null
+  },
+  {
+    "id": "mem-lena-hfa",
+    "accountId": "acct-lena",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2025-09-01",
+    "endedOn": null
+  }
 ]

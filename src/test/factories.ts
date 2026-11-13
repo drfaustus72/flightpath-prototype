@@ -13,6 +13,7 @@ export function makeAccount(overrides: Partial<Account> = {}): Account {
     flightReviewOn: null,
     cfi: null,
     isMinor: false,
+    profileLevel: 'public',
     visibility: {},
     subscription: { pilotPro: false, cfiPro: false },
     demoPersona: null,

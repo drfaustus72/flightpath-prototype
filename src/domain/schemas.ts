@@ -12,6 +12,13 @@ export const icao = z.string().regex(/^[A-Z0-9]{3,4}$/, 'ICAO/FAA identifier, e.
 
 export const visibilitySchema = z.enum(['public', 'followers', 'club', 'private'])
 
+/**
+ * Overall profile level (decided 12 Nov 2026). Private: approved followers only. Public: anyone with
+ * the link, QR code or exact @handle. Discoverable: also found in search and suggestions.
+ * New adult pilots start Public; minors are always Private.
+ */
+export const profileLevelSchema = z.enum(['private', 'public', 'discoverable'])
+
 export const profileFieldSchema = z.enum([
   'homeAirport',
   'certificates',
@@ -69,6 +76,7 @@ export const accountSchema = z.object({
   flightReviewOn: isoDate.nullable(),
   cfi: cfiProfileSchema.nullable(),
   isMinor: z.boolean(),
+  profileLevel: profileLevelSchema,
   /** Partial: fields not listed use the product defaults from the brief. */
   visibility: z.partialRecord(profileFieldSchema, visibilitySchema),
   subscription: subscriptionSchema,
@@ -135,6 +143,12 @@ export const flightStatsSchema = z.object({
   maxGroundspeedKt: z.number().nonnegative().nullable(),
 })
 
+/** A person tagged on a flight (instructor or "flew with"). The tag shows only once they accept it. */
+export const tagSchema = z.object({
+  accountId: id,
+  status: z.enum(['pending', 'accepted', 'declined']),
+})
+
 export const flightSchema = z.object({
   id,
   pilotId: id,
@@ -172,12 +186,18 @@ export const flightSchema = z.object({
     })
     .nullable(),
   postVisibility: z.enum(['public', 'followers', 'private']),
+  /** The CFI who instructed on this flight. Must be a verified CFI other than the pilot. */
+  instructor: tagSchema.nullable(),
+  /** Co-pilot, safety pilot or passenger on Flightpath. */
+  flewWith: z.array(tagSchema),
   createdAt: isoDateTime,
 })
 
 /**
  * Stored achievements are only the ones someone must verify: training milestones (M2) and
  * missions (M3). Stamps and "candy" badges are derived from flights (see domain/recognition.ts).
+ * A stored milestone is the pilot's own (self-reported) claim; a CFI's verification lives in
+ * `signoffs`, so revoking a sign-off never deletes what the pilot entered.
  */
 export const achievementSchema = z.object({
   id,
@@ -191,6 +211,93 @@ export const achievementSchema = z.object({
   earnedAt: isoDateTime,
 })
 
+/** Training milestones a CFI can sign off. Titles and order live in domain/milestones.ts. */
+export const milestoneCodeSchema = z.enum([
+  'first_solo',
+  'first_solo_xc',
+  'private_checkride',
+  'instrument_rating',
+  'flight_review',
+  'ipc',
+  'tailwheel',
+  'high_performance',
+])
+
+export const followSchema = z.object({
+  followerId: id,
+  followeeId: id,
+  /** Following a Private profile needs the owner's approval. */
+  status: z.enum(['pending', 'accepted']),
+  at: isoDateTime,
+})
+
+export const propSchema = z.object({ flightId: id, accountId: id, at: isoDateTime })
+
+export const COMMENT_MAX = 500
+export const commentSchema = z.object({
+  id,
+  flightId: id,
+  authorId: id,
+  text: z.string().trim().min(1).max(COMMENT_MAX),
+  at: isoDateTime,
+})
+
+/** Private student–instructor thread on a flight. Only the pilot and the accepted instructor see it. */
+export const DEBRIEF_MAX = 2000
+export const debriefMessageSchema = z.object({
+  id,
+  flightId: id,
+  authorId: id,
+  text: z.string().trim().min(1).max(DEBRIEF_MAX),
+  at: isoDateTime,
+})
+
+/** A CFI–student relationship; lets the CFI sign off the student's milestones. */
+export const cfiLinkSchema = z.object({
+  id,
+  cfiId: id,
+  studentId: id,
+  status: z.enum(['active', 'ended']),
+  since: isoDate,
+})
+
+/**
+ * A platform verification by a CFI, never an FAA endorsement. Logged with time, CFI and scope;
+ * revocable by the same CFI with a reason. Exactly one of flightId / milestone is set.
+ */
+export const signoffSchema = z.object({
+  id,
+  cfiId: id,
+  studentId: id,
+  flightId: id.nullable(),
+  milestone: milestoneCodeSchema.nullable(),
+  /** The school the CFI signed for, if any. */
+  clubId: id.nullable(),
+  note: z.string().max(500),
+  at: isoDateTime,
+  revoked: z.object({ at: isoDateTime, reason: z.string().trim().min(1).max(500) }).nullable(),
+})
+
+export const signoffRequestSchema = z.object({
+  id,
+  studentId: id,
+  cfiId: id,
+  milestone: milestoneCodeSchema,
+  status: z.enum(['open', 'signed', 'declined']),
+  at: isoDateTime,
+})
+
+export const blockSchema = z.object({ blockerId: id, blockedId: id, at: isoDateTime })
+
+/** Reports are recorded only; a moderation queue is out of scope for the prototype. */
+export const reportSchema = z.object({
+  id,
+  reporterId: id,
+  target: z.object({ kind: z.enum(['account', 'flight', 'comment']), id }),
+  reason: z.enum(['spam', 'harassment', 'unsafe', 'impersonation', 'other']),
+  at: isoDateTime,
+})
+
 export const worldSchema = z.object({
   accounts: z.array(accountSchema).min(1),
   clubs: z.array(clubSchema),
@@ -198,4 +305,13 @@ export const worldSchema = z.object({
   airports: z.array(airportSchema).min(1),
   flights: z.array(flightSchema),
   achievements: z.array(achievementSchema),
+  follows: z.array(followSchema),
+  props: z.array(propSchema),
+  comments: z.array(commentSchema),
+  debriefs: z.array(debriefMessageSchema),
+  cfiLinks: z.array(cfiLinkSchema),
+  signoffs: z.array(signoffSchema),
+  signoffRequests: z.array(signoffRequestSchema),
+  blocks: z.array(blockSchema),
+  reports: z.array(reportSchema),
 })

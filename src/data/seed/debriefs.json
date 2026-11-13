@@ -1,0 +1,23 @@
+[
+  {
+    "id": "dbf-1",
+    "flightId": "flt-maya-pattern",
+    "authorId": "acct-dan",
+    "text": "Good crosswind correction on landings 2 and 3. On the first one you let the upwind wing come up in the flare; keep adding aileron as you slow down.",
+    "at": "2026-11-03T19:00:00Z"
+  },
+  {
+    "id": "dbf-2",
+    "flightId": "flt-maya-pattern",
+    "authorId": "acct-maya",
+    "text": "Thanks! Can we do another gusty day before my solo?",
+    "at": "2026-11-03T19:40:00Z"
+  },
+  {
+    "id": "dbf-3",
+    "flightId": "flt-marcus-ifr",
+    "authorId": "acct-priya",
+    "text": "Solid scan on the second approach. Brief the missed approach before the FAF next time.",
+    "at": "2026-11-08T22:00:00Z"
+  }
+]

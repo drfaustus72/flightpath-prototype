@@ -13,6 +13,18 @@ import type {
   profileFieldSchema,
   visibilitySchema,
   worldSchema,
+  profileLevelSchema,
+  tagSchema,
+  milestoneCodeSchema,
+  followSchema,
+  propSchema,
+  commentSchema,
+  debriefMessageSchema,
+  cfiLinkSchema,
+  signoffSchema,
+  signoffRequestSchema,
+  blockSchema,
+  reportSchema,
 } from './schemas'
 
 export type Account = z.infer<typeof accountSchema>
@@ -28,3 +40,15 @@ export type Flight = z.infer<typeof flightSchema>
 export type FlightStats = z.infer<typeof flightStatsSchema>
 export type Landing = z.infer<typeof landingSchema>
 export type Achievement = z.infer<typeof achievementSchema>
+export type ProfileLevel = z.infer<typeof profileLevelSchema>
+export type Tag = z.infer<typeof tagSchema>
+export type MilestoneCode = z.infer<typeof milestoneCodeSchema>
+export type Follow = z.infer<typeof followSchema>
+export type Prop = z.infer<typeof propSchema>
+export type Comment = z.infer<typeof commentSchema>
+export type DebriefMessage = z.infer<typeof debriefMessageSchema>
+export type CfiLink = z.infer<typeof cfiLinkSchema>
+export type Signoff = z.infer<typeof signoffSchema>
+export type SignoffRequest = z.infer<typeof signoffRequestSchema>
+export type Block = z.infer<typeof blockSchema>
+export type Report = z.infer<typeof reportSchema>

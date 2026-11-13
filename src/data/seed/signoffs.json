@@ -1,0 +1,35 @@
+[
+  {
+    "id": "sgn-1",
+    "cfiId": "acct-dan",
+    "studentId": "acct-maya",
+    "flightId": "flt-maya-pattern",
+    "milestone": null,
+    "clubId": "club-hfa",
+    "note": "Pattern and crosswind landings to standard.",
+    "at": "2026-11-03T19:05:00Z",
+    "revoked": null
+  },
+  {
+    "id": "sgn-2",
+    "cfiId": "acct-priya",
+    "studentId": "acct-marcus",
+    "flightId": "flt-marcus-ifr",
+    "milestone": null,
+    "clubId": null,
+    "note": "",
+    "at": "2026-11-08T22:05:00Z",
+    "revoked": null
+  },
+  {
+    "id": "sgn-3",
+    "cfiId": "acct-kim",
+    "studentId": "acct-jordan",
+    "flightId": null,
+    "milestone": "tailwheel",
+    "clubId": "club-coastal",
+    "note": "",
+    "at": "2026-04-12T18:00:00Z",
+    "revoked": null
+  }
+]

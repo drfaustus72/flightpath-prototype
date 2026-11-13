@@ -8,7 +8,8 @@ import type { Flight, World } from './types'
 
 function seed(): World {
   if (!seedResult.ok) throw new Error('seed')
-  return structuredClone(seedResult.world)
+  // These tests build their own flights; start from the seed's accounts with no flights.
+  return { ...structuredClone(seedResult.world), flights: [] }
 }
 
 let n = 0
@@ -18,7 +19,7 @@ function fly(world: World, legs: Leg[], start: string, opts: { pilotId?: string;
   const draft = { ...r.draft, isSimulator: opts.sim ?? false }
   const f = createFlight(
     draft,
-    { caption: '', routeVisibility: 'full', clubId: null, postVisibility: 'public' },
+    { caption: '', routeVisibility: 'full', clubId: null, postVisibility: 'public', instructorId: null, flewWithIds: [] },
     opts.pilotId ?? 'acct-jordan',
     `f${++n}`,
     start,

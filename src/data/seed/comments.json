@@ -1,0 +1,30 @@
+[
+  {
+    "id": "cmt-1",
+    "flightId": "flt-maya-pattern",
+    "authorId": "acct-lena",
+    "text": "Gusty days are the best practice. Nice work!",
+    "at": "2026-11-03T21:12:00Z"
+  },
+  {
+    "id": "cmt-2",
+    "flightId": "flt-lena-sba",
+    "authorId": "acct-maya",
+    "text": "Adding this to my list for after my checkride.",
+    "at": "2026-11-09T20:05:00Z"
+  },
+  {
+    "id": "cmt-3",
+    "flightId": "flt-kim-bigbear",
+    "authorId": "acct-jordan",
+    "text": "What did you see for density altitude on the field?",
+    "at": "2026-11-05T21:05:00Z"
+  },
+  {
+    "id": "cmt-4",
+    "flightId": "flt-kim-bigbear",
+    "authorId": "acct-kim",
+    "text": "About 8,900 ft. Leaned for best power before takeoff.",
+    "at": "2026-11-05T22:30:00Z"
+  }
+]

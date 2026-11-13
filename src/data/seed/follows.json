@@ -1,0 +1,98 @@
+[
+  {
+    "followerId": "acct-maya",
+    "followeeId": "acct-dan",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-dan",
+    "followeeId": "acct-maya",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-maya",
+    "followeeId": "acct-lena",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-lena",
+    "followeeId": "acct-maya",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-alex",
+    "followeeId": "acct-maya",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-alex",
+    "followeeId": "acct-lena",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-alex",
+    "followeeId": "acct-dan",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-dan",
+    "followeeId": "acct-lena",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-sam",
+    "followeeId": "acct-dan",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-dan",
+    "followeeId": "acct-sam",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-jordan",
+    "followeeId": "acct-kim",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-kim",
+    "followeeId": "acct-jordan",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-marcus",
+    "followeeId": "acct-priya",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-priya",
+    "followeeId": "acct-marcus",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-lena",
+    "followeeId": "acct-theo",
+    "status": "accepted",
+    "at": "2026-10-01T12:00:00Z"
+  },
+  {
+    "followerId": "acct-marcus",
+    "followeeId": "acct-theo",
+    "status": "pending",
+    "at": "2026-11-11T09:00:00Z"
+  }
+]

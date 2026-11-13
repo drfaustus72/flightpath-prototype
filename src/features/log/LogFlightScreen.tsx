@@ -133,6 +133,8 @@ function Review({ draft, onDiscard }: { draft: FlightDraft; onDiscard: () => voi
     routeVisibility: 'full',
     clubId: draft.isSimulator ? null : (home?.id ?? null),
     postVisibility: account.isMinor ? 'private' : 'public',
+    instructorId: null,
+    flewWithIds: [],
   })
   const set = <K extends keyof PostChoices>(key: K, value: PostChoices[K]) => setChoices((c) => ({ ...c, [key]: value }))
 

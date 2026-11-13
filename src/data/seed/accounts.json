@@ -28,9 +28,10 @@
     },
     "demoPersona": {
       "label": "Student pilot",
-      "description": "Maya \u00b7 Pilot Pro seat sponsored by her school",
+      "description": "Maya · Pilot Pro seat sponsored by her school",
       "order": 0
-    }
+    },
+    "profileLevel": "public"
   },
   {
     "id": "acct-dan",
@@ -70,9 +71,10 @@
     },
     "demoPersona": {
       "label": "CFI",
-      "description": "Dan \u00b7 staff CFI, CFI Pro included by his school",
+      "description": "Dan · staff CFI, CFI Pro included by his school",
       "order": 1
-    }
+    },
+    "profileLevel": "discoverable"
   },
   {
     "id": "acct-alex",
@@ -103,9 +105,10 @@
     },
     "demoPersona": {
       "label": "School admin",
-      "description": "Alex \u00b7 admin of a School Pro school",
+      "description": "Alex · admin of a School Pro school",
       "order": 2
-    }
+    },
+    "profileLevel": "discoverable"
   },
   {
     "id": "acct-jordan",
@@ -136,9 +139,10 @@
     },
     "demoPersona": {
       "label": "Free pilot",
-      "description": "Jordan \u00b7 Pilot Free, home school on School Basic",
+      "description": "Jordan · Pilot Free, home school on School Basic",
       "order": 3
-    }
+    },
+    "profileLevel": "discoverable"
   },
   {
     "id": "acct-priya",
@@ -177,7 +181,8 @@
       "pilotPro": false,
       "cfiPro": false
     },
-    "demoPersona": null
+    "demoPersona": null,
+    "profileLevel": "discoverable"
   },
   {
     "id": "acct-sam",
@@ -206,7 +211,8 @@
       "pilotPro": false,
       "cfiPro": false
     },
-    "demoPersona": null
+    "demoPersona": null,
+    "profileLevel": "private"
   },
   {
     "id": "acct-kim",
@@ -244,6 +250,74 @@
       "pilotPro": false,
       "cfiPro": false
     },
-    "demoPersona": null
+    "demoPersona": null,
+    "profileLevel": "discoverable"
+  },
+  {
+    "id": "acct-lena",
+    "displayName": "Lena Brooks",
+    "handle": "lena_b",
+    "bio": "Private pilot since spring. Breakfast flights up the coast.",
+    "homeAirport": "KHHR",
+    "certificates": [
+      "private"
+    ],
+    "totalHours": 112,
+    "hoursSource": "self_reported",
+    "flightReviewOn": null,
+    "cfi": null,
+    "isMinor": false,
+    "visibility": {},
+    "subscription": {
+      "pilotPro": false,
+      "cfiPro": false
+    },
+    "demoPersona": null,
+    "profileLevel": "discoverable"
+  },
+  {
+    "id": "acct-marcus",
+    "displayName": "Marcus Webb",
+    "handle": "marcus_ifr",
+    "bio": "Instrument student flying out of Torrance.",
+    "homeAirport": "KTOA",
+    "certificates": [
+      "private"
+    ],
+    "totalHours": 186,
+    "hoursSource": "self_reported",
+    "flightReviewOn": null,
+    "cfi": null,
+    "isMinor": false,
+    "visibility": {},
+    "subscription": {
+      "pilotPro": false,
+      "cfiPro": false
+    },
+    "demoPersona": null,
+    "profileLevel": "public"
+  },
+  {
+    "id": "acct-theo",
+    "displayName": "Theo Grant",
+    "handle": "theo_g",
+    "bio": "",
+    "homeAirport": "KSMO",
+    "certificates": [
+      "private",
+      "instrument"
+    ],
+    "totalHours": 640,
+    "hoursSource": "self_reported",
+    "flightReviewOn": null,
+    "cfi": null,
+    "isMinor": false,
+    "visibility": {},
+    "subscription": {
+      "pilotPro": false,
+      "cfiPro": false
+    },
+    "demoPersona": null,
+    "profileLevel": "private"
   }
 ]

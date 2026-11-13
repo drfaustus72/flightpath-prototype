@@ -107,10 +107,119 @@ export function checkIntegrity(world: World): string[] {
     if (a.icao !== null && !airports.has(a.icao)) errors.push(`achievement ${a.id}: unknown airport ${a.icao}`)
   }
 
+  errors.push(...checkSocialIntegrity(world, accounts, flightIds, clubs))
+
   for (const d of duplicates(activePairs)) errors.push(`memberships: more than one active membership for ${d}`)
   for (const [accountId, n] of homeSchoolsByAccount) {
     if (n > 1) errors.push(`account ${accountId}: more than one active home school`)
   }
+
+  return errors
+}
+
+function checkSocialIntegrity(
+  world: World,
+  accounts: ReadonlyMap<string, Account>,
+  flightIds: ReadonlySet<string>,
+  clubs: ReadonlyMap<string, unknown>,
+): string[] {
+  const errors: string[] = []
+  const known = (kind: string, accountId: string) => {
+    if (!accounts.has(accountId)) errors.push(`${kind}: unknown account ${accountId}`)
+  }
+  const knownFlight = (kind: string, flightId: string) => {
+    if (!flightIds.has(flightId)) errors.push(`${kind}: unknown flight ${flightId}`)
+  }
+
+  for (const a of world.accounts) {
+    if (a.isMinor && a.profileLevel !== 'private') errors.push(`account ${a.id}: minor accounts must be Private`)
+  }
+
+  for (const f of world.flights) {
+    const tags = [...(f.instructor ? [f.instructor] : []), ...f.flewWith]
+    for (const t of tags) {
+      known(`flight ${f.id} tag`, t.accountId)
+      if (t.accountId === f.pilotId) errors.push(`flight ${f.id}: a pilot can't tag themselves`)
+    }
+    for (const d of duplicates(tags.map((t) => t.accountId))) errors.push(`flight ${f.id}: ${d} tagged more than once`)
+    if (f.instructor) {
+      const cfi = accounts.get(f.instructor.accountId)
+      if (cfi && !isVerified(cfi)) errors.push(`flight ${f.id}: instructor ${cfi.id} is not a verified CFI`)
+    }
+  }
+
+  for (const d of duplicates(world.follows.map((x) => `${x.followerId}→${x.followeeId}`))) errors.push(`follows: duplicate ${d}`)
+  for (const x of world.follows) {
+    known('follow', x.followerId)
+    known('follow', x.followeeId)
+    if (x.followerId === x.followeeId) errors.push(`follow ${x.followerId}: can't follow yourself`)
+  }
+
+  for (const d of duplicates(world.props.map((p) => `${p.accountId}/${p.flightId}`))) errors.push(`props: duplicate ${d}`)
+  for (const p of world.props) {
+    known('props', p.accountId)
+    knownFlight('props', p.flightId)
+  }
+
+  for (const d of duplicates([...world.comments, ...world.debriefs].map((c) => c.id))) errors.push(`comments/debriefs: duplicate id ${d}`)
+  for (const c of world.comments) {
+    known(`comment ${c.id}`, c.authorId)
+    knownFlight(`comment ${c.id}`, c.flightId)
+  }
+  for (const m of world.debriefs) {
+    known(`debrief ${m.id}`, m.authorId)
+    const f = world.flights.find((x) => x.id === m.flightId)
+    if (!f) errors.push(`debrief ${m.id}: unknown flight ${m.flightId}`)
+    else if (m.authorId !== f.pilotId && !(f.instructor?.accountId === m.authorId && f.instructor.status === 'accepted')) {
+      errors.push(`debrief ${m.id}: only the pilot and the accepted instructor can write in a debrief`)
+    }
+  }
+
+  for (const d of duplicates(world.cfiLinks.map((l) => l.id))) errors.push(`cfiLinks: duplicate id ${d}`)
+  for (const d of duplicates(world.cfiLinks.filter((l) => l.status === 'active').map((l) => `${l.cfiId}→${l.studentId}`))) {
+    errors.push(`cfiLinks: more than one active link ${d}`)
+  }
+  for (const l of world.cfiLinks) {
+    known(`cfiLink ${l.id}`, l.studentId)
+    const cfi = accounts.get(l.cfiId)
+    if (!cfi) errors.push(`cfiLink ${l.id}: unknown account ${l.cfiId}`)
+    else if (!isVerified(cfi)) errors.push(`cfiLink ${l.id}: ${l.cfiId} is not a verified CFI`)
+    if (l.cfiId === l.studentId) errors.push(`cfiLink ${l.id}: a CFI can't be their own student`)
+  }
+
+  for (const d of duplicates(world.signoffs.map((s) => s.id))) errors.push(`signoffs: duplicate id ${d}`)
+  const activeSubjects: string[] = []
+  for (const s of world.signoffs) {
+    known(`signoff ${s.id}`, s.studentId)
+    const cfi = accounts.get(s.cfiId)
+    if (!cfi) errors.push(`signoff ${s.id}: unknown account ${s.cfiId}`)
+    else if (!isVerified(cfi)) errors.push(`signoff ${s.id}: ${s.cfiId} is not a verified CFI`)
+    if (s.cfiId === s.studentId) errors.push(`signoff ${s.id}: no self-verification`)
+    if ((s.flightId === null) === (s.milestone === null)) errors.push(`signoff ${s.id}: set exactly one of flightId and milestone`)
+    if (s.clubId !== null && !clubs.has(s.clubId)) errors.push(`signoff ${s.id}: unknown club ${s.clubId}`)
+    if (s.flightId !== null) {
+      const f = world.flights.find((x) => x.id === s.flightId)
+      if (!f) errors.push(`signoff ${s.id}: unknown flight ${s.flightId}`)
+      else if (f.pilotId !== s.studentId || f.instructor?.accountId !== s.cfiId || f.instructor.status !== 'accepted') {
+        errors.push(`signoff ${s.id}: a flight sign-off needs the flight's accepted instructor and its pilot`)
+      }
+    }
+    if (s.revoked === null) activeSubjects.push(`${s.studentId}/${s.flightId ?? s.milestone}`)
+  }
+  for (const d of duplicates(activeSubjects)) errors.push(`signoffs: more than one active sign-off for ${d}`)
+
+  for (const d of duplicates(world.signoffRequests.map((r) => r.id))) errors.push(`signoffRequests: duplicate id ${d}`)
+  for (const r of world.signoffRequests) {
+    known(`signoffRequest ${r.id}`, r.studentId)
+    known(`signoffRequest ${r.id}`, r.cfiId)
+  }
+
+  for (const b of world.blocks) {
+    known('block', b.blockerId)
+    known('block', b.blockedId)
+    if (b.blockerId === b.blockedId) errors.push(`block ${b.blockerId}: can't block yourself`)
+  }
+  for (const d of duplicates(world.reports.map((r) => r.id))) errors.push(`reports: duplicate id ${d}`)
 
   return errors
 }

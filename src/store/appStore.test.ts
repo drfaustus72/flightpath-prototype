@@ -57,20 +57,21 @@ describe('app store', () => {
     )
     const imported = importTrack(gpx, 'c.gpx', world.airports)
     if (!imported.ok) throw new Error(imported.error)
-    const choices = { caption: ' Lunch at DZ ', routeVisibility: 'full', clubId: 'club-hfa', postVisibility: 'public' } as const
+    const choices = { caption: ' Lunch at DZ ', routeVisibility: 'full', clubId: 'club-hfa', postVisibility: 'public' as const, instructorId: null, flewWithIds: [] as string[] } as const
 
     const store = createAppStore(world)
     const first = store.getState().logFlight(imported.draft, choices)
     expect(first.flight.pilotId).toBe('acct-maya')
     expect(first.flight.caption).toBe('Lunch at DZ')
-    expect(first.newAirports.map((a) => a.icao)).toEqual(['KHHR', 'KAVX'])
-    expect(first.newBadges.map((b) => b.code)).toEqual(['first_flight'])
+    // Maya's seed flights already earned KHHR and the first-flight badge.
+    expect(first.newAirports.map((a) => a.icao)).toEqual(['KAVX'])
+    expect(first.newBadges).toEqual([])
     const second = store.getState().logFlight(imported.draft, choices)
     expect(second.newAirports).toEqual([])
     expect(second.newBadges).toEqual([])
 
     const reloaded = createAppStore(world)
-    expect(reloaded.getState().world.flights).toHaveLength(2)
+    expect(reloaded.getState().world.flights).toHaveLength(world.flights.length + 2)
   })
 
   it('marks a tagged sim session pending; only a school admin or staff CFI can confirm it', async () => {
@@ -82,7 +83,7 @@ describe('app store', () => {
     const store = createAppStore(world)
     const { flight, newAirports, newBadges } = store
       .getState()
-      .logFlight(r.draft, { caption: '', routeVisibility: 'full', clubId: 'club-hfa', postVisibility: 'public' })
+      .logFlight(r.draft, { caption: '', routeVisibility: 'full', clubId: 'club-hfa', postVisibility: 'public', instructorId: null, flewWithIds: [] })
     expect(newAirports).toEqual([])
     expect(newBadges.map((b) => b.code)).toEqual(['first_sim'])
     expect(flight.simConfirmation?.status).toBe('pending')
@@ -116,7 +117,7 @@ describe('app store', () => {
     )
     if (!r.ok) throw new Error(r.error)
     expect(() =>
-      store.getState().logFlight(r.draft, { caption: '', routeVisibility: 'full', clubId: 'club-coastal', postVisibility: 'public' }),
+      store.getState().logFlight(r.draft, { caption: '', routeVisibility: 'full', clubId: 'club-coastal', postVisibility: 'public', instructorId: null, flewWithIds: [] }),
     ).toThrow("Can't tag a club")
   })
 

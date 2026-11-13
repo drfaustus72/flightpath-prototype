@@ -55,18 +55,39 @@ export function formatDuration(sec: number | null): string {
   return h > 0 ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`
 }
 
-export type PostChoices = Pick<Flight, 'caption' | 'routeVisibility' | 'clubId' | 'postVisibility'>
+export type PostChoices = Pick<Flight, 'caption' | 'routeVisibility' | 'clubId' | 'postVisibility'> & {
+  /** CFI tagged as instructor; the tag shows once the CFI accepts it. */
+  instructorId: string | null
+  /** People tagged as co-pilot, safety pilot or passenger; each tag shows once accepted. */
+  flewWithIds: string[]
+}
+
+type DraftFields = Omit<
+  Flight,
+  'id' | 'pilotId' | 'createdAt' | 'simConfirmation' | 'instructor' | 'flewWith' | 'caption' | 'routeVisibility' | 'clubId' | 'postVisibility'
+>
 
 /** Turns an imported draft plus the pilot's sharing choices into a stored flight. */
 export function createFlight(
-  draft: { airportsVisited: string[] } & Omit<Flight, 'id' | 'pilotId' | 'createdAt' | 'simConfirmation' | keyof PostChoices>,
+  draft: { airportsVisited: string[] } & DraftFields,
   choices: PostChoices,
   pilotId: string,
   id: string,
   createdAt: string,
 ): Flight {
   const { airportsVisited: _visited, ...rest } = draft
+  const { instructorId, flewWithIds, ...post } = choices
   const simConfirmation =
     draft.isSimulator && choices.clubId !== null ? { status: 'pending' as const, byAccountId: null, at: null } : null
-  return { ...rest, ...choices, caption: choices.caption.trim(), simConfirmation, id, pilotId, createdAt }
+  return {
+    ...rest,
+    ...post,
+    caption: post.caption.trim(),
+    simConfirmation,
+    instructor: instructorId === null ? null : { accountId: instructorId, status: 'pending' },
+    flewWith: [...new Set(flewWithIds)].filter((x) => x !== instructorId).map((accountId) => ({ accountId, status: 'pending' as const })),
+    id,
+    pilotId,
+    createdAt,
+  }
 }

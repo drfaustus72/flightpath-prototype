@@ -8,7 +8,7 @@ import type { Flight, World } from '../domain/types'
 import { demoPersonas, loadWorld } from '../domain/world'
 
 /** Bump whenever the persisted shape changes. Old state is discarded and reset to seed. */
-export const STORAGE_VERSION = 4
+export const STORAGE_VERSION = 5
 export const STORAGE_KEY = 'flightpath-demo'
 
 export interface AppState {

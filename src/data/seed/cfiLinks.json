@@ -1,0 +1,30 @@
+[
+  {
+    "id": "lnk-dan-maya",
+    "cfiId": "acct-dan",
+    "studentId": "acct-maya",
+    "status": "active",
+    "since": "2026-05-01"
+  },
+  {
+    "id": "lnk-dan-sam",
+    "cfiId": "acct-dan",
+    "studentId": "acct-sam",
+    "status": "active",
+    "since": "2026-09-15"
+  },
+  {
+    "id": "lnk-priya-marcus",
+    "cfiId": "acct-priya",
+    "studentId": "acct-marcus",
+    "status": "active",
+    "since": "2026-07-01"
+  },
+  {
+    "id": "lnk-kim-jordan",
+    "cfiId": "acct-kim",
+    "studentId": "acct-jordan",
+    "status": "active",
+    "since": "2026-03-01"
+  }
+]

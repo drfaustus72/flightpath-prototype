@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "ach-maya-solo",
+    "pilotId": "acct-maya",
+    "kind": "milestone",
+    "code": "milestone:first_solo",
+    "title": "First solo",
+    "icao": "KHHR",
+    "flightId": null,
+    "earnedAt": "2026-10-20T17:00:00Z"
+  },
+  {
+    "id": "ach-lena-ppl",
+    "pilotId": "acct-lena",
+    "kind": "milestone",
+    "code": "milestone:private_checkride",
+    "title": "Private Pilot checkride",
+    "icao": "KHHR",
+    "flightId": null,
+    "earnedAt": "2026-04-18T20:00:00Z"
+  }
+]
