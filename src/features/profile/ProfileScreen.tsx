@@ -18,24 +18,6 @@ export function ProfileScreen() {
         <ShareProfile />
       </div>
 
-      <WaitingForYou />
-      <ProfileLevelPicker />
-      <CfiListingSwitch />
-      <ProfileFacts owner={account} />
-      <TrainingTimeline owner={account} />
-      <LogbookPanel key={account.id} account={account} />
-      <TrophyCase owner={account} />
-      <LandedMap owner={account} />
-
-      {isVerifiedCfi(account) && (
-        <section aria-labelledby="own-flying-title" className="flex flex-col gap-2">
-          <h2 id="own-flying-title" className="font-semibold">
-            Your own flying
-          </h2>
-          <LinkRow to="/progress" title="Progress" detail="Stamps, badges, milestones and recent flying" />
-        </section>
-      )}
-
       {adminClubs.length > 0 && (
         <section aria-labelledby="manage-title">
           <h2 id="manage-title" className="mb-2 font-semibold">
@@ -50,6 +32,25 @@ export function ProfileScreen() {
           </ul>
         </section>
       )}
+
+      <WaitingForYou />
+      <ProfileLevelPicker />
+      <CfiListingSwitch />
+      <ProfileFacts owner={account} />
+      <TrainingTimeline owner={account} />
+      <LogbookPanel key={account.id} account={account} />
+      <TrophyCase owner={account} />
+      <LandedMap owner={account} />
+
+      {(isVerifiedCfi(account) || adminClubs.length > 0) && (
+        <section aria-labelledby="own-flying-title" className="flex flex-col gap-2">
+          <h2 id="own-flying-title" className="font-semibold">
+            Your own flying
+          </h2>
+          <LinkRow to="/progress" title="Progress" detail="Stamps, badges, milestones and recent flying" />
+        </section>
+      )}
+
     </div>
   )
 }

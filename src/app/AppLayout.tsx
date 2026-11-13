@@ -1,7 +1,8 @@
-import { Compass, Gauge, Inbox, Plus, Rows3, UserRound } from 'lucide-react'
+import { Building2, Compass, Gauge, Inbox, Plus, Rows3, UserRound } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { NavLink, Outlet } from 'react-router'
 import { missionsToVerify } from '../domain/missions'
+import { schoolQueueCount, schoolQueues } from '../domain/schoolAdmin'
 import { inboxCount, inboxFor } from '../domain/signoffs'
 import { isVerifiedCfi } from '../domain/tiers'
 import { useActive, useWorld } from '../store/hooks'
@@ -15,13 +16,27 @@ const log: Tab = { to: '/log', label: 'Log flight', icon: <Plus size={26} stroke
 const progress: Tab = { to: '/progress', label: 'Progress', icon: <Gauge size={22} aria-hidden="true" /> }
 const profile: Tab = { to: '/profile', label: 'Profile', icon: <UserRound size={22} aria-hidden="true" /> }
 
-/** Verified CFIs get an Inbox tab in place of Progress (still reachable from their profile). */
+/**
+ * The fourth tab follows the persona's job (Progress stays reachable from the profile):
+ *  - verified CFIs get an Inbox (sign-offs, tags, debriefs, plus their schools' join requests);
+ *  - school admins who aren't CFIs get their School tools;
+ *  - everyone else gets Progress.
+ */
 function useTabs(): Tab[] {
   const world = useWorld()
   const { account } = useActive()
-  if (!isVerifiedCfi(account)) return [feed, explore, log, progress, profile]
-  const count = inboxCount(inboxFor(world, account.id)) + missionsToVerify(world, account.id).length
-  return [feed, explore, log, { to: '/inbox', label: 'Inbox', icon: <Inbox size={22} aria-hidden="true" />, count }, profile]
+  const schools = schoolQueues(world, account.id)
+  if (isVerifiedCfi(account)) {
+    // Missions and sim sessions already count in the CFI's own inbox; add only join requests.
+    const joins = schools.reduce((n, q) => n + q.joinRequests.length, 0)
+    const count = inboxCount(inboxFor(world, account.id)) + missionsToVerify(world, account.id).length + joins
+    return [feed, explore, log, { to: '/inbox', label: 'Inbox', icon: <Inbox size={22} aria-hidden="true" />, count }, profile]
+  }
+  if (schools.length > 0) {
+    const count = schools.reduce((n, q) => n + schoolQueueCount(q), 0)
+    return [feed, explore, log, { to: '/school', label: 'School', icon: <Building2 size={22} aria-hidden="true" />, count }, profile]
+  }
+  return [feed, explore, log, progress, profile]
 }
 
 export function AppLayout() {

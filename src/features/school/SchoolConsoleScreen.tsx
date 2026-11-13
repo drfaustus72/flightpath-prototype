@@ -1,9 +1,9 @@
-import { useParams } from 'react-router'
+import { Link, Navigate, useParams } from 'react-router'
 import { type ClubFeature, canInClub } from '../../domain/tiers'
 import { pendingJoinRequests } from '../../domain/clubOps'
-import { missionsToVerify } from '../../domain/missions'
+import { schoolQueue, schoolQueueCount, schoolQueues } from '../../domain/schoolAdmin'
 import { activeMemberCount } from '../../domain/world'
-import { MissionToVerifyRow } from '../cfi/InboxScreen'
+import { MissionToVerifyRow, SimSession } from '../cfi/InboxScreen'
 import { useActive, useWorld } from '../../store/hooks'
 import { ProGate } from '../../ui/ProGate'
 import { Button, ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
@@ -54,6 +54,7 @@ export function SchoolConsoleScreen() {
       </Panel>
 
       <JoinRequests clubId={club.id} />
+      <SimQueue clubId={club.id} />
       {isPro && <MissionsQueue clubId={club.id} />}
 
       {isPro ? (
@@ -87,9 +88,9 @@ export function SchoolConsoleScreen() {
 function MissionsQueue({ clubId }: { clubId: string }) {
   const world = useWorld()
   const { account } = useActive()
-  const queue = missionsToVerify(world, account.id).filter((x) =>
-    x.kind === 'tracked' ? x.flight.clubId === clubId : x.clubs.some((c) => c.id === clubId),
-  )
+  const club = world.clubs.find((c) => c.id === clubId)
+  if (!club) return null
+  const queue = schoolQueue(world, account.id, club).missions
   return (
     <section aria-labelledby="mission-queue" className="flex flex-col gap-2">
       <h2 id="mission-queue" className="font-semibold">
@@ -146,5 +147,62 @@ function JoinRequests({ clubId }: { clubId: string }) {
         </ul>
       )}
     </section>
+  )
+}
+
+/** Simulator sessions members tagged to the school. Admins and staff CFIs confirm them (never the pilot). */
+function SimQueue({ clubId }: { clubId: string }) {
+  const world = useWorld()
+  const { account } = useActive()
+  const club = world.clubs.find((c) => c.id === clubId)
+  if (!club) return null
+  const sessions = schoolQueue(world, account.id, club).simSessions
+  return (
+    <section aria-labelledby="sim-queue" className="flex flex-col gap-2">
+      <h2 id="sim-queue" className="font-semibold">
+        Simulator sessions to confirm
+      </h2>
+      {sessions.length === 0 ? (
+        <p className="text-ink-muted">Nothing waiting.</p>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {sessions.map((f) => (
+            <SimSession key={f.id} flight={f} />
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+}
+
+/** The School tab: straight to the school's tools, or a choice when an admin runs several. */
+export function SchoolHomeScreen() {
+  const world = useWorld()
+  const { account } = useActive()
+  const queues = schoolQueues(world, account.id)
+  const only = queues.length === 1 ? queues[0] : undefined
+  if (only) return <Navigate to={`/school/${only.club.id}`} replace />
+  if (queues.length === 0) {
+    return (
+      <EmptyState title="You don't manage a school" body="School admins see their school's tools here." action={<ButtonLink to="/profile">Go to profile</ButtonLink>} />
+    )
+  }
+  return (
+    <div className="flex flex-col gap-4">
+      <ScreenTitle>Your schools</ScreenTitle>
+      <ul className="flex flex-col gap-2">
+        {queues.map((q) => (
+          <li key={q.club.id}>
+            <Link
+              to={`/school/${q.club.id}`}
+              className="flex min-h-14 items-center justify-between gap-3 rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2"
+            >
+              <span className="font-semibold">{q.club.name}</span>
+              <span className="text-[14px] text-ink-muted">{schoolQueueCount(q)} waiting</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }

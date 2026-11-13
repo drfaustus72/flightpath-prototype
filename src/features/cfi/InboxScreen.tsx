@@ -6,6 +6,7 @@ import { inboxCount, inboxFor, linkedStudentsOf, signoffClubFor } from '../../do
 import { accountById } from '../../domain/social'
 import { isVerifiedCfi } from '../../domain/tiers'
 import { type MissionToVerify, missionsToVerify } from '../../domain/missions'
+import { schoolQueues } from '../../domain/schoolAdmin'
 import type { Flight, SignoffRequest } from '../../domain/types'
 import { useActive, useWorld } from '../../store/hooks'
 import { useAppStore } from '../../store/storeContext'
@@ -30,6 +31,7 @@ export function InboxScreen() {
 
   const inbox = inboxFor(world, account.id)
   const missions = missionsToVerify(world, account.id)
+  const schools = schoolQueues(world, account.id)
   const students = linkedStudentsOf(world, account.id)
 
   return (
@@ -79,6 +81,26 @@ export function InboxScreen() {
         <Section title="Simulator sessions to confirm">
           {inbox.simSessions.map((f) => (
             <SimSession key={f.id} flight={f} />
+          ))}
+        </Section>
+      )}
+
+      {schools.length > 0 && (
+        <Section title="Schools you manage">
+          {schools.map((q) => (
+            <li key={q.club.id}>
+              <Link
+                to={`/school/${q.club.id}`}
+                className="flex min-h-14 items-center justify-between gap-3 rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2"
+              >
+                <span className="font-semibold">{q.club.name}</span>
+                <span className="text-[14px] text-ink-muted">
+                  {q.joinRequests.length > 0
+                    ? `${q.joinRequests.length} join ${q.joinRequests.length === 1 ? 'request' : 'requests'}`
+                    : 'School tools'}
+                </span>
+              </Link>
+            </li>
           ))}
         </Section>
       )}
@@ -188,7 +210,7 @@ function TagRequest({ flight }: { flight: Flight }) {
   )
 }
 
-function SimSession({ flight }: { flight: Flight }) {
+export function SimSession({ flight }: { flight: Flight }) {
   const world = useWorld()
   const review = useAppStore((s) => s.reviewSimSession)
   const club = world.clubs.find((c) => c.id === flight.clubId)

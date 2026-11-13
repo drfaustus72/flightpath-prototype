@@ -46,9 +46,17 @@ test.describe('M4a discovery and school pages', () => {
     await page.goto('/feed')
     await viewAs(page, 'Free pilot', '/clubs/club-hfa')
     await page.getByRole('button', { name: 'Request to join' }).click()
-    await viewAs(page, 'School admin', '/school/club-hfa')
+    await viewAs(page, 'School admin', '/feed')
+    // The admin's fourth tab is School (not Progress), with a count of what's waiting.
+    const nav = page.getByRole('navigation', { name: 'Main' })
+    await expect(nav.getByRole('link', { name: 'Progress' })).toHaveCount(0)
+    await nav.getByRole('link', { name: /School.*2 waiting/ }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Hawthorne Flight Academy' })).toBeVisible()
     await page.getByRole('button', { name: 'Approve Jordan Reyes' }).click()
     await expect(page.getByText('No one is waiting.')).toBeVisible()
+    // Admins confirm simulator sessions too.
+    await page.getByRole('button', { name: 'Confirm session' }).click()
+    await expect(nav.getByRole('link', { name: 'School' })).toBeVisible()
     await viewAs(page, 'Free pilot', '/clubs/club-hfa')
     await expect(page.getByText('You’re a member')).toBeVisible()
     // Now a School Pro member: missions open up without Pilot Pro.

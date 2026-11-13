@@ -12,7 +12,7 @@ import { LogFlightScreen } from '../features/log/LogFlightScreen'
 import { ProfileScreen } from '../features/profile/ProfileScreen'
 import { PublicProfileScreen } from '../features/profile/PublicProfileScreen'
 import { ProgressScreen } from '../features/progress/ProgressScreen'
-import { SchoolConsoleScreen } from '../features/school/SchoolConsoleScreen'
+import { SchoolConsoleScreen, SchoolHomeScreen } from '../features/school/SchoolConsoleScreen'
 import { AppLayout } from './AppLayout'
 import { NotFoundScreen } from './NotFoundScreen'
 
@@ -35,6 +35,7 @@ export const routes: RouteObject[] = [
       { path: 'missions/:code', element: <MissionScreen /> },
       { path: 'u/:handle', element: <PublicProfileScreen /> },
       { path: 'flights/:flightId', element: <FlightScreen /> },
+      { path: 'school', element: <SchoolHomeScreen /> },
       { path: 'school/:clubId', element: <SchoolConsoleScreen /> },
       { path: '*', element: <NotFoundScreen /> },
     ],
