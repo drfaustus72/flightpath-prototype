@@ -1,13 +1,15 @@
 import { ChevronRight, Search } from 'lucide-react'
-import { type ReactNode, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router'
-import { clubPlanName } from '../../domain/clubs'
+import { airportForQuery } from '../../domain/directory'
 import { search, suggestionsFor } from '../../domain/discovery'
 import type { Account } from '../../domain/types'
 import { canFollow } from '../../domain/social'
 import { useActive, useWorld } from '../../store/hooks'
 import { useAppStore } from '../../store/storeContext'
-import { Avatar } from '../../ui/Avatar'
+import { PersonRow } from '../social/PersonRow'
+import { ClubRow } from '../clubs/ClubRow'
+import { AirportMark } from '../../ui/AirportMark'
 import { Button, Ident, ScreenTitle } from '../../ui/primitives'
 
 export function ExploreScreen() {
@@ -16,6 +18,7 @@ export function ExploreScreen() {
   const [query, setQuery] = useState('')
   const results = search(world, account.id, query)
   const searching = query.trim().replace(/^@/, '').length >= 2
+  const airport = airportForQuery(world, query)
   const total = results.pilots.length + results.cfis.length + results.clubs.length
 
   return (
@@ -42,7 +45,22 @@ export function ExploreScreen() {
 
       {searching ? (
         <div aria-live="polite" className="flex flex-col gap-5">
-          {total === 0 && (
+          {airport && (
+            <Link
+              to={`/airports/${airport.icao}`}
+              className="flex min-h-14 items-center gap-3 rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2"
+            >
+              <AirportMark size={40} />
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold">
+                  <Ident>{airport.icao}</Ident> airport page
+                </span>
+                <span className="block truncate text-[14px] text-ink-muted">{airport.name}</span>
+              </span>
+              <ChevronRight size={20} aria-hidden="true" />
+            </Link>
+          )}
+          {total === 0 && !airport && (
             <p className="text-ink-muted">
               No pilots, CFIs or schools match “{query.trim()}”. Pilots who keep their profile Public show up only on their exact @handle.
             </p>
@@ -56,17 +74,7 @@ export function ExploreScreen() {
               </h2>
               <ul className="flex flex-col gap-2">
                 {results.clubs.map((c) => (
-                  <li key={c.id} className="flex min-h-14 items-center gap-3 rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2">
-                    <span aria-hidden="true" className="grid size-10 place-items-center rounded-[var(--radius-control)] bg-magenta-tint font-bold text-magenta">
-                      {c.initials}
-                    </span>
-                    <span>
-                      <span className="block font-semibold">{c.name}</span>
-                      <span className="block text-[14px] text-ink-muted">
-                        {clubPlanName(c)} · <Ident>{c.homeAirport}</Ident>
-                      </span>
-                    </span>
-                  </li>
+                  <ClubRow key={c.id} club={c} />
                 ))}
               </ul>
             </section>
@@ -84,23 +92,25 @@ export function ExploreScreen() {
             </span>
             <ChevronRight size={20} aria-hidden="true" className="text-magenta" />
           </Link>
+          <div className="grid grid-cols-2 gap-2">
+            <Link
+              to={`/nearby?from=${account.homeAirport}`}
+              className="flex min-h-16 flex-col justify-center rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-3"
+            >
+              <span className="font-semibold">Schools and CFIs</span>
+              <span className="text-[14px] text-ink-muted">
+                near <Ident>{account.homeAirport}</Ident>
+              </span>
+            </Link>
+            <Link to="/map" className="flex min-h-16 flex-col justify-center rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-3">
+              <span className="font-semibold">Map</span>
+              <span className="text-[14px] text-ink-muted">Schools, CFIs, pilot counts</span>
+            </Link>
+          </div>
           <Suggestions />
         </>
       )}
     </div>
-  )
-}
-
-function PersonRow({ person, detail, action }: { person: Account; detail: string; action?: ReactNode }) {
-  return (
-    <li className="flex min-h-14 items-center gap-3 rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2">
-      <Avatar account={person} />
-      <Link to={`/u/${person.handle}`} className="min-w-0 flex-1">
-        <span className="block font-semibold">{person.displayName}</span>
-        <span className="block truncate text-[14px] text-ink-muted">{detail}</span>
-      </Link>
-      {action}
-    </li>
   )
 }
 
@@ -155,9 +165,6 @@ function Suggestions() {
           ))}
         </ul>
       )}
-      <p className="mt-2 text-[14px] text-ink-muted">
-        Airport pages and a directory of schools and CFIs near <Ident>{account.homeAirport}</Ident> come in a later build.
-      </p>
     </section>
   )
 }

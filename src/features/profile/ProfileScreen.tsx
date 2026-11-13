@@ -3,8 +3,8 @@ import { isVerifiedCfi, planLabels } from '../../domain/tiers'
 import { adminClubsOf } from '../../domain/world'
 import { useActive, useWorld } from '../../store/hooks'
 import { LogbookPanel } from './LogbookPanel'
-import { LinkRow, ProfileLevelPicker, ShareProfile, WaitingForYou } from './OwnProfileSections'
-import { LandedMap, ProfileFacts, ProfileHeader, TrophyCase } from './ProfileParts'
+import { CfiListingSwitch, LinkRow, ProfileLevelPicker, ShareProfile, WaitingForYou } from './OwnProfileSections'
+import { LandedMap, ProfileFacts, ProfileHeader, TrainingTimeline, TrophyCase } from './ProfileParts'
 
 export function ProfileScreen() {
   const world = useWorld()
@@ -20,7 +20,9 @@ export function ProfileScreen() {
 
       <WaitingForYou />
       <ProfileLevelPicker />
+      <CfiListingSwitch />
       <ProfileFacts owner={account} />
+      <TrainingTimeline owner={account} />
       <LogbookPanel key={account.id} account={account} />
       <TrophyCase owner={account} />
       <LandedMap owner={account} />

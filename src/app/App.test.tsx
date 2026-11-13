@@ -59,7 +59,8 @@ describe('app shell', () => {
     expect(await screen.findByText("You don't manage this school")).toBeInTheDocument()
     const user = await switchTo('School admin')
     await user.click(screen.getByRole('link', { name: 'Profile' }))
-    await user.click(await screen.findByRole('link', { name: /Hawthorne Flight Academy/ }))
+    const manage = await screen.findByRole('region', { name: 'Schools you manage' })
+    await user.click(within(manage).getByRole('link', { name: /Hawthorne Flight Academy/ }))
     expect(await screen.findByText('School Pro tools')).toBeInTheDocument()
     expect(screen.getByText('Retention dashboard')).toBeInTheDocument()
   })
@@ -68,7 +69,7 @@ describe('app shell', () => {
     renderApp('/profile')
     const user = await switchTo('Free pilot')
     await user.click(screen.getByRole('link', { name: 'Profile' }))
-    expect(await screen.findByText('Coastal Aviation Training')).toBeInTheDocument()
+    expect((await screen.findAllByText('Coastal Aviation Training')).length).toBeGreaterThan(0)
     expect(within(screen.getByRole('main')).getByText(/School Basic/)).toBeInTheDocument()
   })
 

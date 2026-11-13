@@ -1,11 +1,13 @@
 import { useParams } from 'react-router'
 import { type ClubFeature, canInClub } from '../../domain/tiers'
+import { pendingJoinRequests } from '../../domain/clubOps'
 import { missionsToVerify } from '../../domain/missions'
 import { activeMemberCount } from '../../domain/world'
 import { MissionToVerifyRow } from '../cfi/InboxScreen'
 import { useActive, useWorld } from '../../store/hooks'
 import { ProGate } from '../../ui/ProGate'
-import { ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
+import { Button, ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
+import { useAppStore } from '../../store/storeContext'
 
 const proTools: { feature: ClubFeature; name: string }[] = [
   { feature: 'school.dashboard', name: 'Retention dashboard' },
@@ -51,6 +53,7 @@ export function SchoolConsoleScreen() {
         </p>
       </Panel>
 
+      <JoinRequests clubId={club.id} />
       {isPro && <MissionsQueue clubId={club.id} />}
 
       {isPro ? (
@@ -99,6 +102,47 @@ function MissionsQueue({ clubId }: { clubId: string }) {
           {queue.map((item) => (
             <MissionToVerifyRow key={`${item.pilotId}-${item.mission.code}`} item={item} />
           ))}
+        </ul>
+      )}
+    </section>
+  )
+}
+
+function JoinRequests({ clubId }: { clubId: string }) {
+  const world = useWorld()
+  const { access } = useActive()
+  const answer = useAppStore((s) => s.answerJoinRequest)
+  if (!canInClub(access, 'school.approveMembers', clubId)) return null
+  const requests = pendingJoinRequests(world, clubId)
+  return (
+    <section aria-labelledby="join-requests" className="flex flex-col gap-2">
+      <h2 id="join-requests" className="font-semibold">
+        Join requests
+      </h2>
+      {requests.length === 0 ? (
+        <p className="text-ink-muted">No one is waiting.</p>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {requests.map((m) => {
+            const who = world.accounts.find((a) => a.id === m.accountId)
+            return (
+              <li key={m.id}>
+                <Panel className="flex flex-col gap-2">
+                  <p>
+                    <span className="font-semibold">{who?.displayName}</span> wants to join.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button tone="primary" onClick={() => answer(m.id, true)} aria-label={`Approve ${who?.displayName}`}>
+                      Approve
+                    </Button>
+                    <Button onClick={() => answer(m.id, false)} aria-label={`Decline ${who?.displayName}`}>
+                      Decline
+                    </Button>
+                  </div>
+                </Panel>
+              </li>
+            )
+          })}
         </ul>
       )}
     </section>

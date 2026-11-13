@@ -10,7 +10,7 @@ import { Button, ButtonLink, EmptyState } from '../../ui/primitives'
 import { FlightCard } from '../feed/FlightCard'
 import { ReportButton } from '../social/ReportButton'
 import { publicBadges } from './labels'
-import { LandedMap, ProfileFacts, ProfileHeader, TrophyCase } from './ProfileParts'
+import { LandedMap, ProfileFacts, ProfileHeader, TrainingTimeline, TrophyCase } from './ProfileParts'
 
 export function PublicProfileScreen() {
   const { handle = '' } = useParams()
@@ -54,6 +54,7 @@ export function PublicProfileScreen() {
       {visible ? (
         <>
           <ProfileFacts owner={owner} />
+          <TrainingTimeline owner={owner} />
           <TrophyCase owner={owner} />
           <LandedMap owner={owner} />
           <ProfileFlights ownerId={owner.id} />

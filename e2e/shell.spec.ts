@@ -21,7 +21,7 @@ test.describe('M0 app shell', () => {
     await page.getByRole('dialog').getByRole('button', { name: /School admin/ }).click()
     await nav.getByRole('link', { name: 'Profile' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Alex Chen' })).toBeVisible()
-    await page.getByRole('link', { name: /Hawthorne Flight Academy/ }).click()
+    await page.getByRole('region', { name: 'Schools you manage' }).getByRole('link', { name: /Hawthorne Flight Academy/ }).click()
     await expect(page.getByText('School Pro tools')).toBeVisible()
 
     // Persona survives a reload (persisted state)

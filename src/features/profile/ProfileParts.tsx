@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { clubPlanName } from '../../domain/clubs'
 import { recognitionFor } from '../../domain/recognition'
 import { milestonesFor } from '../../domain/signoffs'
@@ -74,7 +75,9 @@ export function ProfileFacts({ owner }: { owner: Account }) {
           <p className="text-[13px] text-ink-muted">Home school</p>
           {homeSchool ? (
             <>
-              <p className="text-[17px] font-semibold">{homeSchool.name}</p>
+              <Link to={`/clubs/${homeSchool.id}`} className="text-[17px] font-semibold underline-offset-2 hover:underline">
+                {homeSchool.name}
+              </Link>
               <p className="text-[14px] text-ink-muted">
                 {clubPlanName(homeSchool)} · <Ident>{homeSchool.homeAirport}</Ident>
               </p>
@@ -193,6 +196,49 @@ export function LandedMap({ owner }: { owner: Account }) {
           )
         })}
       </svg>
+    </section>
+  )
+}
+
+/** Where the pilot has trained, from memberships. History stays after switching schools. */
+export function TrainingTimeline({ owner }: { owner: Account }) {
+  const world = useWorld()
+  const { account: viewer } = useActive()
+  if (!canSeeField(world, viewer.id, owner, 'homeSchool')) return null
+  const entries = world.memberships
+    .filter((m) => m.accountId === owner.id && m.status !== 'pending')
+    .flatMap((m) => {
+      const club = world.clubs.find((c) => c.id === m.clubId)
+      return club ? [{ m, club }] : []
+    })
+    .sort((a, b) => b.m.startedOn.localeCompare(a.m.startedOn))
+  if (entries.length === 0) return null
+  const year = (d: string) => d.slice(0, 4)
+
+  return (
+    <section aria-labelledby="timeline-title" className="flex flex-col gap-2">
+      <h2 id="timeline-title" className="font-semibold">
+        Schools and clubs
+      </h2>
+      <ol className="flex flex-col border-l-2 border-hairline pl-4">
+        {entries.map(({ m, club }) => (
+          <li key={m.id} className="relative py-2">
+            <span
+              aria-hidden="true"
+              className={`absolute top-4 -left-[23px] size-3 rounded-full border-2 ${m.status === 'active' ? 'border-magenta bg-magenta' : 'border-hairline bg-surface'}`}
+            />
+            <Link to={`/clubs/${club.id}`} className="font-semibold underline-offset-2 hover:underline">
+              {club.name}
+            </Link>
+            <p className="text-[14px] text-ink-muted">
+              {year(m.startedOn)}–{m.endedOn ? year(m.endedOn) : 'now'}
+              {m.roles.includes('staff_cfi') && ' · Instructor'}
+              {m.roles.includes('admin') && ' · Admin'}
+              {!club.claimed && ' · self-reported'}
+            </p>
+          </li>
+        ))}
+      </ol>
     </section>
   )
 }

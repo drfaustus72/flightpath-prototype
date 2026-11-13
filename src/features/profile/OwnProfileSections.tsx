@@ -153,3 +153,28 @@ export function LinkRow({ to, title, detail }: { to: string; title: string; deta
     </Link>
   )
 }
+
+/** A verified CFI can leave the directory without losing the CFI role or sign-off authority. */
+export function CfiListingSwitch() {
+  const { account } = useActive()
+  const setListed = useAppStore((s) => s.setCfiListed)
+  if (!account.cfi?.verified) return null
+  return (
+    <Panel>
+      <label className="flex min-h-11 items-start gap-3">
+        <input
+          type="checkbox"
+          checked={account.cfi.listed}
+          onChange={(e) => setListed(e.target.checked)}
+          className="mt-1 size-5 accent-chart-blue"
+        />
+        <span>
+          <span className="block font-semibold">List me in the CFI directory</span>
+          <span className="block text-[14px] text-ink-muted">
+            Pilots find you on airport pages, the map and “Schools and CFIs nearby”. Turning this off doesn’t change your CFI role or your sign-offs.
+          </span>
+        </span>
+      </label>
+    </Panel>
+  )
+}
