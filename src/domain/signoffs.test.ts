@@ -28,6 +28,7 @@ const signoff = (over: Partial<Signoff> = {}): Signoff => ({
   milestone: 'first_solo',
   clubId: null,
   note: '',
+  schoolAircraft: false,
   at: '2026-11-01T00:00:00.000Z',
   revoked: null,
   ...over,

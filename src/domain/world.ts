@@ -108,6 +108,7 @@ export function checkIntegrity(world: World): string[] {
   }
 
   errors.push(...checkSocialIntegrity(world, accounts, flightIds, clubs))
+  errors.push(...checkMissionIntegrity(world, accounts, airports, clubs))
 
   for (const d of duplicates(activePairs)) errors.push(`memberships: more than one active membership for ${d}`)
   for (const [accountId, n] of homeSchoolsByAccount) {
@@ -204,6 +205,9 @@ function checkSocialIntegrity(
         errors.push(`signoff ${s.id}: a flight sign-off needs the flight's accepted instructor and its pilot`)
       }
     }
+    if (s.schoolAircraft && (s.milestone === null || s.clubId === null)) {
+      errors.push(`signoff ${s.id}: schoolAircraft applies only to a milestone signed for a school`)
+    }
     if (s.revoked === null) activeSubjects.push(`${s.studentId}/${s.flightId ?? s.milestone}`)
   }
   for (const d of duplicates(activeSubjects)) errors.push(`signoffs: more than one active sign-off for ${d}`)
@@ -221,6 +225,61 @@ function checkSocialIntegrity(
   }
   for (const d of duplicates(world.reports.map((r) => r.id))) errors.push(`reports: duplicate id ${d}`)
 
+  return errors
+}
+
+function checkMissionIntegrity(
+  world: World,
+  accounts: ReadonlyMap<string, Account>,
+  airports: ReadonlySet<string>,
+  clubs: ReadonlyMap<string, unknown>,
+): string[] {
+  const errors: string[] = []
+  const missions = new Map(world.missions.map((m) => [m.code, m]))
+  for (const d of duplicates(world.missions.map((m) => m.code))) errors.push(`missions: duplicate code ${d}`)
+  for (const m of world.missions) {
+    const r = m.requirements
+    for (const code of r.landAtAny ?? []) if (!airports.has(code)) errors.push(`mission ${m.code}: unknown airport ${code}`)
+    const checks = [r.landAtAny, r.minDistanceFromDepartureNm, r.minTotalNm, r.minFullStopAirports, r.minFieldElevationFt, r.crossesBox]
+    const hasCheck = checks.some((c) => c !== undefined)
+    if (hasCheck === r.cfiOnly) errors.push(`mission ${m.code}: needs track checks, or cfiOnly with none`)
+  }
+  for (const d of duplicates(world.pathways.map((p) => p.code))) errors.push(`pathways: duplicate code ${d}`)
+  for (const p of world.pathways) {
+    for (const code of p.missionCodes) if (!missions.has(code)) errors.push(`pathway ${p.code}: unknown mission ${code}`)
+  }
+  const challenges = new Set(world.challenges.map((c) => c.code))
+  for (const d of duplicates(world.challenges.map((c) => c.code))) errors.push(`challenges: duplicate code ${d}`)
+  for (const c of world.challenges) {
+    if ((c.kind === 'states') !== (c.states.length > 0)) errors.push(`challenge ${c.code}: states are required exactly for a states challenge`)
+    if ((c.kind === 'states') !== (c.target === null)) errors.push(`challenge ${c.code}: target is required except for a states challenge`)
+  }
+  for (const d of duplicates(world.challengeEntries.map((e) => `${e.pilotId}/${e.challengeCode}`))) errors.push(`challengeEntries: duplicate ${d}`)
+  for (const e of world.challengeEntries) {
+    if (!accounts.has(e.pilotId)) errors.push(`challengeEntry: unknown account ${e.pilotId}`)
+    if (!challenges.has(e.challengeCode)) errors.push(`challengeEntry: unknown challenge ${e.challengeCode}`)
+  }
+  for (const d of duplicates(world.noGos.map((n) => n.id))) errors.push(`noGos: duplicate id ${d}`)
+  for (const n of world.noGos) {
+    if (!accounts.has(n.pilotId)) errors.push(`noGo ${n.id}: unknown account ${n.pilotId}`)
+    for (const code of [n.from, n.to]) if (code !== null && !airports.has(code)) errors.push(`noGo ${n.id}: unknown airport ${code}`)
+  }
+  for (const d of duplicates(world.missionVerifications.map((v) => v.id))) errors.push(`missionVerifications: duplicate id ${d}`)
+  const active: string[] = []
+  for (const v of world.missionVerifications) {
+    if (!missions.has(v.missionCode)) errors.push(`missionVerification ${v.id}: unknown mission ${v.missionCode}`)
+    if (!accounts.has(v.byAccountId)) errors.push(`missionVerification ${v.id}: unknown account ${v.byAccountId}`)
+    if (v.byAccountId === v.pilotId) errors.push(`missionVerification ${v.id}: a pilot can't verify their own mission`)
+    if (v.clubId !== null && !clubs.has(v.clubId)) errors.push(`missionVerification ${v.id}: unknown club ${v.clubId}`)
+    const f = world.flights.find((x) => x.id === v.flightId)
+    if (!f) errors.push(`missionVerification ${v.id}: unknown flight ${v.flightId}`)
+    else {
+      if (f.pilotId !== v.pilotId) errors.push(`missionVerification ${v.id}: flight belongs to another pilot`)
+      if (v.clubId !== null && f.clubId !== v.clubId) errors.push(`missionVerification ${v.id}: flight isn't tagged to ${v.clubId}`)
+    }
+    if (v.revoked === null) active.push(`${v.pilotId}/${v.missionCode}`)
+  }
+  for (const d of duplicates(active)) errors.push(`missionVerifications: more than one active verification for ${d}`)
   return errors
 }
 

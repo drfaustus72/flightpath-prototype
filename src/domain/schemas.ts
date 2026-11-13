@@ -274,6 +274,11 @@ export const signoffSchema = z.object({
   /** The school the CFI signed for, if any. */
   clubId: id.nullable(),
   note: z.string().max(500),
+  /**
+   * The CFI confirms the milestone was flown in the school's aircraft. Only then does a
+   * milestone sign-off for a School Pro school earn the student XP there (decided 13 Nov 2026).
+   */
+  schoolAircraft: z.boolean(),
   at: isoDateTime,
   revoked: z.object({ at: isoDateTime, reason: z.string().trim().min(1).max(500) }).nullable(),
 })
@@ -298,6 +303,93 @@ export const reportSchema = z.object({
   at: isoDateTime,
 })
 
+const missionCode = z.string().regex(/^[a-z0-9_]{2,40}$/)
+const bbox = z.tuple([z.number(), z.number(), z.number(), z.number()]) // west, south, east, north
+
+/**
+ * What a track must show for a mission to count as complete. Every listed check must pass.
+ * A mission with `cfiOnly` can't be detected from a track; the flight's instructor verifies it.
+ */
+export const missionRequirementsSchema = z.object({
+  /** Lands (full stop or touch-and-go) at any of these airports. */
+  landAtAny: z.array(icao).min(1).optional(),
+  /** Lands somewhere at least this far, straight-line, from the departure airport. */
+  minDistanceFromDepartureNm: z.number().positive().optional(),
+  minTotalNm: z.number().positive().optional(),
+  /** Distinct airports with full-stop landings, counting the departure airport. */
+  minFullStopAirports: z.number().int().min(2).optional(),
+  /** Lands at an airport at or above this field elevation. */
+  minFieldElevationFt: z.number().optional(),
+  /** The route passes through this box (e.g. the LAX Special Flight Rules Area). */
+  crossesBox: bbox.optional(),
+  cfiOnly: z.boolean(),
+})
+
+export const missionSchema = z.object({
+  code: missionCode,
+  title: z.string().min(1),
+  theme: z.enum(['coast', 'urban', 'mountain', 'desert', 'valley', 'training']),
+  /** Adventure only / potentially qualifying FAA experience / CFI-verified training. */
+  label: z.enum(['adventure', 'potentially_qualifying', 'cfi_verified']),
+  story: z.string().min(1),
+  objectives: z.array(z.string().min(1)).min(1),
+  prerequisites: z.array(z.string().min(1)),
+  /** Milestones the pilot should have before the advisor suggests this mission. */
+  suggestAfter: z.array(milestoneCodeSchema),
+  estMinutes: z.number().int().positive(),
+  xp: z.number().int().positive(),
+  /** Simulator sessions can count only for sim-eligible missions, once the school confirms them. */
+  simEligible: z.boolean(),
+  requirements: missionRequirementsSchema,
+})
+
+export const pathwaySchema = z.object({
+  code: missionCode,
+  title: z.string().min(1),
+  description: z.string().min(1),
+  missionCodes: z.array(missionCode).min(1),
+})
+
+/** Opt-in, no leaderboards, no countdown pressure. */
+export const challengeSchema = z.object({
+  code: missionCode,
+  title: z.string().min(1),
+  description: z.string().min(1),
+  kind: z.enum(['new_airports', 'states', 'no_go']),
+  /** new_airports: how many; no_go: how many recorded no-gos. */
+  target: z.number().int().positive().nullable(),
+  /** states: all of these, from landings since joining. */
+  states: z.array(z.string().length(2)),
+})
+
+export const challengeEntrySchema = z.object({ pilotId: id, challengeCode: missionCode, joinedAt: isoDateTime })
+
+/** A flight the pilot decided not to make. Recognized with a "Good Call" badge; never XP. */
+export const noGoSchema = z.object({
+  id,
+  pilotId: id,
+  from: icao,
+  to: icao.nullable(),
+  reason: z.string().trim().min(1).max(500),
+  at: isoDateTime,
+})
+
+/**
+ * A school (or, for CFI-only missions, the flight's instructor) verifying a completed mission.
+ * Only this is stored; completion itself is worked out from the track. XP counts only when the
+ * club is a claimed School Pro school and the flight was tagged to it (flown in its aircraft).
+ */
+export const missionVerificationSchema = z.object({
+  id,
+  pilotId: id,
+  missionCode,
+  flightId: id,
+  clubId: id.nullable(),
+  byAccountId: id,
+  at: isoDateTime,
+  revoked: z.object({ at: isoDateTime, reason: z.string().trim().min(1).max(500) }).nullable(),
+})
+
 export const worldSchema = z.object({
   accounts: z.array(accountSchema).min(1),
   clubs: z.array(clubSchema),
@@ -314,4 +406,10 @@ export const worldSchema = z.object({
   signoffRequests: z.array(signoffRequestSchema),
   blocks: z.array(blockSchema),
   reports: z.array(reportSchema),
+  missions: z.array(missionSchema),
+  pathways: z.array(pathwaySchema),
+  challenges: z.array(challengeSchema),
+  challengeEntries: z.array(challengeEntrySchema),
+  noGos: z.array(noGoSchema),
+  missionVerifications: z.array(missionVerificationSchema),
 })

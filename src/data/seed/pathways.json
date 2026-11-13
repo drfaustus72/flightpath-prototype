@@ -1,0 +1,14 @@
+[
+  {
+    "code": "private_xc",
+    "title": "Private Pilot Cross-Country",
+    "description": "From your first trip beyond the practice area to the long cross-country before your checkride.",
+    "missionCodes": [
+      "airport_in_the_sky",
+      "class_c_arrival",
+      "coastal_xc",
+      "practice_diversion",
+      "three_point_xc"
+    ]
+  }
+]

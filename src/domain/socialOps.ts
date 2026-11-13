@@ -108,6 +108,8 @@ export function signOffFlight(world: World, actorId: string, flightId: string, n
     milestone: null,
     clubId: signoffClubFor(world, actorId, f.pilotId)?.id ?? null,
     note: note.trim().slice(0, 500),
+    // Flight sign-offs never earn XP; the field matters only for milestones.
+    schoolAircraft: false,
     at: ctx.now,
     revoked: null,
   }
@@ -120,17 +122,21 @@ export function signOffMilestone(
   studentId: string,
   milestone: MilestoneCode,
   note: string,
+  schoolAircraft: boolean,
   ctx: OpContext,
 ): World {
   if (!canSignOffMilestone(world, actorId, studentId, milestone)) throw new Error("Can't sign off this milestone")
+  const clubId = signoffClubFor(world, actorId, studentId)?.id ?? null
   const signoff = {
     id: ctx.id,
     cfiId: actorId,
     studentId,
     flightId: null,
     milestone,
-    clubId: signoffClubFor(world, actorId, studentId)?.id ?? null,
+    clubId,
     note: note.trim().slice(0, 500),
+    // "Flown in the school's aircraft" only means something when signing for a school.
+    schoolAircraft: clubId !== null && schoolAircraft,
     at: ctx.now,
     revoked: null,
   }

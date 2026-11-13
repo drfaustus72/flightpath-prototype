@@ -1,0 +1,306 @@
+[
+  {
+    "code": "airport_in_the_sky",
+    "title": "Airport in the Sky",
+    "theme": "coast",
+    "label": "adventure",
+    "story": "Twenty-two miles of open water, then a runway on a mountaintop at 1,602 feet. Catalina rewards careful planning: altitude for glide range over the channel, and a hump in the middle of the runway that hides the far end.",
+    "objectives": [
+      "Plan a crossing altitude that keeps you within gliding distance of land as long as practical",
+      "Brief the KAVX runway hump, cliffs and downdrafts on short final",
+      "Land at KAVX and get the famous buffalo burger"
+    ],
+    "prerequisites": [
+      "Over-water briefing with your CFI",
+      "Life vests on board"
+    ],
+    "suggestAfter": [],
+    "estMinutes": 120,
+    "xp": 200,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": false,
+      "landAtAny": [
+        "KAVX"
+      ]
+    }
+  },
+  {
+    "code": "class_c_arrival",
+    "title": "Class C Arrival",
+    "theme": "urban",
+    "label": "cfi_verified",
+    "story": "Two-way radio contact, a squawk code and a landing among the airliners. Burbank or John Wayne turns busy airspace from intimidating into routine.",
+    "objectives": [
+      "Get the ATIS and establish contact with approach before the Class C ring",
+      "Fly assigned headings and altitudes, and copy a landing clearance",
+      "Land at KBUR or KSNA"
+    ],
+    "prerequisites": [
+      "Radio practice with your CFI",
+      "Charlie airspace briefing"
+    ],
+    "suggestAfter": [],
+    "estMinutes": 75,
+    "xp": 200,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": false,
+      "landAtAny": [
+        "KBUR",
+        "KSNA"
+      ]
+    }
+  },
+  {
+    "code": "coastal_xc",
+    "title": "Coastal Cross-Country",
+    "theme": "coast",
+    "label": "potentially_qualifying",
+    "story": "Up the coast past Point Mugu to Santa Barbara: more than 50 nm from home, with a marine layer to plan around and plenty of airspace to talk to.",
+    "objectives": [
+      "Plan the route with checkpoints and fuel",
+      "Land at KSBA, more than 50 nm straight-line from your departure airport",
+      "Close your flight plan"
+    ],
+    "prerequisites": [
+      "Cross-country planning lesson",
+      "Weather briefing for coastal fog"
+    ],
+    "suggestAfter": [],
+    "estMinutes": 150,
+    "xp": 300,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": false,
+      "landAtAny": [
+        "KSBA"
+      ],
+      "minDistanceFromDepartureNm": 50
+    }
+  },
+  {
+    "code": "santa_paula",
+    "title": "Santa Paula",
+    "theme": "valley",
+    "label": "adventure",
+    "story": "A one-runway airport full of vintage aircraft and a Sunday open house. A short, narrow runway between hills makes for a good precision landing.",
+    "objectives": [
+      "Fly a stabilized approach to a short, narrow runway",
+      "Land at KSZP"
+    ],
+    "prerequisites": [],
+    "suggestAfter": [],
+    "estMinutes": 90,
+    "xp": 150,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": false,
+      "landAtAny": [
+        "KSZP"
+      ]
+    }
+  },
+  {
+    "code": "lax_sfra",
+    "title": "LAX Special Flight Rules Area",
+    "theme": "urban",
+    "label": "adventure",
+    "story": "Fly straight over the LAX runways on the Special Flight Rules Area route, with the published altitudes and self-announced position reports.",
+    "objectives": [
+      "Study the SFRA procedures and altitudes on the terminal area chart",
+      "Self-announce on the SFRA frequency",
+      "Cross the SFRA box over LAX"
+    ],
+    "prerequisites": [
+      "SFRA briefing with your CFI"
+    ],
+    "suggestAfter": [],
+    "estMinutes": 60,
+    "xp": 200,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": false,
+      "crossesBox": [
+        -118.44,
+        33.92,
+        -118.37,
+        33.96
+      ]
+    }
+  },
+  {
+    "code": "high_country",
+    "title": "High Country",
+    "theme": "mountain",
+    "label": "cfi_verified",
+    "story": "Mammoth Yosemite sits at 7,135 feet. Density altitude, mountain winds and terrain make this a flight to plan with an instructor first.",
+    "objectives": [
+      "Compute takeoff and climb performance for the density altitude",
+      "Plan an escape route for mountain wave and downdrafts",
+      "Land at an airport above 7,000 ft"
+    ],
+    "prerequisites": [
+      "Mountain flying ground lesson",
+      "Performance planning reviewed by a CFI"
+    ],
+    "suggestAfter": [
+      "private_checkride"
+    ],
+    "estMinutes": 210,
+    "xp": 400,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": false,
+      "minFieldElevationFt": 7000
+    }
+  },
+  {
+    "code": "big_bear",
+    "title": "Big Bear Density Altitude",
+    "theme": "mountain",
+    "label": "adventure",
+    "story": "At 6,752 feet and on a warm afternoon, Big Bear can feel like flying at 10,000. Lean for best power and watch the climb rate.",
+    "objectives": [
+      "Lean for best power before takeoff",
+      "Land at L35"
+    ],
+    "prerequisites": [
+      "Mountain flying ground lesson"
+    ],
+    "suggestAfter": [
+      "private_checkride"
+    ],
+    "estMinutes": 120,
+    "xp": 300,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": false,
+      "landAtAny": [
+        "L35"
+      ]
+    }
+  },
+  {
+    "code": "palm_springs",
+    "title": "Palm Springs",
+    "theme": "desert",
+    "label": "adventure",
+    "story": "Over the Banning Pass, where the wind can be strong and bumpy, into the desert. Plan for heat, turbulence and wind farms.",
+    "objectives": [
+      "Brief the Banning Pass winds",
+      "Land at KPSP"
+    ],
+    "prerequisites": [],
+    "suggestAfter": [
+      "private_checkride"
+    ],
+    "estMinutes": 120,
+    "xp": 250,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": false,
+      "landAtAny": [
+        "KPSP"
+      ]
+    }
+  },
+  {
+    "code": "wine_country",
+    "title": "Santa Ynez Wine Country",
+    "theme": "valley",
+    "label": "adventure",
+    "story": "A quiet valley airport a short walk from tasting rooms. Coastal fog and the Gaviota Pass winds are part of the planning.",
+    "objectives": [
+      "Plan around coastal fog",
+      "Land at KIZA"
+    ],
+    "prerequisites": [],
+    "suggestAfter": [
+      "private_checkride"
+    ],
+    "estMinutes": 150,
+    "xp": 200,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": false,
+      "landAtAny": [
+        "KIZA"
+      ]
+    }
+  },
+  {
+    "code": "owens_valley",
+    "title": "Owens Valley",
+    "theme": "mountain",
+    "label": "adventure",
+    "story": "Between the Sierra and the White Mountains, the deepest valley in the country. Smooth mornings, big afternoon winds.",
+    "objectives": [
+      "Plan to arrive before the afternoon winds",
+      "Land at KBIH"
+    ],
+    "prerequisites": [
+      "Mountain flying ground lesson"
+    ],
+    "suggestAfter": [
+      "private_checkride"
+    ],
+    "estMinutes": 210,
+    "xp": 300,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": false,
+      "landAtAny": [
+        "KBIH"
+      ]
+    }
+  },
+  {
+    "code": "practice_diversion",
+    "title": "Practice Diversion",
+    "theme": "training",
+    "label": "cfi_verified",
+    "story": "Your instructor picks a new destination mid-flight. Estimate heading, distance, time and fuel, and get there.",
+    "objectives": [
+      "Divert to an alternate your CFI chooses",
+      "Estimate heading, time and fuel within a few minutes of flying it"
+    ],
+    "prerequisites": [
+      "Flown with a CFI, who verifies it"
+    ],
+    "suggestAfter": [],
+    "estMinutes": 90,
+    "xp": 250,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": true
+    }
+  },
+  {
+    "code": "three_point_xc",
+    "title": "Three-Point Cross-Country",
+    "theme": "training",
+    "label": "potentially_qualifying",
+    "story": "The big one before the checkride: full-stop landings at three airports, one more than 50 nm from home, about 150 nm in all.",
+    "objectives": [
+      "Full-stop landings at three airports, including your departure airport",
+      "One landing more than 50 nm straight-line from your departure airport",
+      "About 150 nm in total"
+    ],
+    "prerequisites": [
+      "Solo cross-country endorsement from your CFI"
+    ],
+    "suggestAfter": [
+      "first_solo"
+    ],
+    "estMinutes": 240,
+    "xp": 500,
+    "simEligible": false,
+    "requirements": {
+      "cfiOnly": false,
+      "minFullStopAirports": 3,
+      "minDistanceFromDepartureNm": 50,
+      "minTotalNm": 150
+    }
+  }
+]

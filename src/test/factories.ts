@@ -110,6 +110,12 @@ export function makeWorld(overrides: Partial<World> = {}): World {
     signoffRequests: [],
     blocks: [],
     reports: [],
+    missions: [],
+    pathways: [],
+    challenges: [],
+    challengeEntries: [],
+    noGos: [],
+    missionVerifications: [],
     ...overrides,
   }
 }

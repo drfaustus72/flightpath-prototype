@@ -8,7 +8,8 @@
     "clubId": "club-hfa",
     "note": "Pattern and crosswind landings to standard.",
     "at": "2026-11-03T19:05:00Z",
-    "revoked": null
+    "revoked": null,
+    "schoolAircraft": false
   },
   {
     "id": "sgn-2",
@@ -19,7 +20,8 @@
     "clubId": null,
     "note": "",
     "at": "2026-11-08T22:05:00Z",
-    "revoked": null
+    "revoked": null,
+    "schoolAircraft": false
   },
   {
     "id": "sgn-3",
@@ -30,6 +32,7 @@
     "clubId": "club-coastal",
     "note": "",
     "at": "2026-04-12T18:00:00Z",
-    "revoked": null
+    "revoked": null,
+    "schoolAircraft": true
   }
 ]

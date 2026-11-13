@@ -2,7 +2,7 @@ import { MonitorPlay } from 'lucide-react'
 import { type ReactNode, useState } from 'react'
 import { Link } from 'react-router'
 import { SIGNOFF_DISCLAIMER, milestoneTitle } from '../../domain/milestones'
-import { inboxCount, inboxFor, linkedStudentsOf } from '../../domain/signoffs'
+import { inboxCount, inboxFor, linkedStudentsOf, signoffClubFor } from '../../domain/signoffs'
 import { accountById } from '../../domain/social'
 import { isVerifiedCfi } from '../../domain/tiers'
 import type { Flight, SignoffRequest } from '../../domain/types'
@@ -118,7 +118,10 @@ function MilestoneRequest({ request }: { request: SignoffRequest }) {
   const world = useWorld()
   const signOffMilestone = useAppStore((s) => s.signOffMilestone)
   const decline = useAppStore((s) => s.declineSignoffRequest)
+  const { account } = useActive()
   const [note, setNote] = useState('')
+  const [schoolAircraft, setSchoolAircraft] = useState(true)
+  const school = signoffClubFor(world, account.id, request.studentId)
   const student = accountById(world, request.studentId)
   const title = milestoneTitle(request.milestone)
   const noteId = `note-${request.id}`
@@ -141,8 +144,14 @@ function MilestoneRequest({ request }: { request: SignoffRequest }) {
             className="min-h-11 rounded-[var(--radius-control)] border border-hairline bg-surface px-3"
           />
         </div>
+        {school && (
+          <label className="flex min-h-11 items-center gap-3">
+            <input type="checkbox" checked={schoolAircraft} onChange={(e) => setSchoolAircraft(e.target.checked)} className="size-5 accent-chart-blue" />
+            Flown in a {school.name} aircraft
+          </label>
+        )}
         <div className="flex flex-wrap gap-2">
-          <Button tone="primary" onClick={() => signOffMilestone(request.studentId, request.milestone, note)}>
+          <Button tone="primary" onClick={() => signOffMilestone(request.studentId, request.milestone, note, schoolAircraft)}>
             Sign off {title}
           </Button>
           <Button onClick={() => decline(request.id)}>Decline</Button>

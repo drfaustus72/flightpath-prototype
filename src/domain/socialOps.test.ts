@@ -26,7 +26,7 @@ describe('Script B: Dan debriefs and signs off', () => {
 
     w = ops.addDebrief(w, 'acct-dan', 'flt-maya-dual-xc', 'Great pilotage. Work on the descent planning.', ctx())
     w = ops.signOffFlight(w, 'acct-dan', 'flt-maya-dual-xc', '', ctx())
-    w = ops.signOffMilestone(w, 'acct-dan', 'acct-maya', 'first_solo', 'Solo at KHHR, three full stops.', ctx())
+    w = ops.signOffMilestone(w, 'acct-dan', 'acct-maya', 'first_solo', 'Solo at KHHR, three full stops.', true, ctx())
     expect(checkIntegrity(w)).toEqual([])
 
     const solo = milestonesFor(w, 'acct-maya').find((m) => m.code === 'first_solo')

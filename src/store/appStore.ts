@@ -11,7 +11,7 @@ import { isBlocked } from '../domain/visibility'
 import { demoPersonas, loadWorld } from '../domain/world'
 
 /** Bump whenever the persisted shape changes. Old state is discarded and reset to seed. */
-export const STORAGE_VERSION = 5
+export const STORAGE_VERSION = 6
 export const STORAGE_KEY = 'flightpath-demo'
 
 export interface AppState {
@@ -36,7 +36,7 @@ export interface AppState {
   answerTag: (flightId: string, accept: boolean) => void
   addDebrief: (flightId: string, text: string) => void
   signOffFlight: (flightId: string, note: string) => void
-  signOffMilestone: (studentId: string, milestone: MilestoneCode, note: string) => void
+  signOffMilestone: (studentId: string, milestone: MilestoneCode, note: string, schoolAircraft: boolean) => void
   revokeSignoff: (signoffId: string, reason: string) => void
   requestSignoff: (cfiId: string, milestone: MilestoneCode) => void
   declineSignoffRequest: (requestId: string) => void
@@ -213,7 +213,8 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
         answerTag: (flightId, accept) => act((w, me) => ops.answerTag(w, me, flightId, accept)),
         addDebrief: (flightId, text) => act((w, me, c) => ops.addDebrief(w, me, flightId, text, c)),
         signOffFlight: (flightId, note) => act((w, me, c) => ops.signOffFlight(w, me, flightId, note, c)),
-        signOffMilestone: (studentId, milestone, note) => act((w, me, c) => ops.signOffMilestone(w, me, studentId, milestone, note, c)),
+        signOffMilestone: (studentId, milestone, note, schoolAircraft) =>
+          act((w, me, c) => ops.signOffMilestone(w, me, studentId, milestone, note, schoolAircraft, c)),
         revokeSignoff: (signoffId, reason) => act((w, me, c) => ops.revokeSignoff(w, me, signoffId, reason, c)),
         requestSignoff: (cfiId, milestone) => act((w, me, c) => ops.requestSignoff(w, me, cfiId, milestone, c)),
         declineSignoffRequest: (requestId) => act((w, me) => ops.declineSignoffRequest(w, me, requestId)),

@@ -25,6 +25,13 @@ import type {
   signoffRequestSchema,
   blockSchema,
   reportSchema,
+  missionSchema,
+  missionRequirementsSchema,
+  pathwaySchema,
+  challengeSchema,
+  challengeEntrySchema,
+  noGoSchema,
+  missionVerificationSchema,
 } from './schemas'
 
 export type Account = z.infer<typeof accountSchema>
@@ -52,3 +59,10 @@ export type Signoff = z.infer<typeof signoffSchema>
 export type SignoffRequest = z.infer<typeof signoffRequestSchema>
 export type Block = z.infer<typeof blockSchema>
 export type Report = z.infer<typeof reportSchema>
+export type Mission = z.infer<typeof missionSchema>
+export type MissionRequirements = z.infer<typeof missionRequirementsSchema>
+export type Pathway = z.infer<typeof pathwaySchema>
+export type Challenge = z.infer<typeof challengeSchema>
+export type ChallengeEntry = z.infer<typeof challengeEntrySchema>
+export type NoGo = z.infer<typeof noGoSchema>
+export type MissionVerification = z.infer<typeof missionVerificationSchema>

@@ -111,8 +111,8 @@ describe('social and sign-off integrity', () => {
   it('rejects self-verification and flight sign-offs by someone other than the accepted instructor', () => {
     const errors = errorsFor((w) => {
       w.signoffs.push(
-        { id: 'self', cfiId: 'acct-dan', studentId: 'acct-dan', flightId: null, milestone: 'ipc', clubId: null, note: '', at: '2026-11-01T00:00:00.000Z', revoked: null },
-        { id: 'wrong', cfiId: 'acct-kim', studentId: 'acct-maya', flightId: 'flt-maya-dual-xc', milestone: null, clubId: null, note: '', at: '2026-11-01T00:00:00.000Z', revoked: null },
+        { id: 'self', cfiId: 'acct-dan', studentId: 'acct-dan', flightId: null, milestone: 'ipc', clubId: null, note: '', schoolAircraft: false, at: '2026-11-01T00:00:00.000Z', revoked: null },
+        { id: 'wrong', cfiId: 'acct-kim', studentId: 'acct-maya', flightId: 'flt-maya-dual-xc', milestone: null, clubId: null, note: '', schoolAircraft: false, at: '2026-11-01T00:00:00.000Z', revoked: null },
       )
     })
     expect(errors).toContain('signoff self: no self-verification')

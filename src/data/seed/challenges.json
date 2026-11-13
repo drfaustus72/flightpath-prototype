@@ -1,0 +1,30 @@
+[
+  {
+    "code": "five_new_airports",
+    "title": "Five New Airports",
+    "description": "Land at five airports you’ve never landed at before. Take as long as you like.",
+    "kind": "new_airports",
+    "target": 5,
+    "states": []
+  },
+  {
+    "code": "three_state_passport",
+    "title": "Three-State Passport",
+    "description": "Land in California, Nevada and Arizona.",
+    "kind": "states",
+    "target": null,
+    "states": [
+      "CA",
+      "NV",
+      "AZ"
+    ]
+  },
+  {
+    "code": "good_call",
+    "title": "Good Call",
+    "description": "Record a flight you decided not to make. Recognizing a no-go is part of good airmanship.",
+    "kind": "no_go",
+    "target": 1,
+    "states": []
+  }
+]

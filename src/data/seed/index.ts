@@ -14,6 +14,12 @@ import signoffs from './signoffs.json'
 import signoffRequests from './signoffRequests.json'
 import blocks from './blocks.json'
 import reports from './reports.json'
+import missions from './missions.json'
+import pathways from './pathways.json'
+import challenges from './challenges.json'
+import challengeEntries from './challengeEntries.json'
+import noGos from './noGos.json'
+import missionVerifications from './missionVerifications.json'
 
 export const rawSeed = {
   accounts,
@@ -31,6 +37,12 @@ export const rawSeed = {
   signoffRequests,
   blocks,
   reports,
+  missions,
+  pathways,
+  challenges,
+  challengeEntries,
+  noGos,
+  missionVerifications,
 }
 
 /** Validated once at startup. The app renders an error screen if this fails. */
