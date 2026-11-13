@@ -21,3 +21,6 @@ export const milestoneAchievementCode = (code: MilestoneCode) => `milestone:${co
 
 /** Shown wherever a sign-off appears (CLAUDE.md rule 3). */
 export const SIGNOFF_DISCLAIMER = 'A Flightpath platform verification, not an FAA endorsement or logbook entry.'
+
+/** Short form for compact badges (feed cards, trophy case). */
+export const SIGNOFF_DISCLAIMER_SHORT = 'Platform verification, not an FAA endorsement.'

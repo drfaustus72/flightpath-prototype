@@ -1,4 +1,5 @@
 import { Info, MonitorPlay } from 'lucide-react'
+import { useEffect } from 'react'
 import { useLocation, useParams } from 'react-router'
 import { routeForViewer } from '../../domain/flights'
 import { canViewFlight } from '../../domain/visibility'
@@ -21,6 +22,11 @@ export function FlightScreen() {
   const { account } = useActive()
   const location = useLocation()
   const flight = world.flights.find((f) => f.id === flightId)
+
+  // Links like "/flights/x#comments-title" jump to that section.
+  useEffect(() => {
+    if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView()
+  }, [location.hash])
 
   if (!flight || !canViewFlight(world, flight, account.id)) {
     return (

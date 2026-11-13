@@ -1,5 +1,5 @@
 import { BadgeCheck } from 'lucide-react'
-import { SIGNOFF_DISCLAIMER } from '../../domain/milestones'
+import { SIGNOFF_DISCLAIMER, SIGNOFF_DISCLAIMER_SHORT } from '../../domain/milestones'
 import { accountById } from '../../domain/social'
 import type { Signoff } from '../../domain/types'
 import { useWorld } from '../../store/hooks'
@@ -16,7 +16,8 @@ export function SignoffBadge({ signoff, compact = false }: { signoff: Signoff; c
         <BadgeCheck size={16} aria-hidden="true" />
         CFI-verified{by && ` · ${by}`}
       </p>
-      {!compact && <p className="text-[12px] text-ink-muted">{SIGNOFF_DISCLAIMER}</p>}
+      {/* CLAUDE.md rule 3: the platform-verification label appears wherever a sign-off does. */}
+      <p className="text-[12px] text-ink-muted">{compact ? SIGNOFF_DISCLAIMER_SHORT : SIGNOFF_DISCLAIMER}</p>
     </div>
   )
 }

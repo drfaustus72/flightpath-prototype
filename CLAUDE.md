@@ -38,6 +38,9 @@ e2e/          Playwright smoke tests, one per demo script
 ```
 
 - Domain logic is pure TypeScript in `src/domain/` and is tested there; components stay thin.
+- Who-can-see-what lives in `src/domain/visibility.ts` (`canSeeProfile`, `canSeeField`, `canViewFlight`); sign-off authority in `src/domain/signoffs.ts`. Screens call these; never re-derive visibility or sign-off rules in a component.
+- State changes for the social layer and sign-offs are pure transitions in `src/domain/socialOps.ts`; store actions only wrap them.
+- Seed flights are generated: edit `scripts/seed-flights.ts`, then run `npx jiti scripts/seed-flights.ts`.
 - Seed data is validated with zod at load. A validation failure renders a visible error screen; never fail silently.
 - Persisted state carries `STORAGE_VERSION` and a fingerprint of the seed data. Bump `STORAGE_VERSION` when the persisted shape changes; a version or seed mismatch, or corrupt state, resets to seed with a console warning.
 - The active persona is selected via the persona switcher; all screens derive from the active account.
