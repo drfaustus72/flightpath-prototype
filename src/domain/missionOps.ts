@@ -1,4 +1,4 @@
-import { canVerifyMission, missionByCode, verificationClubId } from './missions'
+import { canVerifyClaim, canVerifyMission, claimFor, claimVerificationClubs, missionByCode, verificationClubId } from './missions'
 import type { OpContext } from './socialOps'
 import type { World } from './types'
 
@@ -8,17 +8,51 @@ export function verifyMission(world: World, actorId: string, flightId: string, m
   const flight = world.flights.find((f) => f.id === flightId)
   const mission = missionByCode(world, missionCode)
   if (!flight || !mission || !canVerifyMission(world, actorId, flight, mission)) throw new Error("Can't verify this mission")
+  const clubId = verificationClubId(world, actorId, flight)
   const verification = {
     id: ctx.id,
     pilotId: flight.pilotId,
     missionCode,
     flightId,
-    clubId: verificationClubId(world, actorId, flight),
+    clubId,
+    // A tracked flight tagged to the school was flown in its aircraft.
+    schoolAircraft: clubId !== null,
     byAccountId: actorId,
     at: ctx.now,
     revoked: null,
   }
   return { ...world, missionVerifications: [...world.missionVerifications, verification] }
+}
+
+/**
+ * The school verifies a mission the pilot self-reported without a track. The verifier confirms
+ * whether it was flown in the school's aircraft; only then does it earn XP.
+ */
+export function verifyMissionClaim(
+  world: World,
+  actorId: string,
+  pilotId: string,
+  missionCode: string,
+  clubId: string,
+  schoolAircraft: boolean,
+  ctx: OpContext,
+): World {
+  const mission = missionByCode(world, missionCode)
+  if (!mission || !canVerifyClaim(world, actorId, pilotId, mission)) throw new Error("Can't verify this mission")
+  if (!claimVerificationClubs(world, actorId, pilotId).some((c) => c.id === clubId)) throw new Error(`Can't verify for ${clubId}`)
+  const verification = { id: ctx.id, pilotId, missionCode, flightId: null, clubId, schoolAircraft, byAccountId: actorId, at: ctx.now, revoked: null }
+  return { ...world, missionVerifications: [...world.missionVerifications, verification] }
+}
+
+/** The pilot reports flying a mission (e.g. no track). Lying gains nothing: it never earns XP by itself. */
+export function claimMission(world: World, actorId: string, missionCode: string, ctx: OpContext): World {
+  if (!missionByCode(world, missionCode)) throw new Error(`Unknown mission ${missionCode}`)
+  if (claimFor(world, actorId, missionCode)) return world
+  return { ...world, missionClaims: [...world.missionClaims, { pilotId: actorId, missionCode, at: ctx.now }] }
+}
+
+export function withdrawMissionClaim(world: World, actorId: string, missionCode: string): World {
+  return { ...world, missionClaims: world.missionClaims.filter((c) => !(c.pilotId === actorId && c.missionCode === missionCode)) }
 }
 
 /** The verifier, or an admin of the school it was recorded for, can revoke it with a reason. */

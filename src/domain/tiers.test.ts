@@ -88,6 +88,21 @@ describe('XP (school-bound)', () => {
   })
 })
 
+describe("a School Pro school's mission catalog", () => {
+  it('gives free members missions, the pathway and the advisor, but not Pilot Pro extras', () => {
+    const freeMember = ctx({ account: makeAccount(), clubs: [makeClub()], memberships: [makeMembership()] })
+    for (const f of ['progress.missions', 'progress.pathways', 'progress.advisor', 'progress.xp'] as const) expect(can(freeMember, f)).toBe(true)
+    expect(can(freeMember, 'progress.challenges')).toBe(false)
+    expect(can(freeMember, 'media.polishedCard')).toBe(false)
+  })
+
+  it('stays behind Pilot Pro for free pilots at School Basic schools or without a school', () => {
+    const basic = ctx({ account: makeAccount(), clubs: [makeClub({ plan: 'school_basic' })], memberships: [makeMembership()] })
+    expect(can(basic, 'progress.missions')).toBe(false)
+    expect(can(ctx({ account: makeAccount() }), 'progress.missions')).toBe(false)
+  })
+})
+
 describe('CFI tiers', () => {
   it('never paywalls sign-off authority: a verified CFI with no subscriptions can sign off', () => {
     const c = ctx({ account: makeCfi() })

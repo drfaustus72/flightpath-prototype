@@ -61,6 +61,24 @@ test.describe('M3 script A: mission, card, Props and school-verified XP', () => 
     await expect(page.getByText(/Next on Private Pilot/)).toHaveCount(0)
   })
 
+  test('Maya self-reports a mission and her school verifies it for XP', async ({ page }) => {
+    await page.goto('/missions/santa_paula')
+    await page.getByRole('button', { name: 'I flew this' }).click()
+    await expect(page.getByText(/Self-reported\. Hawthorne Flight Academy can verify it for XP/)).toBeVisible()
+
+    await viewAs(page, 'School admin', '/school/club-hfa')
+    const row = page.getByRole('listitem').filter({ hasText: 'says they flew Santa Paula' })
+    await expect(row).toContainText('Self-reported, with no track')
+    await expect(row.getByRole('checkbox', { name: 'Flown in a Hawthorne Flight Academy aircraft' })).toBeChecked()
+    await row.getByRole('button', { name: 'Verify Santa Paula' }).click()
+    await expect(page.getByText('says they flew Santa Paula')).toHaveCount(0)
+
+    await viewAs(page, 'Student pilot', '/progress')
+    const xp = page.locator('section', { has: page.getByRole('heading', { name: 'XP at Hawthorne Flight Academy' }) })
+    await expect(xp).toContainText('Santa Paula')
+    await expect(xp).toContainText('+150')
+  })
+
   test('records a no-go for the Good Call challenge', async ({ page }) => {
     await page.goto('/progress')
     const goodCall = page.getByRole('listitem').filter({ hasText: 'Record a flight you decided not to make' })

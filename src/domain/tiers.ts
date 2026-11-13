@@ -12,6 +12,9 @@ import type { Account, Club, Membership, World } from './types'
  *  - cfi_pro:    verified CFI with CFI Pro (paid, or staff CFI at a School Pro school)
  *  - school_pro_member: active member of a School Pro school. XP is school-bound: it is earned
  *    and held at that school and comes with the School Pro account, not with Pilot Pro.
+ *  - pilot_pro_or_school_pro_member: either. The school's mission catalog, pathway and advisor
+ *    come with School Pro membership, so free pilots at a School Pro school can earn XP
+ *    (decided 13 Nov 2026).
  *
  * Club requirements (the account must be an active admin of that club):
  *  - school_admin:     any flight school page (School Basic or Pro)
@@ -29,9 +32,9 @@ export const ACCOUNT_FEATURES = {
 
   'progress.xp': 'school_pro_member',
   'progress.ranks': 'school_pro_member',
-  'progress.missions': 'pilot_pro',
-  'progress.pathways': 'pilot_pro',
-  'progress.advisor': 'pilot_pro',
+  'progress.missions': 'pilot_pro_or_school_pro_member',
+  'progress.pathways': 'pilot_pro_or_school_pro_member',
+  'progress.advisor': 'pilot_pro_or_school_pro_member',
   'progress.challenges': 'pilot_pro',
   'media.polishedCard': 'pilot_pro',
   'stats.advanced': 'pilot_pro',
@@ -62,7 +65,7 @@ export const CLUB_FEATURES = {
   'school.sponsorSeats': 'school_pro_admin',
 } as const satisfies Record<string, ClubRequirement>
 
-export type AccountRequirement = 'pilot_free' | 'pilot_pro' | 'cfi' | 'cfi_pro' | 'school_pro_member'
+export type AccountRequirement = 'pilot_free' | 'pilot_pro' | 'cfi' | 'cfi_pro' | 'school_pro_member' | 'pilot_pro_or_school_pro_member'
 export type ClubRequirement = 'school_admin' | 'school_pro_admin'
 export type AccountFeature = keyof typeof ACCOUNT_FEATURES
 export type ClubFeature = keyof typeof CLUB_FEATURES
@@ -123,6 +126,8 @@ export function can(ctx: AccessContext, feature: AccountFeature): boolean {
       return hasCfiPro(ctx)
     case 'school_pro_member':
       return xpSchoolsOf(ctx).length > 0
+    case 'pilot_pro_or_school_pro_member':
+      return hasPilotPro(ctx) || xpSchoolsOf(ctx).length > 0
   }
 }
 

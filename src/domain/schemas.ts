@@ -380,12 +380,21 @@ export const missionVerificationSchema = z.object({
   id,
   pilotId: id,
   missionCode,
-  flightId: id,
+  /** Null when the school verifies a mission the pilot self-reported without a track. */
+  flightId: id.nullable(),
   clubId: id.nullable(),
+  /**
+   * Flown in the school's aircraft. For a tracked flight this is the flight's tag to the school;
+   * for a self-reported mission the verifier confirms it. XP counts only when true.
+   */
+  schoolAircraft: z.boolean(),
   byAccountId: id,
   at: isoDateTime,
   revoked: z.object({ at: isoDateTime, reason: z.string().trim().min(1).max(500) }).nullable(),
 })
+
+/** A pilot's own report that they flew a mission (e.g. no track recorded). Shown as self-reported. */
+export const missionClaimSchema = z.object({ pilotId: id, missionCode, at: isoDateTime })
 
 export const worldSchema = z.object({
   accounts: z.array(accountSchema).min(1),
@@ -409,4 +418,5 @@ export const worldSchema = z.object({
   challengeEntries: z.array(challengeEntrySchema),
   noGos: z.array(noGoSchema),
   missionVerifications: z.array(missionVerificationSchema),
+  missionClaims: z.array(missionClaimSchema),
 })

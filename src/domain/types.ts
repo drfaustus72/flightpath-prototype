@@ -32,6 +32,7 @@ import type {
   challengeEntrySchema,
   noGoSchema,
   missionVerificationSchema,
+  missionClaimSchema,
 } from './schemas'
 
 export type Account = z.infer<typeof accountSchema>
@@ -66,3 +67,4 @@ export type Challenge = z.infer<typeof challengeSchema>
 export type ChallengeEntry = z.infer<typeof challengeEntrySchema>
 export type NoGo = z.infer<typeof noGoSchema>
 export type MissionVerification = z.infer<typeof missionVerificationSchema>
+export type MissionClaim = z.infer<typeof missionClaimSchema>

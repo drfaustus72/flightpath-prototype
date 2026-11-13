@@ -1,7 +1,7 @@
 import { distanceNm } from './geo'
 import { flightsInOrder } from './recognition'
 import { isVerifiedCfi } from './tiers'
-import type { Airport, Club, Flight, Mission, MissionVerification, World } from './types'
+import type { Airport, Club, Flight, Mission, MissionClaim, MissionVerification, World } from './types'
 import { isStaffOfClub } from './visibility'
 
 /**
@@ -46,20 +46,30 @@ export function activeVerification(world: World, pilotId: string, missionCode: s
   return world.missionVerifications.find((v) => v.pilotId === pilotId && v.missionCode === missionCode && v.revoked === null)
 }
 
+export function claimFor(world: World, pilotId: string, missionCode: string): MissionClaim | undefined {
+  return world.missionClaims.find((c) => c.pilotId === pilotId && c.missionCode === missionCode)
+}
+
 export interface MissionStatus {
   mission: Mission
   /** First flight whose track completes it (null for cfiOnly missions until verified). */
   flight: Flight | null
   verification: MissionVerification | null
+  /** The pilot's own report that they flew it. */
+  claim: MissionClaim | null
   complete: boolean
+  /** How we know: the school verified it, the track shows it, or the pilot says so. */
+  source: 'verified' | 'tracked' | 'self_reported' | null
 }
 
 export function missionStatus(world: World, pilotId: string, mission: Mission): MissionStatus {
   const verification = activeVerification(world, pilotId, mission.code) ?? null
+  const claim = claimFor(world, pilotId, mission.code) ?? null
   const ordered = flightsInOrder(world.flights.filter((f) => f.pilotId === pilotId))
   const detected = ordered.find((f) => flightMeetsMission(world, f, mission)) ?? null
-  const verifiedFlight = verification ? (world.flights.find((f) => f.id === verification.flightId) ?? null) : null
-  return { mission, flight: detected ?? verifiedFlight, verification, complete: detected !== null || verification !== null }
+  const verifiedFlight = verification?.flightId ? (world.flights.find((f) => f.id === verification.flightId) ?? null) : null
+  const source = verification ? 'verified' : detected ? 'tracked' : claim ? 'self_reported' : null
+  return { mission, flight: detected ?? verifiedFlight, verification, claim, complete: source !== null, source }
 }
 
 export function missionStatuses(world: World, pilotId: string): MissionStatus[] {
@@ -106,24 +116,48 @@ export function verificationClubId(world: World, accountId: string, flight: Flig
   return club && isStaffOfClub(world, accountId, club.id) ? club.id : null
 }
 
-export interface MissionToVerify {
-  flight: Flight
-  mission: Mission
+/**
+ * School Pro schools where this staff member can verify a self-reported mission for the pilot:
+ * the staff member is an admin or staff CFI there and the pilot is an active member.
+ */
+export function claimVerificationClubs(world: World, accountId: string, pilotId: string): Club[] {
+  if (accountId === pilotId) return []
+  const pilotClubs = new Set(world.memberships.filter((m) => m.accountId === pilotId && m.status === 'active').map((m) => m.clubId))
+  return world.clubs.filter((c) => c.plan === 'school_pro' && c.claimed && pilotClubs.has(c.id) && isStaffOfClub(world, accountId, c.id))
 }
 
-/** Track-detected missions waiting for this school staff member's verification. */
+/** A self-reported mission (no track) the school can verify after checking with the pilot. */
+export function canVerifyClaim(world: World, accountId: string, pilotId: string, mission: Mission): boolean {
+  if (!claimFor(world, pilotId, mission.code) || activeVerification(world, pilotId, mission.code)) return false
+  return claimVerificationClubs(world, accountId, pilotId).length > 0
+}
+
+export type MissionToVerify =
+  | { kind: 'tracked'; pilotId: string; mission: Mission; flight: Flight }
+  | { kind: 'self_reported'; pilotId: string; mission: Mission; claim: MissionClaim; clubs: Club[] }
+
+/**
+ * What waits for this school staff member. Tagging a flight to the school is the submission:
+ * every mission it completes lands here automatically (decided 13 Nov 2026). Self-reported
+ * missions from the school's members land here too, for the school to check and verify.
+ */
 export function missionsToVerify(world: World, accountId: string): MissionToVerify[] {
-  return world.missions
-    .filter((m) => !m.requirements.cfiOnly)
-    .flatMap((mission) => {
-      const pilots = new Set(world.flights.map((f) => f.pilotId))
-      return [...pilots].flatMap((pilotId) => {
+  const pilots = [...new Set([...world.flights.map((f) => f.pilotId), ...world.missionClaims.map((c) => c.pilotId)])]
+  return world.missions.flatMap((mission) =>
+    pilots.flatMap((pilotId): MissionToVerify[] => {
+      if (!mission.requirements.cfiOnly) {
         const flight = flightsInOrder(world.flights.filter((f) => f.pilotId === pilotId)).find((f) =>
           canVerifyMission(world, accountId, f, mission),
         )
-        return flight ? [{ flight, mission }] : []
-      })
-    })
+        if (flight) return [{ kind: 'tracked', pilotId, mission, flight }]
+      }
+      const claim = claimFor(world, pilotId, mission.code)
+      if (claim && canVerifyClaim(world, accountId, pilotId, mission)) {
+        return [{ kind: 'self_reported', pilotId, mission, claim, clubs: claimVerificationClubs(world, accountId, pilotId) }]
+      }
+      return []
+    }),
+  )
 }
 
 export const MISSION_LABELS: Record<Mission['label'], string> = {

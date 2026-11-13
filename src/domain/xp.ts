@@ -4,7 +4,8 @@ import type { Club, MilestoneCode, World } from './types'
 /**
  * XP (CLAUDE.md rules 2 and 7): school-bound, held per School Pro school, never transferred.
  * It comes only from things the school verified:
- *  - missions verified for that school, on flights tagged to it (flown in its aircraft);
+ *  - missions verified for that school and flown in its aircraft (a flight tagged to it, or a
+ *    self-reported mission the verifier confirmed);
  *  - milestones a staff CFI signed off for that school, flown in its aircraft.
  * A logged flight earns nothing by itself. No-gos earn a badge, never XP. Ranks are recognition;
  * any discount is out of scope until aviation counsel reviews it (rule 8).
@@ -66,8 +67,9 @@ export function xpEntries(world: World, pilotId: string, clubId: string): XpEntr
   const missions: XpEntry[] = world.missionVerifications.flatMap((v) => {
     if (v.pilotId !== pilotId || v.clubId !== clubId || v.revoked !== null) return []
     const mission = world.missions.find((m) => m.code === v.missionCode)
-    const flight = world.flights.find((f) => f.id === v.flightId)
-    if (!mission || flight?.clubId !== clubId) return []
+    if (!mission || !v.schoolAircraft) return []
+    // A tracked flight must be tagged to this school; a self-reported one relies on the verifier's confirmation.
+    if (v.flightId !== null && world.flights.find((f) => f.id === v.flightId)?.clubId !== clubId) return []
     return [{ kind: 'mission' as const, title: mission.title, xp: mission.xp, at: v.at }]
   })
   const milestones: XpEntry[] = world.signoffs.flatMap((s) => {

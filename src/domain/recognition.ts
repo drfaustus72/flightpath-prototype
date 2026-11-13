@@ -199,3 +199,13 @@ export function flightReviewStatus(account: Pick<Account, 'flightReviewOn'>, now
   const status = daysLeft < 0 ? 'overdue' : daysLeft <= FLIGHT_REVIEW_REMINDER_DAYS ? 'due_soon' : 'current'
   return { status, lastOn: account.flightReviewOn, dueBy, daysLeft }
 }
+
+/**
+ * Flight time worked out from logged tracks (airborne time, or the whole track when takeoff
+ * wasn't detected). Simulator sessions don't count. Shown next to the self-reported logbook total.
+ */
+export function trackedTime(world: World, pilotId: string): { hours: number; flights: number } {
+  const flights = world.flights.filter((f) => f.pilotId === pilotId && !f.isSimulator)
+  const sec = flights.reduce((sum, f) => sum + (f.stats.airborneSec ?? f.stats.durationSec ?? 0), 0)
+  return { hours: Math.round((sec / 3600) * 10) / 10, flights: flights.length }
+}

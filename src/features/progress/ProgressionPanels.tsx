@@ -87,7 +87,7 @@ export function PathwayPanel() {
             </span>
             <Link to={`/missions/${s.mission.code}`} className="flex min-h-12 flex-1 items-center justify-between gap-2 border-b border-hairline">
               <span className={s.complete ? 'font-semibold' : ''}>{s.mission.title}</span>
-              <span className="text-[13px] text-ink-muted">{s.complete ? (s.verified ? 'Verified' : 'Complete') : ''}</span>
+              <span className="text-[13px] text-ink-muted">{s.source === 'verified' ? 'Verified' : s.source === 'self_reported' ? 'Self-reported' : s.complete ? 'Complete' : ''}</span>
             </Link>
           </li>
         ))}

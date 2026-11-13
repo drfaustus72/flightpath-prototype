@@ -12,6 +12,7 @@ import { Avatar } from '../../ui/Avatar'
 import { Ident, Panel, PlanBadge } from '../../ui/primitives'
 import { SignoffBadge } from '../cfi/SignoffBadge'
 import { certificateNames } from './labels'
+import { TrackedLine } from './LogbookPanel'
 
 export function ProfileHeader({ owner, badges }: { owner: Account; badges: string[] }) {
   const world = useWorld()
@@ -98,6 +99,7 @@ export function ProfileFacts({ owner }: { owner: Account }) {
               {owner.hoursSource === 'logbook_verified' ? 'Logbook verified' : 'Self-reported'}
             </span>
           </p>
+          <TrackedLine pilotId={owner.id} />
         </Panel>
       )}
     </>

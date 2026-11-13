@@ -55,4 +55,22 @@ describe('xpSummary', () => {
     expect(xpSummary(w, 'acct-jordan')).toEqual([])
     expect(xpSummary(w, 'acct-marcus')).toEqual([])
   })
+
+  it('stays with the old school when a pilot switches; the new school starts at 0', () => {
+    const w = seed()
+    w.clubs.push({ id: 'club-new', name: 'Bayside Flight Center', kind: 'flight_school', plan: 'school_pro', claimed: true, homeAirport: 'KTOA', website: null, initials: 'BFC' })
+    w.memberships = w.memberships.map((m) => (m.id === 'mem-lena-hfa' ? { ...m, status: 'former' as const, isHomeSchool: false, endedOn: '2026-11-12' } : m))
+    w.memberships.push({ id: 'mem-lena-new', accountId: 'acct-lena', clubId: 'club-new', roles: ['member'], status: 'active', isHomeSchool: true, sponsoredPilotPro: false, startedOn: '2026-11-12', endedOn: null })
+    expect(xpSummary(w, 'acct-lena').map((s) => [s.club.id, s.xp])).toEqual([['club-new', 0]])
+    // The record stays with Hawthorne: rejoining brings it back.
+    w.memberships = w.memberships.map((m) => (m.id === 'mem-lena-hfa' ? { ...m, status: 'active' as const, endedOn: null } : m))
+    expect(xpSummary(w, 'acct-lena').find((s) => s.club.id === 'club-hfa')?.xp).toBe(300)
+  })
+
+  it('counts a self-reported mission the school verified, only if flown in its aircraft', () => {
+    const w = seed()
+    const v = { id: 'v', pilotId: 'acct-maya', missionCode: 'santa_paula', flightId: null, clubId: 'club-hfa', byAccountId: 'acct-alex', at: '2026-11-13T00:00:00.000Z', revoked: null }
+    expect(xpSummary({ ...w, missionVerifications: [{ ...v, schoolAircraft: true }] }, 'acct-maya')[0]?.xp).toBe(150)
+    expect(xpSummary({ ...w, missionVerifications: [{ ...v, schoolAircraft: false }] }, 'acct-maya')[0]?.xp).toBe(0)
+  })
 })

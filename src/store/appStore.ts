@@ -12,7 +12,7 @@ import { isBlocked } from '../domain/visibility'
 import { demoPersonas, loadWorld } from '../domain/world'
 
 /** Bump whenever the persisted shape changes. Old state is discarded and reset to seed. */
-export const STORAGE_VERSION = 6
+export const STORAGE_VERSION = 7
 export const STORAGE_KEY = 'flightpath-demo'
 
 export interface AppState {
@@ -48,6 +48,9 @@ export interface AppState {
 
   // Missions, challenges and no-gos (domain/missionOps.ts).
   verifyMission: (flightId: string, missionCode: string) => void
+  verifyMissionClaim: (pilotId: string, missionCode: string, clubId: string, schoolAircraft: boolean) => void
+  claimMission: (missionCode: string) => void
+  withdrawMissionClaim: (missionCode: string) => void
   revokeMissionVerification: (verificationId: string, reason: string) => void
   joinChallenge: (code: string) => void
   leaveChallenge: (code: string) => void
@@ -231,6 +234,10 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
         unblock: (id) => act((w, me) => ops.unblock(w, me, id)),
         report: (target, reason) => act((w, me, c) => ops.report(w, me, target, reason, c)),
         verifyMission: (flightId, code) => act((w, me, c) => missionOps.verifyMission(w, me, flightId, code, c)),
+        verifyMissionClaim: (pilotId, code, clubId, schoolAircraft) =>
+          act((w, me, c) => missionOps.verifyMissionClaim(w, me, pilotId, code, clubId, schoolAircraft, c)),
+        claimMission: (code) => act((w, me, c) => missionOps.claimMission(w, me, code, c)),
+        withdrawMissionClaim: (code) => act((w, me) => missionOps.withdrawMissionClaim(w, me, code)),
         revokeMissionVerification: (id, reason) => act((w, me, c) => missionOps.revokeMissionVerification(w, me, id, reason, c)),
         joinChallenge: (code) => act((w, me, c) => missionOps.joinChallenge(w, me, code, c)),
         leaveChallenge: (code) => act((w, me) => missionOps.leaveChallenge(w, me, code)),

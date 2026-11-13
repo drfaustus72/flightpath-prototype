@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { seedResult } from '../data/seed'
 import { createFlight } from './flights'
-import { airportEvents, flightReviewStatus, landingsWithin, newlyEarned, recognitionFor } from './recognition'
+import { airportEvents, flightReviewStatus, landingsWithin, newlyEarned, recognitionFor, trackedTime } from './recognition'
 import { importTrack } from './track/importTrack'
 import { type Leg, synthesize, toGpx } from './track/synth'
 import type { Flight, World } from './types'
@@ -149,5 +149,22 @@ describe('flightReviewStatus', () => {
   })
   it('is unknown without a date', () => {
     expect(flightReviewStatus({ flightReviewOn: null }, now).status).toBe('unknown')
+  })
+})
+
+describe('trackedTime', () => {
+  it('adds airborne time from real flights and ignores simulator sessions', () => {
+    const w = seed()
+    const legs: Leg[] = [
+      { kind: 'ground', at: 'KHHR', sec: 120 },
+      { kind: 'fly', from: 'KHHR', to: 'KAVX', cruiseFt: 4500, kt: 110 },
+      { kind: 'ground', at: 'KAVX', sec: 120 },
+    ]
+    const real = fly(w, legs, '2026-11-08T17:00:00Z', { pilotId: 'acct-jordan' })
+    const sim = fly(w, legs, '2026-11-09T17:00:00Z', { pilotId: 'acct-jordan', sim: true })
+    const t = trackedTime({ ...w, flights: [real, sim] }, 'acct-jordan')
+    expect(t.flights).toBe(1)
+    expect(t.hours).toBeCloseTo((real.stats.airborneSec ?? 0) / 3600, 1)
+    expect(t.hours).toBeGreaterThan(0)
   })
 })

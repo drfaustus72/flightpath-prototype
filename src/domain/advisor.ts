@@ -11,14 +11,14 @@ import type { Mission, Pathway, World } from './types'
 export interface PathwayStep {
   mission: Mission
   complete: boolean
-  verified: boolean
+  source: MissionStatus['source']
 }
 
 export function pathwaySteps(world: World, pilotId: string, pathway: Pathway): PathwayStep[] {
   const statuses = new Map(missionStatuses(world, pilotId).map((s) => [s.mission.code, s]))
   return pathway.missionCodes.flatMap((code) => {
     const s = statuses.get(code)
-    return s ? [{ mission: s.mission, complete: s.complete, verified: s.verification !== null }] : []
+    return s ? [{ mission: s.mission, complete: s.complete, source: s.source }] : []
   })
 }
 

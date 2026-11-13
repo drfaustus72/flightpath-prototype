@@ -5,6 +5,14 @@ import * as ops from './missionOps'
 import { checkIntegrity } from './world'
 import type { World } from './types'
 import { xpSummary } from './xp'
+import { missionByCode, missionStatus, missionsToVerify } from './missions'
+import type { Mission } from './types'
+
+const santaPaula = (w: World): Mission => {
+  const m = missionByCode(w, 'santa_paula')
+  if (!m) throw new Error('santa_paula missing')
+  return m
+}
 
 let n = 0
 const ctx = () => ({ id: `mop-${++n}`, now: '2026-11-14T20:00:00.000Z' })
@@ -31,6 +39,29 @@ describe('Script A: Maya flies to Catalina and the school verifies it', () => {
     expect(() => ops.revokeMissionVerification(w, 'acct-dan', v.id, ' ', ctx())).toThrow('reason')
     w = ops.revokeMissionVerification(w, 'acct-dan', v.id, 'Landed at the wrong airport', ctx())
     expect(xpSummary(w, 'acct-maya')[0]?.xp).toBe(0)
+  })
+})
+
+describe('self-reported missions', () => {
+  it('shows as self-reported, earns nothing alone, and earns XP once the school verifies it', () => {
+    let w = seed()
+    w = ops.claimMission(w, 'acct-lena', 'santa_paula', ctx())
+    expect(missionStatus(w, 'acct-lena', santaPaula(w)).source).toBe('self_reported')
+    expect(xpSummary(w, 'acct-lena')[0]?.xp).toBe(300) // only the seed's verified coastal cross-country
+
+    expect(missionsToVerify(w, 'acct-alex').some((x) => x.kind === 'self_reported' && x.pilotId === 'acct-lena')).toBe(true)
+    expect(() => ops.verifyMissionClaim(w, 'acct-lena', 'acct-lena', 'santa_paula', 'club-hfa', true, ctx())).toThrow()
+    expect(() => ops.verifyMissionClaim(w, 'acct-kim', 'acct-lena', 'santa_paula', 'club-hfa', true, ctx())).toThrow()
+    w = ops.verifyMissionClaim(w, 'acct-alex', 'acct-lena', 'santa_paula', 'club-hfa', true, ctx())
+    expect(checkIntegrity(w)).toEqual([])
+    expect(missionStatus(w, 'acct-lena', santaPaula(w)).source).toBe('verified')
+    expect(xpSummary(w, 'acct-lena')[0]?.xp).toBe(450)
+  })
+
+  it("doesn't let a School Basic school verify for XP", () => {
+    const w = seed()
+    // Jordan's seed claim (Santa Paula) belongs to a School Basic member: no one can verify it for XP.
+    expect(missionsToVerify(w, 'acct-kim').filter((x) => x.pilotId === 'acct-jordan')).toEqual([])
   })
 })
 

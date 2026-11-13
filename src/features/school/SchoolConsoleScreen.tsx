@@ -84,7 +84,9 @@ export function SchoolConsoleScreen() {
 function MissionsQueue({ clubId }: { clubId: string }) {
   const world = useWorld()
   const { account } = useActive()
-  const queue = missionsToVerify(world, account.id).filter((x) => x.flight.clubId === clubId)
+  const queue = missionsToVerify(world, account.id).filter((x) =>
+    x.kind === 'tracked' ? x.flight.clubId === clubId : x.clubs.some((c) => c.id === clubId),
+  )
   return (
     <section aria-labelledby="mission-queue" className="flex flex-col gap-2">
       <h2 id="mission-queue" className="font-semibold">
@@ -94,8 +96,8 @@ function MissionsQueue({ clubId }: { clubId: string }) {
         <p className="text-ink-muted">Nothing waiting. Missions your members complete in your aircraft show up here.</p>
       ) : (
         <ul className="flex flex-col gap-2">
-          {queue.map(({ flight, mission }) => (
-            <MissionToVerifyRow key={`${flight.id}-${mission.code}`} flight={flight} mission={mission} />
+          {queue.map((item) => (
+            <MissionToVerifyRow key={`${item.pilotId}-${item.mission.code}`} item={item} />
           ))}
         </ul>
       )}

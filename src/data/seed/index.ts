@@ -20,6 +20,7 @@ import challenges from './challenges.json'
 import challengeEntries from './challengeEntries.json'
 import noGos from './noGos.json'
 import missionVerifications from './missionVerifications.json'
+import missionClaims from './missionClaims.json'
 
 export const rawSeed = {
   accounts,
@@ -43,6 +44,7 @@ export const rawSeed = {
   challengeEntries,
   noGos,
   missionVerifications,
+  missionClaims,
 }
 
 /** Validated once at startup. The app renders an error screen if this fails. */

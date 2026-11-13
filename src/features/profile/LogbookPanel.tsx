@@ -1,3 +1,5 @@
+import { trackedTime } from '../../domain/recognition'
+import { useWorld } from '../../store/hooks'
 import { useState } from 'react'
 import type { Account } from '../../domain/types'
 import { useAppStore } from '../../store/storeContext'
@@ -35,6 +37,7 @@ export function LogbookPanel({ account }: { account: Account }) {
             · {account.hoursSource === 'logbook_verified' ? 'Logbook verified' : 'Self-reported'}
           </span>
         </p>
+        <TrackedLine pilotId={account.id} />
         <p className="text-ink-muted">
           Last flight review: {account.flightReviewOn ? <Ident>{account.flightReviewOn}</Ident> : 'not entered'}
         </p>
@@ -79,5 +82,18 @@ export function LogbookPanel({ account }: { account: Account }) {
         </Button>
       </div>
     </Panel>
+  )
+}
+
+/** Hours worked out from logged tracks, next to the pilot's own total. */
+export function TrackedLine({ pilotId }: { pilotId: string }) {
+  const world = useWorld()
+  const t = trackedTime(world, pilotId)
+  if (t.flights === 0) return null
+  return (
+    <p className="text-[14px] text-ink-muted">
+      Tracked in Flightpath: <Ident>{t.hours.toLocaleString('en-US')}</Ident> h from <Ident>{t.flights}</Ident>{' '}
+      {t.flights === 1 ? 'flight' : 'flights'}
+    </p>
   )
 }

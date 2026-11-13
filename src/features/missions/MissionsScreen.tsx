@@ -4,8 +4,9 @@ import { MISSION_LABELS, missionByCode, missionStatus, missionStatuses } from '.
 import { can } from '../../domain/tiers'
 import { xpClubsOf } from '../../domain/xp'
 import { useActive, useWorld } from '../../store/hooks'
+import { useAppStore } from '../../store/storeContext'
 import { ProGate } from '../../ui/ProGate'
-import { ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
+import { Button, ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
 
 const THEMES: Record<string, string> = {
   coast: 'Island and coast',
@@ -93,6 +94,8 @@ export function MissionScreen() {
   const world = useWorld()
   const { account, access } = useActive()
   const mission = missionByCode(world, code)
+  const claimMission = useAppStore((s) => s.claimMission)
+  const withdrawClaim = useAppStore((s) => s.withdrawMissionClaim)
 
   if (!mission) {
     return <EmptyState title="Mission not found" body="It may have been retired." action={<ButtonLink to="/missions">All missions</ButtonLink>} />
@@ -108,6 +111,13 @@ export function MissionScreen() {
 
   const status = missionStatus(world, account.id, mission)
   const xpSchool = xpClubsOf(world, account.id)[0]
+  const sourceText = {
+    verified: `Verified by ${xpSchool && status.verification?.clubId === xpSchool.id ? xpSchool.name : 'your school or instructor'}.`,
+    tracked: xpSchool
+      ? `Your track shows it. ${xpSchool.name} verifies it for XP when the flight is tagged to the school.`
+      : 'Your track shows it.',
+    self_reported: xpSchool ? `Self-reported. ${xpSchool.name} can verify it for XP after checking with you.` : 'Self-reported.',
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -120,7 +130,7 @@ export function MissionScreen() {
         </p>
       </div>
 
-      {status.complete && (
+      {status.complete && status.source ? (
         <Panel className="border-magenta/30">
           <p className="inline-flex items-center gap-1.5 font-semibold text-magenta">
             <Flag size={16} aria-hidden="true" /> Complete
@@ -130,7 +140,21 @@ export function MissionScreen() {
               {status.flight.title}
             </Link>
           )}
-          <p className="mt-1 text-[14px] text-ink-muted">{status.verification ? 'Verified by your school.' : 'Not verified yet.'}</p>
+          <p className="mt-1 text-[14px] text-ink-muted">{sourceText[status.source]}</p>
+          {status.source === 'self_reported' && (
+            <Button className="mt-2" onClick={() => withdrawClaim(mission.code)}>
+              Remove my report
+            </Button>
+          )}
+        </Panel>
+      ) : (
+        <Panel className="flex flex-col gap-2">
+          <p className="text-[14px] text-ink-muted">
+            Flown it without recording a track? Report it yourself. It shows as self-reported{xpSchool ? `, and ${xpSchool.name} can verify it for XP` : ''}.
+          </p>
+          <Button className="self-start" onClick={() => claimMission(mission.code)}>
+            I flew this
+          </Button>
         </Panel>
       )}
 

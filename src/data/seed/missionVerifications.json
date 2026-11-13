@@ -7,6 +7,7 @@
     "clubId": "club-hfa",
     "byAccountId": "acct-alex",
     "at": "2026-11-10T17:00:00Z",
-    "revoked": null
+    "revoked": null,
+    "schoolAircraft": true
   }
 ]

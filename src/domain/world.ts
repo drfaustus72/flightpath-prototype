@@ -271,15 +271,25 @@ function checkMissionIntegrity(
     if (!accounts.has(v.byAccountId)) errors.push(`missionVerification ${v.id}: unknown account ${v.byAccountId}`)
     if (v.byAccountId === v.pilotId) errors.push(`missionVerification ${v.id}: a pilot can't verify their own mission`)
     if (v.clubId !== null && !clubs.has(v.clubId)) errors.push(`missionVerification ${v.id}: unknown club ${v.clubId}`)
-    const f = world.flights.find((x) => x.id === v.flightId)
-    if (!f) errors.push(`missionVerification ${v.id}: unknown flight ${v.flightId}`)
-    else {
-      if (f.pilotId !== v.pilotId) errors.push(`missionVerification ${v.id}: flight belongs to another pilot`)
-      if (v.clubId !== null && f.clubId !== v.clubId) errors.push(`missionVerification ${v.id}: flight isn't tagged to ${v.clubId}`)
+    if (v.flightId === null) {
+      if (v.clubId === null) errors.push(`missionVerification ${v.id}: a verification without a flight must be recorded for a school`)
+    } else {
+      const f = world.flights.find((x) => x.id === v.flightId)
+      if (!f) errors.push(`missionVerification ${v.id}: unknown flight ${v.flightId}`)
+      else {
+        if (f.pilotId !== v.pilotId) errors.push(`missionVerification ${v.id}: flight belongs to another pilot`)
+        if (v.clubId !== null && f.clubId !== v.clubId) errors.push(`missionVerification ${v.id}: flight isn't tagged to ${v.clubId}`)
+        if (v.schoolAircraft !== (v.clubId !== null)) errors.push(`missionVerification ${v.id}: on a tracked flight, schoolAircraft follows the school tag`)
+      }
     }
     if (v.revoked === null) active.push(`${v.pilotId}/${v.missionCode}`)
   }
   for (const d of duplicates(active)) errors.push(`missionVerifications: more than one active verification for ${d}`)
+  for (const d of duplicates(world.missionClaims.map((c) => `${c.pilotId}/${c.missionCode}`))) errors.push(`missionClaims: duplicate ${d}`)
+  for (const c of world.missionClaims) {
+    if (!accounts.has(c.pilotId)) errors.push(`missionClaim: unknown account ${c.pilotId}`)
+    if (!missions.has(c.missionCode)) errors.push(`missionClaim: unknown mission ${c.missionCode}`)
+  }
   return errors
 }
 

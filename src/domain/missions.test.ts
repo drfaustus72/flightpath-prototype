@@ -89,7 +89,7 @@ describe('verifying missions', () => {
   it('verifies only once', () => {
     const verified: World = {
       ...w,
-      missionVerifications: [...w.missionVerifications, { id: 'v', pilotId: 'acct-maya', missionCode: sky.code, flightId: tagged.id, clubId: 'club-hfa', byAccountId: 'acct-alex', at: '2026-11-14T21:00:00.000Z', revoked: null }],
+      missionVerifications: [...w.missionVerifications, { id: 'v', pilotId: 'acct-maya', missionCode: sky.code, flightId: tagged.id, clubId: 'club-hfa', schoolAircraft: true, byAccountId: 'acct-alex', at: '2026-11-14T21:00:00.000Z', revoked: null }],
     }
     expect(canVerifyMission(verified, 'acct-dan', tagged, sky)).toBe(false)
   })
@@ -103,7 +103,7 @@ describe('verifying missions', () => {
   })
 
   it('lists missions waiting for a school staff member', () => {
-    expect(missionsToVerify(w, 'acct-alex').map((x) => `${x.flight.pilotId}:${x.mission.code}`)).toContain('acct-maya:airport_in_the_sky')
+    expect(missionsToVerify(w, 'acct-alex').map((x) => `${x.pilotId}:${x.mission.code}`)).toContain('acct-maya:airport_in_the_sky')
     expect(missionsToVerify(w, 'acct-kim')).toEqual([])
   })
 })

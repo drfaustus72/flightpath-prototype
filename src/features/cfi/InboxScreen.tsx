@@ -5,8 +5,8 @@ import { SIGNOFF_DISCLAIMER, milestoneTitle } from '../../domain/milestones'
 import { inboxCount, inboxFor, linkedStudentsOf, signoffClubFor } from '../../domain/signoffs'
 import { accountById } from '../../domain/social'
 import { isVerifiedCfi } from '../../domain/tiers'
-import { missionsToVerify } from '../../domain/missions'
-import type { Flight, Mission, SignoffRequest } from '../../domain/types'
+import { type MissionToVerify, missionsToVerify } from '../../domain/missions'
+import type { Flight, SignoffRequest } from '../../domain/types'
 import { useActive, useWorld } from '../../store/hooks'
 import { useAppStore } from '../../store/storeContext'
 import { Avatar } from '../../ui/Avatar'
@@ -51,8 +51,8 @@ export function InboxScreen() {
 
       {missions.length > 0 && (
         <Section title="Missions to verify">
-          {missions.map(({ flight, mission }) => (
-            <MissionToVerifyRow key={`${flight.id}-${mission.code}`} flight={flight} mission={mission} />
+          {missions.map((item) => (
+            <MissionToVerifyRow key={`${item.pilotId}-${item.mission.code}`} item={item} />
           ))}
         </Section>
       )}
@@ -211,20 +211,46 @@ function SimSession({ flight }: { flight: Flight }) {
   )
 }
 
-export function MissionToVerifyRow({ flight, mission }: { flight: Flight; mission: Mission }) {
+export function MissionToVerifyRow({ item }: { item: MissionToVerify }) {
   const world = useWorld()
   const verifyMission = useAppStore((s) => s.verifyMission)
-  const club = world.clubs.find((c) => c.id === flight.clubId)
+  const verifyMissionClaim = useAppStore((s) => s.verifyMissionClaim)
+  const [schoolAircraft, setSchoolAircraft] = useState(true)
+  const pilot = accountById(world, item.pilotId)
+  const { mission } = item
+
+  if (item.kind === 'tracked') {
+    const club = world.clubs.find((c) => c.id === item.flight.clubId)
+    return (
+      <li>
+        <Panel className="flex flex-col gap-3">
+          <p>
+            <span className="font-semibold">{pilot?.displayName}</span> completed <span className="font-semibold">{mission.title}</span>.
+          </p>
+          <FlightLink flight={item.flight} />
+          <p className="text-[13px] text-ink-muted">Verifying adds {mission.xp} XP at {club?.name}. Open the flight to check the track first.</p>
+          <Button tone="primary" className="self-start" onClick={() => verifyMission(item.flight.id, mission.code)}>
+            Verify {mission.title}
+          </Button>
+        </Panel>
+      </li>
+    )
+  }
+
+  const club = item.clubs[0]
+  if (!club) return null
   return (
     <li>
       <Panel className="flex flex-col gap-3">
         <p>
-          <span className="font-semibold">{accountById(world, flight.pilotId)?.displayName}</span> completed{' '}
-          <span className="font-semibold">{mission.title}</span>.
+          <span className="font-semibold">{pilot?.displayName}</span> says they flew <span className="font-semibold">{mission.title}</span>.
         </p>
-        <FlightLink flight={flight} />
-        <p className="text-[13px] text-ink-muted">Verifying adds {mission.xp} XP at {club?.name}. Open the flight to check the track first.</p>
-        <Button tone="primary" className="self-start" onClick={() => verifyMission(flight.id, mission.code)}>
+        <p className="text-[13px] text-ink-muted">Self-reported, with no track. Check with them before verifying. Verifying adds {mission.xp} XP at {club.name} if it was flown in your aircraft.</p>
+        <label className="flex min-h-11 items-center gap-3">
+          <input type="checkbox" checked={schoolAircraft} onChange={(e) => setSchoolAircraft(e.target.checked)} className="size-5 accent-chart-blue" />
+          Flown in a {club.name} aircraft
+        </label>
+        <Button tone="primary" className="self-start" onClick={() => verifyMissionClaim(item.pilotId, mission.code, club.id, schoolAircraft)}>
           Verify {mission.title}
         </Button>
       </Panel>
