@@ -1,17 +1,24 @@
-import { MonitorPlay } from 'lucide-react'
+import { MessageCircle, MonitorPlay } from 'lucide-react'
 import { Link } from 'react-router'
 import { formatDuration, routeForViewer } from '../../domain/flights'
 import { recognitionFor } from '../../domain/recognition'
+import { activeSignoffForFlight } from '../../domain/signoffs'
+import { commentsFor } from '../../domain/social'
 import type { Flight } from '../../domain/types'
 import { useActive, useWorld } from '../../store/hooks'
 import { RouteSketch } from '../../ui/RouteSketch'
 import { Ident } from '../../ui/primitives'
+import { SignoffBadge } from '../cfi/SignoffBadge'
+import { FlightPeople } from '../social/FlightPeople'
+import { PropsButton } from '../social/PropsButton'
 
 export function FlightCard({ flight }: { flight: Flight }) {
   const world = useWorld()
   const { account } = useActive()
   const pilot = world.accounts.find((a) => a.id === flight.pilotId)
   const route = routeForViewer(flight, account.id)
+  const signoff = activeSignoffForFlight(world, flight.id)
+  const comments = commentsFor(world, account.id, flight.id).length
   const stamps = recognitionFor(world, flight.pilotId).airports.filter((a) => a.firstFlightId === flight.id)
 
   return (
@@ -29,6 +36,7 @@ export function FlightCard({ flight }: { flight: Flight }) {
             </p>
           )}
         </header>
+        <FlightPeople flight={flight} linked={false} />
         {flight.caption && <p className="line-clamp-3">{flight.caption}</p>}
         {route && <RouteSketch route={route} label={`Route of ${flight.title}`} />}
         <p className="flex flex-wrap gap-x-4 text-[14px] text-ink-muted">
@@ -44,7 +52,18 @@ export function FlightCard({ flight }: { flight: Flight }) {
             </span>
           )}
         </p>
+        {signoff && <SignoffBadge signoff={signoff} compact />}
       </Link>
+      <footer className="flex items-center gap-4 border-t border-hairline px-2">
+        <PropsButton flight={flight} />
+        <Link
+          to={`/flights/${flight.id}#comments-title`}
+          className="inline-flex min-h-11 items-center gap-1.5 px-2 text-[14px] font-semibold text-ink-muted hover:text-ink"
+        >
+          <MessageCircle size={18} aria-hidden="true" />
+          Comments <Ident>{comments}</Ident>
+        </Link>
+      </footer>
     </article>
   )
 }

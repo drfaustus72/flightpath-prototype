@@ -7,6 +7,8 @@ import { type FlightDraft, importTrack } from '../../domain/track/importTrack'
 import { MAX_FILE_BYTES } from '../../domain/track/parse'
 import { synthesize, toGpx } from '../../domain/track/synth'
 import { recognitionFor } from '../../domain/recognition'
+import { instructorOptions } from '../../domain/signoffs'
+import { followingOf } from '../../domain/social'
 import { homeSchoolOf } from '../../domain/world'
 import { useActive, useWorld } from '../../store/hooks'
 import { useAppStore } from '../../store/storeContext'
@@ -132,11 +134,16 @@ function Review({ draft, onDiscard }: { draft: FlightDraft; onDiscard: () => voi
     caption: '',
     routeVisibility: 'full',
     clubId: draft.isSimulator ? null : (home?.id ?? null),
-    postVisibility: account.isMinor ? 'private' : 'public',
+    postVisibility: account.isMinor ? 'followers' : 'public',
     instructorId: null,
     flewWithIds: [],
   })
   const set = <K extends keyof PostChoices>(key: K, value: PostChoices[K]) => setChoices((c) => ({ ...c, [key]: value }))
+
+  const instructors = instructorOptions(world, account.id)
+  const companions = followingOf(world, account.id).filter((a) => !instructors.some((i) => i.id === a.id))
+  const toggleCompanion = (id: string) =>
+    set('flewWithIds', choices.flewWithIds.includes(id) ? choices.flewWithIds.filter((x) => x !== id) : [...choices.flewWithIds, id])
 
   const visited = new Set(recognitionFor(world, account.id).airports.map((a) => a.icao))
   const save = () => {
@@ -212,7 +219,7 @@ function Review({ draft, onDiscard }: { draft: FlightDraft; onDiscard: () => voi
           onChange={(v) => set('postVisibility', v)}
           options={[
             { value: 'public', label: 'Everyone', disabled: account.isMinor },
-            { value: 'followers', label: 'Followers', disabled: account.isMinor },
+            { value: 'followers', label: 'Followers' },
             { value: 'private', label: 'Only me' },
           ]}
         />
@@ -247,6 +254,47 @@ function Review({ draft, onDiscard }: { draft: FlightDraft; onDiscard: () => voi
           </label>
         )}
       </Panel>
+
+      {(instructors.length > 0 || companions.length > 0) && (
+        <Panel className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">Who was on board</h2>
+          {instructors.length > 0 && (
+            <label className="flex flex-col gap-1">
+              <span className="text-[14px] font-semibold">Instructor</span>
+              <select
+                value={choices.instructorId ?? ''}
+                onChange={(e) => set('instructorId', e.target.value === '' ? null : e.target.value)}
+                className="min-h-11 rounded-[var(--radius-control)] border border-hairline bg-surface px-3"
+              >
+                <option value="">No instructor</option>
+                {instructors.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.displayName}
+                  </option>
+                ))}
+              </select>
+              <span className="text-[13px] text-ink-muted">Your instructor can accept the tag, write you a private debrief and sign off the flight.</span>
+            </label>
+          )}
+          {companions.length > 0 && (
+            <fieldset className="flex flex-col gap-1">
+              <legend className="mb-1 text-[14px] font-semibold">Flew with</legend>
+              {companions.map((a) => (
+                <label key={a.id} className="flex min-h-11 items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={choices.flewWithIds.includes(a.id)}
+                    onChange={() => toggleCompanion(a.id)}
+                    className="size-5 accent-chart-blue"
+                  />
+                  {a.displayName}
+                </label>
+              ))}
+              <span className="text-[13px] text-ink-muted">Each tag shows on the flight once that person accepts it.</span>
+            </fieldset>
+          )}
+        </Panel>
+      )}
 
       <div className="flex gap-3">
         <Button onClick={onDiscard}>Discard</Button>

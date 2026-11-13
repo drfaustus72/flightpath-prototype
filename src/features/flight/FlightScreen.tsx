@@ -8,6 +8,12 @@ import { AirportMark } from '../../ui/AirportMark'
 import { ButtonLink, EmptyState, Ident, ScreenTitle } from '../../ui/primitives'
 import { FlightMap } from './FlightMap'
 import { FlightStats } from './FlightStats'
+import { DebriefThread, FlightSignoff, TagAnswer } from './FlightTraining'
+import { Comments } from '../social/Comments'
+import { FlightPeople } from '../social/FlightPeople'
+import { PersonLink } from '../social/PersonLink'
+import { PropsButton } from '../social/PropsButton'
+import { ReportButton } from '../social/ReportButton'
 
 export function FlightScreen() {
   const { flightId = '' } = useParams()
@@ -60,7 +66,7 @@ export function FlightScreen() {
       <div>
         <ScreenTitle>{flight.title}</ScreenTitle>
         <p className="text-ink-muted">
-          {pilot?.displayName}
+          {pilot && <PersonLink account={pilot} className="text-ink" />}
           {flight.startedAt && ` · ${new Date(flight.startedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}`}
           {club && ` · ${club.name}`}
         </p>
@@ -77,6 +83,9 @@ export function FlightScreen() {
           </p>
         )}
       </div>
+
+      <FlightPeople flight={flight} />
+      <TagAnswer flight={flight} />
 
       {flight.caption && <p className="max-w-[60ch] text-[17px]">{flight.caption}</p>}
 
@@ -123,6 +132,15 @@ export function FlightScreen() {
           </ul>
         </section>
       )}
+
+      <FlightSignoff flight={flight} />
+      <DebriefThread flight={flight} />
+
+      <div className="flex items-center justify-between border-y border-hairline">
+        <PropsButton flight={flight} />
+        {account.id !== flight.pilotId && <ReportButton target={{ kind: 'flight', id: flight.id }} subject="flight" />}
+      </div>
+      <Comments flight={flight} />
 
       {account.id === flight.pilotId && flight.importNotes.length > 0 && (
         <ul className="flex flex-col gap-1.5" aria-label="Import notes">
