@@ -1,6 +1,7 @@
 import { Info, MonitorPlay } from 'lucide-react'
 import { useLocation, useParams } from 'react-router'
-import { canViewFlight, routeForViewer } from '../../domain/flights'
+import { routeForViewer } from '../../domain/flights'
+import { canViewFlight } from '../../domain/visibility'
 import { recognitionFor } from '../../domain/recognition'
 import { useActive, useWorld } from '../../store/hooks'
 import { AirportMark } from '../../ui/AirportMark'

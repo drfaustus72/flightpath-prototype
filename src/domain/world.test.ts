@@ -85,3 +85,54 @@ describe('loadWorld', () => {
     expect(errors).toContain('account acct-maya: more than one active home school')
   })
 })
+
+describe('social and sign-off integrity', () => {
+  const errorsFor = (mutate: (w: World) => void) => {
+    const w = clone()
+    mutate(w)
+    const r = loadWorld(w)
+    return r.ok ? [] : r.errors
+  }
+  const flightOf = (w: World, id: string) => {
+    const f = w.flights.find((x) => x.id === id)
+    if (!f) throw new Error(`seed flight ${id} missing`)
+    return f
+  }
+
+  it('keeps every minor Private', () => {
+    expect(
+      errorsFor((w) => {
+        const sam = w.accounts.find((a) => a.id === 'acct-sam')
+        if (sam) sam.profileLevel = 'public'
+      }),
+    ).toContain('account acct-sam: minor accounts must be Private')
+  })
+
+  it('rejects self-verification and flight sign-offs by someone other than the accepted instructor', () => {
+    const errors = errorsFor((w) => {
+      w.signoffs.push(
+        { id: 'self', cfiId: 'acct-dan', studentId: 'acct-dan', flightId: null, milestone: 'ipc', clubId: null, note: '', at: '2026-11-01T00:00:00.000Z', revoked: null },
+        { id: 'wrong', cfiId: 'acct-kim', studentId: 'acct-maya', flightId: 'flt-maya-dual-xc', milestone: null, clubId: null, note: '', at: '2026-11-01T00:00:00.000Z', revoked: null },
+      )
+    })
+    expect(errors).toContain('signoff self: no self-verification')
+    expect(errors).toContain("signoff wrong: a flight sign-off needs the flight's accepted instructor and its pilot")
+  })
+
+  it('rejects an unverified instructor tag and debriefs from outsiders', () => {
+    const errors = errorsFor((w) => {
+      flightOf(w, 'flt-lena-sba').instructor = { accountId: 'acct-jordan', status: 'accepted' }
+      w.debriefs.push({ id: 'out', flightId: 'flt-maya-pattern', authorId: 'acct-lena', text: 'hi', at: '2026-11-04T00:00:00.000Z' })
+    })
+    expect(errors).toContain('flight flt-lena-sba: instructor acct-jordan is not a verified CFI')
+    expect(errors).toContain('debrief out: only the pilot and the accepted instructor can write in a debrief')
+  })
+
+  it('rejects two active sign-offs for the same subject', () => {
+    const errors = errorsFor((w) => {
+      const first = w.signoffs[0]
+      if (first) w.signoffs.push({ ...first, id: 'dup' })
+    })
+    expect(errors.some((e) => e.startsWith('signoffs: more than one active sign-off'))).toBe(true)
+  })
+})

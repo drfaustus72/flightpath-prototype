@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react'
-import { feedFor } from '../../domain/flights'
+import { feedFor } from '../../domain/social'
 import { useActive, useWorld } from '../../store/hooks'
 import { ButtonLink, EmptyState, ScreenTitle } from '../../ui/primitives'
 import { FlightCard } from './FlightCard'

@@ -1,5 +1,5 @@
 import { distanceNm } from './geo'
-import type { Flight, World } from './types'
+import type { Flight } from './types'
 
 /** Route privacy: "hide_ends" trims this much from each end so home fields and hangars stay private. */
 export const HIDDEN_END_NM = 1
@@ -31,21 +31,6 @@ function trimEnds(route: readonly [number, number][], nm: number): [number, numb
   }
   if (first === -1 || last === -1 || last < first) return []
   return route.slice(first, last + 1)
-}
-
-/** Whether a viewer may see a flight at all. Follows arrive in M2; until then "followers" means only the pilot. */
-export function canViewFlight(world: World, flight: Flight, viewerId: string): boolean {
-  if (viewerId === flight.pilotId) return true
-  const pilot = world.accounts.find((a) => a.id === flight.pilotId)
-  if (!pilot || pilot.isMinor) return false
-  return flight.postVisibility === 'public'
-}
-
-/** Feed for a viewer: their own flights and flights they may see, newest first. */
-export function feedFor(world: World, viewerId: string): Flight[] {
-  return world.flights
-    .filter((f) => canViewFlight(world, f, viewerId))
-    .sort((a, b) => (b.startedAt ?? b.createdAt).localeCompare(a.startedAt ?? a.createdAt))
 }
 
 export function formatDuration(sec: number | null): string {
