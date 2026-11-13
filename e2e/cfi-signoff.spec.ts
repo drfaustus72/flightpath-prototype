@@ -36,8 +36,10 @@ test.describe('M2 script B: CFI debrief and sign-off', () => {
     await viewAs(page, 'Student pilot', '/flights/flt-maya-dual-xc')
     await expect(page.getByText('Great pilotage. Start the descent 5 nm earlier next time.')).toBeVisible()
     await nav.getByRole('link', { name: 'Progress' }).click()
-    const solo = page.getByRole('listitem').filter({ hasText: 'First solo' }).first()
-    await expect(solo).toContainText('CFI-verified · Dan Whitaker')
+    const milestones = page.locator('section', { has: page.getByRole('heading', { name: 'Training milestones' }) })
+    await expect(milestones.getByRole('listitem').filter({ hasText: 'First solo' })).toContainText('CFI-verified · Dan Whitaker')
+    // Signed for the school and flown in its aircraft (the default), so it earns XP there.
+    await expect(page.locator('section', { has: page.getByRole('heading', { name: 'XP at Hawthorne Flight Academy' }) })).toContainText('First solo')
 
     // A classmate can't read the debrief
     await viewAs(page, 'School admin', '/flights/flt-maya-dual-xc')
