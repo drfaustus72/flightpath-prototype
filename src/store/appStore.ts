@@ -5,6 +5,7 @@ import { type PostChoices, createFlight } from '../domain/flights'
 import type { FlightDraft } from '../domain/track/importTrack'
 import { type AirportRecord, type Badge, newlyEarned, recognitionFor } from '../domain/recognition'
 import { canTagInstructor } from '../domain/signoffs'
+import * as clubOps from '../domain/clubOps'
 import * as missionOps from '../domain/missionOps'
 import * as ops from '../domain/socialOps'
 import type { Flight, MilestoneCode, ProfileLevel, Report, World } from '../domain/types'
@@ -55,6 +56,15 @@ export interface AppState {
   joinChallenge: (code: string) => void
   leaveChallenge: (code: string) => void
   recordNoGo: (entry: { from: string; to: string | null; reason: string }) => void
+
+  // Schools and clubs (domain/clubOps.ts).
+  requestJoin: (clubId: string) => void
+  cancelJoinRequest: (clubId: string) => void
+  answerJoinRequest: (membershipId: string, approve: boolean) => void
+  leaveClub: (clubId: string) => void
+  setHomeSchool: (clubId: string) => void
+  claimClub: (clubId: string, email: string) => void
+  setCfiListed: (listed: boolean) => void
 
   resetDemo: () => void
 }
@@ -242,6 +252,13 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
         joinChallenge: (code) => act((w, me, c) => missionOps.joinChallenge(w, me, code, c)),
         leaveChallenge: (code) => act((w, me) => missionOps.leaveChallenge(w, me, code)),
         recordNoGo: (entry) => act((w, me, c) => missionOps.recordNoGo(w, me, entry, c)),
+        requestJoin: (clubId) => act((w, me, c) => clubOps.requestJoin(w, me, clubId, c)),
+        cancelJoinRequest: (clubId) => act((w, me) => clubOps.cancelJoinRequest(w, me, clubId)),
+        answerJoinRequest: (id, approve) => act((w, me, c) => clubOps.answerJoinRequest(w, me, id, approve, c)),
+        leaveClub: (clubId) => act((w, me, c) => clubOps.leaveClub(w, me, clubId, c)),
+        setHomeSchool: (clubId) => act((w, me) => clubOps.setHomeSchool(w, me, clubId)),
+        claimClub: (clubId, email) => act((w, me, c) => clubOps.claimClub(w, me, clubId, email, c)),
+        setCfiListed: (listed) => act((w, me) => clubOps.setCfiListed(w, me, listed)),
         resetDemo: () => set(seed()),
         }
       },
