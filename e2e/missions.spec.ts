@@ -39,6 +39,7 @@ test.describe('M3 script A: mission, card, Props and school-verified XP', () => 
     await post.getByRole('button', { name: /Props/ }).click()
     await expect(post.getByRole('button', { name: /Props/ })).toHaveAttribute('aria-pressed', 'true')
     await page.getByRole('link', { name: /^Act as Hawthorne Flight Academy/ }).click()
+    await page.getByRole('navigation', { name: 'Hawthorne Flight Academy school' }).getByRole('link', { name: /Queue/ }).click()
     const row = page.getByRole('listitem').filter({ hasText: 'completed Airport in the Sky' })
     await row.getByRole('button', { name: 'Verify Airport in the Sky' }).click()
     await expect(page.getByText('completed Airport in the Sky')).toHaveCount(0)
@@ -66,7 +67,7 @@ test.describe('M3 script A: mission, card, Props and school-verified XP', () => 
     await page.getByRole('button', { name: 'I flew this' }).click()
     await expect(page.getByText(/Self-reported\. Hawthorne Flight Academy can verify it for XP/)).toBeVisible()
 
-    await viewAs(page, 'School admin', '/school/club-hfa')
+    await viewAs(page, 'School admin', '/school/club-hfa/queue')
     const row = page.getByRole('listitem').filter({ hasText: 'says they flew Santa Paula' })
     await expect(row).toContainText('Self-reported, with no track')
     await expect(row.getByRole('checkbox', { name: 'Flown in a Hawthorne Flight Academy aircraft' })).toBeChecked()

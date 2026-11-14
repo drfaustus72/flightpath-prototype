@@ -43,7 +43,7 @@ describe('seed data', () => {
     const world = seedWorld()
     expect(homeSchoolOf(world, 'acct-jordan')?.id).toBe('club-coastal')
     expect(homeSchoolOf(world, 'acct-priya')).toBeNull()
-    expect(activeMemberCount(world, 'club-hfa')).toBe(5)
+    expect(activeMemberCount(world, 'club-hfa')).toBe(20)
     expect(adminClubsOf(world, 'acct-alex').map((c) => c.id)).toEqual(['club-hfa'])
     expect(adminClubsOf(world, 'acct-maya')).toEqual([])
   })

@@ -68,6 +68,7 @@ test.describe('M2 script B: CFI debrief and sign-off', () => {
     await expect(page.getByRole('heading', { name: 'Simulator sessions to confirm' })).toHaveCount(0)
     await page.getByRole('link', { name: /Hawthorne Flight Academy\s*\d+ waiting/ }).click()
     await expect(page.getByText('Acting as')).toBeVisible()
+    await page.getByRole('navigation', { name: 'Hawthorne Flight Academy school' }).getByRole('link', { name: /Queue/ }).click()
     // Staff CFIs work the queue; join requests stay with admins.
     await expect(page.getByRole('heading', { name: 'Join requests' })).toHaveCount(0)
     await page.getByRole('button', { name: 'Confirm session' }).click()

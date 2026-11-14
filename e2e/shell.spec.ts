@@ -22,7 +22,7 @@ test.describe('M0 app shell', () => {
     await nav.getByRole('link', { name: 'Profile' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Alex Chen' })).toBeVisible()
     await page.getByRole('region', { name: 'Your schools' }).getByRole('link', { name: /Hawthorne Flight Academy/ }).click()
-    await expect(page.getByRole('heading', { level: 1, name: 'Queue' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible()
     await page.getByRole('navigation', { name: 'Hawthorne Flight Academy school' }).getByRole('link', { name: 'Page' }).click()
     await expect(page.getByText('School Pro tools')).toBeVisible()
 

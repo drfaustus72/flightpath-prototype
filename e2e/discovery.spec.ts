@@ -52,7 +52,7 @@ test.describe('M4a discovery and school pages', () => {
     await page.getByRole('link', { name: 'Act as Hawthorne Flight Academy, 2 waiting' }).click()
     await expect(page.getByText('Acting as')).toBeVisible()
     const schoolNav = page.getByRole('navigation', { name: 'Hawthorne Flight Academy school' })
-    await expect(schoolNav.getByRole('link', { name: /Queue.*2 waiting/ })).toBeVisible()
+    await schoolNav.getByRole('link', { name: /Queue.*2 waiting/ }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Queue' })).toBeVisible()
     await page.getByRole('button', { name: 'Approve Jordan Reyes' }).click()
     await expect(page.getByText('No one is waiting.')).toBeVisible()

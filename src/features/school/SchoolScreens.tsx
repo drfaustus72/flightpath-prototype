@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link, Navigate, useParams } from 'react-router'
 import { clubPlanName } from '../../domain/clubs'
+import { dataAsOf, schoolDashboard } from '../../domain/dashboard'
 import { pendingJoinRequests } from '../../domain/clubOps'
 import { schoolQueue, schoolQueueCount, schoolQueues } from '../../domain/schoolAdmin'
 import type { Club } from '../../domain/types'
@@ -11,6 +12,7 @@ import { useAppStore } from '../../store/storeContext'
 import { ProGate } from '../../ui/ProGate'
 import { Button, ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
 import { MissionToVerifyRow, SimSession } from './QueueRows'
+import { WeeklyFlightsChart } from './WeeklyFlightsChart'
 
 /** The school for the current /school/:clubId route. SchoolLayout has already checked staff access. */
 function useSchool(): Club | undefined {
@@ -18,9 +20,88 @@ function useSchool(): Club | undefined {
   return useWorld().clubs.find((c) => c.id === clubId)
 }
 
-/** /school/:clubId opens the school's queue. */
+/** /school/:clubId opens the dashboard on School Pro, otherwise the queue. */
 export function SchoolIndex() {
-  return <Navigate to="queue" replace />
+  const { clubId = '' } = useParams()
+  const { access } = useActive()
+  return <Navigate to={canInClub(access, 'school.dashboard', clubId) ? 'dashboard' : 'queue'} replace />
+}
+
+const longDate = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+
+export function SchoolDashboardScreen() {
+  const club = useSchool()
+  const world = useWorld()
+  const { access } = useActive()
+  if (!club) return null
+  if (!canInClub(access, 'school.dashboard', club.id)) {
+    return (
+      <ProGate plan="School Pro">
+        See who’s flying with your school, who has gone quiet, and how many flights members tag to you each week.
+      </ProGate>
+    )
+  }
+  const asOf = dataAsOf(world)
+  if (!asOf) return <EmptyState title="No flights yet" body="When members tag flights to your school, their activity shows up here." />
+  const d = schoolDashboard(world, club.id, asOf)
+  const quiet = d.members.filter((m) => m.status === 'inactive')
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <ScreenTitle>Dashboard</ScreenTitle>
+        <p className="mt-1 text-[14px] text-ink-muted">
+          As of {longDate(d.asOf)}. Counts only flights pilots chose to tag to {club.name}.
+        </p>
+      </div>
+
+      <dl className="grid grid-cols-2 gap-2">
+        <StatTile label="Flying in the last 30 days" value={d.active} detail={`of ${d.members.length} members`} />
+        <StatTile label="Gone quiet" value={d.inactive} detail="no flight in 30+ days" />
+        <StatTile label="Missions verified" value={d.missionsVerified} detail="last 30 days" />
+        <StatTile label="Milestone requests" value={d.openMilestoneRequests} detail="waiting for your CFIs" />
+      </dl>
+
+      <Panel>
+        <WeeklyFlightsChart weeks={d.weekly} title="Flights tagged to the school, per week" />
+      </Panel>
+
+      <section aria-labelledby="quiet-title" className="flex flex-col gap-2">
+        <h2 id="quiet-title" className="font-semibold">
+          Gone quiet
+        </h2>
+        {quiet.length === 0 ? (
+          <p className="text-ink-muted">Everyone has flown with you in the last 30 days.</p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {quiet.map((m) => (
+              <li key={m.account.id}>
+                <Link
+                  to={`/u/${m.account.handle}`}
+                  className="flex min-h-14 items-center justify-between gap-3 rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2"
+                >
+                  <span className="font-semibold">{m.account.displayName}</span>
+                  <span className="text-[14px] text-ink-muted">
+                    {m.daysSince === null ? 'No flights yet' : `Last flew ${m.daysSince} days ago`}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  )
+}
+
+function StatTile({ label, value, detail }: { label: string; value: number; detail: string }) {
+  return (
+    <div className="flex flex-col rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-3">
+      <dt className="text-[14px] text-ink-muted">{label}</dt>
+      <dd className="text-[28px] font-semibold tabular-nums leading-tight">{value}</dd>
+      <dd className="text-[13px] text-ink-muted">{detail}</dd>
+    </div>
+  )
 }
 
 export function SchoolQueueScreen() {

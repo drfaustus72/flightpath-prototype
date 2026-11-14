@@ -39,7 +39,7 @@ export function PersonaSwitcher() {
       <button
         type="button"
         onClick={() => dialog.current?.showModal()}
-        className="flex min-h-11 items-center gap-2 rounded-full border border-hairline bg-surface py-1 pr-3 pl-1 text-[14px] font-semibold"
+        className="flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-hairline bg-surface py-1 pr-3 pl-1 text-[14px] font-semibold"
         aria-haspopup="dialog"
       >
         <span
@@ -48,7 +48,7 @@ export function PersonaSwitcher() {
         >
           {account.displayName.slice(0, 1)}
         </span>
-        <span>
+        <span className="whitespace-nowrap">
           <span className="sr-only">Viewing as </span>
           {account.demoPersona?.label ?? account.displayName}
         </span>

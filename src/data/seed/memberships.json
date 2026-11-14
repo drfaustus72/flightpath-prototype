@@ -103,5 +103,200 @@
     "sponsoredPilotPro": false,
     "startedOn": "2025-09-01",
     "endedOn": null
+  },
+  {
+    "id": "mem-ava-hfa",
+    "accountId": "acct-ava",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2026-08-04",
+    "endedOn": null
+  },
+  {
+    "id": "mem-ben-hfa",
+    "accountId": "acct-ben",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2026-07-14",
+    "endedOn": null
+  },
+  {
+    "id": "mem-chloe-hfa",
+    "accountId": "acct-chloe",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2025-11-02",
+    "endedOn": null
+  },
+  {
+    "id": "mem-diego-hfa",
+    "accountId": "acct-diego",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2026-08-20",
+    "endedOn": null
+  },
+  {
+    "id": "mem-grace-hfa",
+    "accountId": "acct-grace",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2026-06-30",
+    "endedOn": null
+  },
+  {
+    "id": "mem-hassan-hfa",
+    "accountId": "acct-hassan",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2025-09-15",
+    "endedOn": null
+  },
+  {
+    "id": "mem-isla-hfa",
+    "accountId": "acct-isla",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2026-09-08",
+    "endedOn": null
+  },
+  {
+    "id": "mem-jonah-hfa",
+    "accountId": "acct-jonah",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2025-12-01",
+    "endedOn": null
+  },
+  {
+    "id": "mem-keiko-hfa",
+    "accountId": "acct-keiko",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2026-07-28",
+    "endedOn": null
+  },
+  {
+    "id": "mem-liam-hfa",
+    "accountId": "acct-liam",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2026-05-12",
+    "endedOn": null
+  },
+  {
+    "id": "mem-mia-hfa",
+    "accountId": "acct-mia",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2025-10-20",
+    "endedOn": null
+  },
+  {
+    "id": "mem-noah-hfa",
+    "accountId": "acct-noah",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2026-04-18",
+    "endedOn": null
+  },
+  {
+    "id": "mem-olivia-hfa",
+    "accountId": "acct-olivia",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2026-03-30",
+    "endedOn": null
+  },
+  {
+    "id": "mem-ravi-hfa",
+    "accountId": "acct-ravi",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2025-08-11",
+    "endedOn": null
+  },
+  {
+    "id": "mem-sofia-hfa",
+    "accountId": "acct-sofia",
+    "clubId": "club-hfa",
+    "roles": [
+      "member"
+    ],
+    "status": "active",
+    "isHomeSchool": true,
+    "sponsoredPilotPro": false,
+    "startedOn": "2026-04-02",
+    "endedOn": null
   }
 ]

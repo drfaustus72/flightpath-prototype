@@ -182,6 +182,66 @@ const FLIGHTS: SeedFlight[] = [
   },
 ]
 
+/**
+ * Hawthorne's wider roster, for the School Pro retention dashboard. Short local flights only, to
+ * airports no mission asks for, with no instructor tag, so they fill the dashboard without adding to
+ * anyone's queue or inbox. `lastDaysAgo` sets when each pilot last flew before AS_OF; the last six
+ * have gone quiet (more than 30 days).
+ */
+const AS_OF = Date.parse('2026-11-12T18:00:00Z')
+const DAY = 86_400_000
+const ROSTER: { key: string; flights: number; lastDaysAgo: number; gapDays: number }[] = [
+  { key: 'ava', flights: 6, lastDaysAgo: 2, gapDays: 9 },
+  { key: 'ben', flights: 5, lastDaysAgo: 4, gapDays: 11 },
+  { key: 'chloe', flights: 4, lastDaysAgo: 6, gapDays: 16 },
+  { key: 'diego', flights: 5, lastDaysAgo: 8, gapDays: 10 },
+  { key: 'grace', flights: 4, lastDaysAgo: 11, gapDays: 13 },
+  { key: 'hassan', flights: 3, lastDaysAgo: 13, gapDays: 21 },
+  { key: 'isla', flights: 5, lastDaysAgo: 15, gapDays: 8 },
+  { key: 'jonah', flights: 3, lastDaysAgo: 19, gapDays: 18 },
+  { key: 'keiko', flights: 4, lastDaysAgo: 24, gapDays: 12 },
+  { key: 'liam', flights: 4, lastDaysAgo: 38, gapDays: 10 },
+  { key: 'mia', flights: 3, lastDaysAgo: 45, gapDays: 14 },
+  { key: 'noah', flights: 3, lastDaysAgo: 52, gapDays: 9 },
+  { key: 'olivia', flights: 2, lastDaysAgo: 63, gapDays: 12 },
+  { key: 'ravi', flights: 2, lastDaysAgo: 77, gapDays: 15 },
+  { key: 'sofia', flights: 2, lastDaysAgo: 88, gapDays: 11 },
+]
+
+const outAndBackTo = (to: string, kt: number): Leg[] => [
+  { kind: 'ground', at: 'KHHR', sec: 360 },
+  { kind: 'fly', from: 'KHHR', to, cruiseFt: 2500, kt },
+  { kind: 'ground', at: to, sec: 600 },
+  { kind: 'fly', from: to, to: 'KHHR', cruiseFt: 3500, kt },
+  { kind: 'ground', at: 'KHHR', sec: 240 },
+]
+const ROSTER_TEMPLATES: { title: string; legs: Leg[] }[] = [
+  { title: 'Pattern work', legs: [{ kind: 'ground', at: 'KHHR', sec: 300 }, hhrPattern(true), hhrPattern(true), hhrPattern(false), { kind: 'ground', at: 'KHHR', sec: 200 }] },
+  { title: 'Over to Torrance and back', legs: outAndBackTo('KTOA', 95) },
+  { title: 'Long Beach and back', legs: outAndBackTo('KLGB', 100) },
+  { title: 'Lunch at Fullerton', legs: outAndBackTo('KFUL', 100) },
+  { title: 'Santa Monica hop', legs: outAndBackTo('KSMO', 95) },
+]
+
+for (const [i, r] of ROSTER.entries()) {
+  for (let j = 0; j < r.flights; j++) {
+    const daysAgo = r.lastDaysAgo + j * r.gapDays
+    const template = ROSTER_TEMPLATES[(i + j) % ROSTER_TEMPLATES.length]
+    if (!template) throw new Error('template index out of range')
+    const start = new Date(AS_OF - daysAgo * DAY - ((i * 37 + j * 53) % 300) * 60_000).toISOString()
+    FLIGHTS.push({
+      id: `flt-${r.key}-${j + 1}`,
+      pilotId: `acct-${r.key}`,
+      title: template.title,
+      start,
+      legs: template.legs,
+      caption: '',
+      clubId: 'club-hfa',
+      postVisibility: 'followers',
+    })
+  }
+}
+
 const flights: Flight[] = FLIGHTS.map((s) => {
   const gpx = toGpx(synthesize(s.legs, airports as Airport[], s.start), s.title)
   const imported = importTrack(gpx, `${s.id}.gpx`, airports as Airport[])

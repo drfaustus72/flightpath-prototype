@@ -13,7 +13,7 @@ import { ProfileScreen } from '../features/profile/ProfileScreen'
 import { PublicProfileScreen } from '../features/profile/PublicProfileScreen'
 import { ProgressScreen } from '../features/progress/ProgressScreen'
 import { SchoolLayout } from '../features/school/SchoolLayout'
-import { SchoolHomeScreen, SchoolIndex, SchoolPageScreen, SchoolQueueScreen } from '../features/school/SchoolScreens'
+import { SchoolDashboardScreen, SchoolHomeScreen, SchoolIndex, SchoolPageScreen, SchoolQueueScreen } from '../features/school/SchoolScreens'
 import { AppLayout } from './AppLayout'
 import { NotFoundScreen } from './NotFoundScreen'
 
@@ -46,6 +46,7 @@ export const routes: RouteObject[] = [
     element: <SchoolLayout />,
     children: [
       { index: true, element: <SchoolIndex /> },
+      { path: 'dashboard', element: <SchoolDashboardScreen /> },
       { path: 'queue', element: <SchoolQueueScreen /> },
       { path: 'page', element: <SchoolPageScreen /> },
       { path: '*', element: <NotFoundScreen /> },

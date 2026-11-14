@@ -1,4 +1,4 @@
-import { Globe, ListChecks } from 'lucide-react'
+import { ChartColumn, Globe, ListChecks } from 'lucide-react'
 import { Navigate, useParams } from 'react-router'
 import { ActingAs } from '../../app/ActingAs'
 import { Shell, type Tab } from '../../app/Shell'
@@ -19,6 +19,9 @@ export function SchoolLayout() {
 
   const base = `/school/${club.id}`
   const tabs: Tab[] = [
+    ...(canInClub(access, 'school.dashboard', club.id)
+      ? [{ to: `${base}/dashboard`, label: 'Dashboard', icon: <ChartColumn size={22} aria-hidden="true" /> }]
+      : []),
     { to: `${base}/queue`, label: 'Queue', icon: <ListChecks size={22} aria-hidden="true" />, count: schoolQueueCount(schoolQueue(world, account.id, club)) },
     { to: `${base}/page`, label: 'Page', icon: <Globe size={22} aria-hidden="true" /> },
   ]
