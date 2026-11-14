@@ -264,6 +264,12 @@ function checkMissionIntegrity(
     if (!accounts.has(n.pilotId)) errors.push(`noGo ${n.id}: unknown account ${n.pilotId}`)
     for (const code of [n.from, n.to]) if (code !== null && !airports.has(code)) errors.push(`noGo ${n.id}: unknown airport ${code}`)
   }
+  for (const d of duplicates(world.nudges.map((n) => n.id))) errors.push(`nudges: duplicate id ${d}`)
+  for (const n of world.nudges) {
+    if (!clubs.has(n.clubId)) errors.push(`nudge ${n.id}: unknown club ${n.clubId}`)
+    for (const who of [n.fromAccountId, n.toAccountId]) if (!accounts.has(who)) errors.push(`nudge ${n.id}: unknown account ${who}`)
+    if (n.missionCode !== null && !missions.has(n.missionCode)) errors.push(`nudge ${n.id}: unknown mission ${n.missionCode}`)
+  }
   for (const d of duplicates(world.missionVerifications.map((v) => v.id))) errors.push(`missionVerifications: duplicate id ${d}`)
   const active: string[] = []
   for (const v of world.missionVerifications) {

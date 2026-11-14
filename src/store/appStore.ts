@@ -7,13 +7,14 @@ import { type AirportRecord, type Badge, newlyEarned, recognitionFor } from '../
 import { canTagInstructor } from '../domain/signoffs'
 import * as clubOps from '../domain/clubOps'
 import * as missionOps from '../domain/missionOps'
+import * as schoolOps from '../domain/schoolOps'
 import * as ops from '../domain/socialOps'
 import type { Flight, MilestoneCode, ProfileLevel, Report, World } from '../domain/types'
 import { isBlocked } from '../domain/visibility'
 import { demoPersonas, loadWorld } from '../domain/world'
 
 /** Bump whenever the persisted shape changes. Old state is discarded and reset to seed. */
-export const STORAGE_VERSION = 8
+export const STORAGE_VERSION = 9
 export const STORAGE_KEY = 'flightpath-demo'
 
 export interface AppState {
@@ -65,6 +66,11 @@ export interface AppState {
   setHomeSchool: (clubId: string) => void
   claimClub: (clubId: string, email: string) => void
   setCfiListed: (listed: boolean) => void
+
+  // School staff tools (domain/schoolOps.ts).
+  sendNudge: (args: { clubId: string; pilotId: string; message: string; missionCode: string | null }) => void
+  dismissNudge: (nudgeId: string) => void
+  setSponsoredSeat: (args: { clubId: string; pilotId: string; on: boolean }) => void
 
   resetDemo: () => void
 }
@@ -254,6 +260,9 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
         recordNoGo: (entry) => act((w, me, c) => missionOps.recordNoGo(w, me, entry, c)),
         requestJoin: (clubId) => act((w, me, c) => clubOps.requestJoin(w, me, clubId, c)),
         cancelJoinRequest: (clubId) => act((w, me) => clubOps.cancelJoinRequest(w, me, clubId)),
+        sendNudge: (args) => act((w, me, c) => schoolOps.sendNudge(w, me, args, c)),
+        dismissNudge: (id) => act((w, me, c) => schoolOps.dismissNudge(w, me, id, c)),
+        setSponsoredSeat: (args) => act((w, me) => schoolOps.setSponsoredSeat(w, me, args)),
         answerJoinRequest: (id, approve) => act((w, me, c) => clubOps.answerJoinRequest(w, me, id, approve, c)),
         leaveClub: (clubId) => act((w, me, c) => clubOps.leaveClub(w, me, clubId, c)),
         setHomeSchool: (clubId) => act((w, me) => clubOps.setHomeSchool(w, me, clubId)),

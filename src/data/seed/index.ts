@@ -19,6 +19,7 @@ import pathways from './pathways.json'
 import challenges from './challenges.json'
 import challengeEntries from './challengeEntries.json'
 import noGos from './noGos.json'
+import nudges from './nudges.json'
 import missionVerifications from './missionVerifications.json'
 import missionClaims from './missionClaims.json'
 
@@ -43,6 +44,7 @@ export const rawSeed = {
   challenges,
   challengeEntries,
   noGos,
+  nudges,
   missionVerifications,
   missionClaims,
 }

@@ -5,6 +5,7 @@ import { useActive, useWorld } from '../../store/hooks'
 import { AirportMark } from '../../ui/AirportMark'
 import { ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
 import { MilestonesPanel } from './MilestonesPanel'
+import { NudgeCards } from './NudgeCards'
 import { AdvisorCard, ChallengesPanel, PathwayPanel, XpPanel } from './ProgressionPanels'
 
 const SOURCE_LABEL: Record<Badge['source'], string | null> = {
@@ -30,6 +31,7 @@ export function ProgressScreen() {
     <div className="flex flex-col gap-6">
       <ScreenTitle>Progress</ScreenTitle>
 
+      <NudgeCards />
       <AdvisorCard />
 
       <dl className="grid grid-cols-4 gap-2">

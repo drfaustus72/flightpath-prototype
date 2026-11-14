@@ -378,6 +378,23 @@ export const noGoSchema = z.object({
   at: isoDateTime,
 })
 
+export const NUDGE_MAX = 280
+
+/**
+ * A short note from a school's staff to one of its pilots, optionally suggesting a mission.
+ * Shown on the pilot's Progress until they dismiss it. Never public.
+ */
+export const nudgeSchema = z.object({
+  id,
+  clubId: id,
+  fromAccountId: id,
+  toAccountId: id,
+  message: z.string().trim().min(1).max(NUDGE_MAX),
+  missionCode: missionCode.nullable(),
+  at: isoDateTime,
+  dismissedAt: isoDateTime.nullable(),
+})
+
 /**
  * A school (or, for CFI-only missions, the flight's instructor) verifying a completed mission.
  * Only this is stored; completion itself is worked out from the track. XP counts only when the
@@ -424,6 +441,7 @@ export const worldSchema = z.object({
   challenges: z.array(challengeSchema),
   challengeEntries: z.array(challengeEntrySchema),
   noGos: z.array(noGoSchema),
+  nudges: z.array(nudgeSchema),
   missionVerifications: z.array(missionVerificationSchema),
   missionClaims: z.array(missionClaimSchema),
 })

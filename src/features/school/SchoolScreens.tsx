@@ -77,7 +77,7 @@ export function SchoolDashboardScreen() {
             {quiet.map((m) => (
               <li key={m.account.id}>
                 <Link
-                  to={`/u/${m.account.handle}`}
+                  to={`/school/${club.id}/members/${m.account.id}`}
                   className="flex min-h-14 items-center justify-between gap-3 rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2"
                 >
                   <span className="font-semibold">{m.account.displayName}</span>
