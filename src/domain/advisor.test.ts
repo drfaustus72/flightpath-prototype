@@ -21,7 +21,8 @@ describe('adviceFor', () => {
   it('moves to the next step once the track completes one', () => {
     const w = seed()
     w.flights.push(flyLegs(w, outAndBack('KHHR', 'KAVX'), '2026-11-14T17:00:00Z', { pilotId: 'acct-maya', clubId: 'club-hfa' }))
-    expect(adviceFor(w, 'acct-maya')?.mission.code).toBe('class_c_arrival')
+    // Class C is already done on her Burbank arrival, so the advisor skips to the coastal cross-country.
+    expect(adviceFor(w, 'acct-maya')?.mission.code).toBe('coastal_xc')
     expect(pathwaySteps(w, 'acct-maya', w.pathways[0] ?? { code: 'x', title: '', description: '', missionCodes: [] })[0]?.complete).toBe(true)
   })
 

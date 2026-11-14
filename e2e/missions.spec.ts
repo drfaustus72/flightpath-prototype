@@ -49,8 +49,8 @@ test.describe('M3 script A: mission, card, Props and school-verified XP', () => 
     await page.goto('/progress')
     const xp = page.locator('section', { has: page.getByRole('heading', { name: 'XP at Hawthorne Flight Academy' }) })
     await expect(xp).toContainText('200')
-    await expect(xp).toContainText('300 XP to Navigator')
-    await expect(page.locator('section', { hasText: 'Next on Private Pilot Cross-Country' }).first()).toContainText('Class C Arrival')
+    await expect(xp).toContainText('100 XP to Navigator')
+    await expect(page.locator('section', { hasText: 'Next on Private Pilot Cross-Country' }).first()).toContainText('Coastal Cross-Country')
   })
 
   test('a free pilot sees missions behind Pilot Pro and XP behind School Pro', async ({ page }) => {

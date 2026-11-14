@@ -1439,28 +1439,35 @@
     },
     "isSimulator": false,
     "stats": {
-      "distanceNm": 84.5,
-      "durationSec": 4300,
-      "airborneSec": 2736,
+      "distanceNm": 96.1,
+      "durationSec": 4704,
+      "airborneSec": 3144,
       "maxAltitudeFt": 4500,
-      "maxGroundspeedKt": 120
+      "maxGroundspeedKt": 110
     },
     "departure": "KHHR",
     "arrival": "KHHR",
     "landings": [
       {
+        "icao": "KBUR",
+        "kind": "touch_and_go",
+        "lon": -118.355831,
+        "lat": 34.190397,
+        "at": "2026-11-10T17:46:16.000Z"
+      },
+      {
         "icao": "KCMA",
         "kind": "full_stop",
-        "lon": -119.0943,
-        "lat": 34.2137,
-        "at": "2026-11-10T17:59:48.000Z"
+        "lon": -119.094287,
+        "lat": 34.213728,
+        "at": "2026-11-10T18:06:36.000Z"
       },
       {
         "icao": "KHHR",
         "kind": "full_stop",
         "lon": -118.335,
         "lat": 33.9228,
-        "at": "2026-11-10T18:37:40.000Z"
+        "at": "2026-11-10T18:44:24.000Z"
       }
     ],
     "route": [
@@ -1469,12 +1476,16 @@
         33.9228
       ],
       [
-        -118.334086,
-        33.924435
+        -118.334143,
+        33.924364
       ],
       [
-        -118.333343,
-        33.924773
+        -118.333514,
+        33.9248
+      ],
+      [
+        -118.332857,
+        33.924364
       ],
       [
         -118.332,
@@ -1485,8 +1496,12 @@
         33.9228
       ],
       [
-        -118.62101,
-        34.020412
+        -118.3564,
+        34.1977
+      ],
+      [
+        -118.600046,
+        34.200001
       ],
       [
         -119.0943,
@@ -1534,7 +1549,7 @@
       ]
     ],
     "importNotes": [],
-    "caption": "Flew the whole route on pilotage. Dan only touched the radio once.",
+    "caption": "Class C arrival into Burbank, then pilotage all the way to Camarillo. Dan only touched the radio once.",
     "routeVisibility": "full",
     "clubId": "club-hfa",
     "postVisibility": "public",

@@ -38,7 +38,8 @@ describe('xpSummary', () => {
   })
 
   it('counts a milestone signed for the school only when flown in its aircraft', () => {
-    const w = seed()
+    // Leave out Maya's seeded mission so only the milestone counts.
+    const w = { ...seed(), missionVerifications: [] }
     expect(xpSummary({ ...w, signoffs: [milestone({})] }, 'acct-maya')[0]?.xp).toBe(300)
     expect(xpSummary({ ...w, signoffs: [milestone({ schoolAircraft: false })] }, 'acct-maya')[0]?.xp).toBe(0)
     expect(xpSummary({ ...w, signoffs: [milestone({ revoked: { at: '2026-11-14T00:00:00.000Z', reason: 'x' } })] }, 'acct-maya')[0]?.xp).toBe(0)

@@ -9,5 +9,16 @@
     "at": "2026-11-10T17:00:00Z",
     "revoked": null,
     "schoolAircraft": true
+  },
+  {
+    "id": "mv-maya-burbank",
+    "pilotId": "acct-maya",
+    "missionCode": "class_c_arrival",
+    "flightId": "flt-maya-dual-xc",
+    "clubId": "club-hfa",
+    "byAccountId": "acct-dan",
+    "at": "2026-11-10T22:00:00Z",
+    "revoked": null,
+    "schoolAircraft": true
   }
 ]

@@ -18,8 +18,8 @@ describe('challengeProgress', () => {
   it('counts only airports first visited after joining', () => {
     const w = seed()
     const c = challenge(w, 'five_new_airports')
-    // Maya's seed flights (KHHR, KCMA) came after 1 Oct; joining later leaves them out.
-    expect(challengeProgress(w, 'acct-maya', c, '2026-10-01T00:00:00Z').items.sort()).toEqual(['KCMA', 'KHHR'])
+    // Maya's seed flights (KHHR, KBUR, KCMA) came after 1 Oct; joining later leaves them out.
+    expect(challengeProgress(w, 'acct-maya', c, '2026-10-01T00:00:00Z').items.sort()).toEqual(['KBUR', 'KCMA', 'KHHR'])
     expect(challengeProgress(w, 'acct-maya', c, '2026-11-13T00:00:00Z').current).toBe(0)
     w.flights.push(flyLegs(w, outAndBack('KHHR', 'KAVX'), '2026-11-14T17:00:00Z', { pilotId: 'acct-maya' }))
     expect(challengeProgress(w, 'acct-maya', c, '2026-11-13T00:00:00Z').items).toEqual(['KAVX'])

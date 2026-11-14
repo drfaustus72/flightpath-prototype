@@ -29,7 +29,8 @@ describe('Script A: Maya flies to Catalina and the school verifies it', () => {
     expect(() => ops.verifyMission(w, 'acct-maya', f.id, 'airport_in_the_sky', ctx())).toThrow()
     w = ops.verifyMission(w, 'acct-dan', f.id, 'airport_in_the_sky', ctx())
     expect(checkIntegrity(w)).toEqual([])
-    expect(xpSummary(w, 'acct-maya')[0]?.xp).toBe(200)
+    // 200 on top of the Class C arrival already verified in the seed.
+    expect(xpSummary(w, 'acct-maya')[0]?.xp).toBe(400)
 
     const v = w.missionVerifications.at(-1)
     if (!v) throw new Error('missing verification')
@@ -38,7 +39,7 @@ describe('Script A: Maya flies to Catalina and the school verifies it', () => {
     expect(ops.canRevokeMissionVerification(w, 'acct-maya', v.id)).toBe(false)
     expect(() => ops.revokeMissionVerification(w, 'acct-dan', v.id, ' ', ctx())).toThrow('reason')
     w = ops.revokeMissionVerification(w, 'acct-dan', v.id, 'Landed at the wrong airport', ctx())
-    expect(xpSummary(w, 'acct-maya')[0]?.xp).toBe(0)
+    expect(xpSummary(w, 'acct-maya')[0]?.xp).toBe(200)
   })
 })
 
