@@ -62,4 +62,20 @@ test.describe('M4b school space', () => {
     await card.getByRole('button', { name: 'Take Class C Arrival off the wall' }).click()
     await expect(page.getByText('Nothing on the wall yet.')).toBeVisible()
   })
+
+  test('an admin makes a school challenge and a member joins it', async ({ page }) => {
+    await page.goto('/feed')
+    await viewAs(page, 'School admin', '/school/club-hfa/page')
+    await page.getByLabel('Title').fill('Hawthorne Explorer')
+    await page.getByLabel('Description').fill('Land at three airports you haven’t flown to before.')
+    await page.getByLabel('Airports to land at').fill('3')
+    await page.getByRole('button', { name: 'Create challenge' }).click()
+    await expect(page.getByText('0 pilots joined')).toBeVisible()
+
+    await viewAs(page, 'Student pilot', '/progress')
+    const row = page.getByRole('listitem').filter({ hasText: 'Hawthorne Explorer' })
+    await expect(row).toContainText('Hawthorne Flight Academy')
+    await row.getByRole('button', { name: 'Join challenge' }).click()
+    await expect(row).toContainText('0 of 3')
+  })
 })

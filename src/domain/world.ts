@@ -251,6 +251,7 @@ function checkMissionIntegrity(
   const challenges = new Set(world.challenges.map((c) => c.code))
   for (const d of duplicates(world.challenges.map((c) => c.code))) errors.push(`challenges: duplicate code ${d}`)
   for (const c of world.challenges) {
+    if (c.clubId !== null && !clubs.has(c.clubId)) errors.push(`challenge ${c.code}: unknown club ${c.clubId}`)
     if ((c.kind === 'states') !== (c.states.length > 0)) errors.push(`challenge ${c.code}: states are required exactly for a states challenge`)
     if ((c.kind === 'states') !== (c.target === null)) errors.push(`challenge ${c.code}: target is required except for a states challenge`)
   }

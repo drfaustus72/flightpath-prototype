@@ -2,7 +2,7 @@ import { Check, Compass, Flag } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import { Link } from 'react-router'
 import { adviceFor, pathwaySteps } from '../../domain/advisor'
-import { challengeProgress, entryFor } from '../../domain/challenges'
+import { challengeProgress, entryFor, schoolChallengesFor } from '../../domain/challenges'
 import { can } from '../../domain/tiers'
 import type { Challenge } from '../../domain/types'
 import { xpSummary } from '../../domain/xp'
@@ -165,20 +165,30 @@ export function XpPanel() {
 
 export function ChallengesPanel() {
   const world = useWorld()
-  const { access } = useActive()
-  if (!can(access, 'progress.challenges')) {
-    return <ProGate plan="Pilot Pro">Opt-in challenges like Five New Airports and the Three-State Passport. No leaderboards, no deadlines.</ProGate>
-  }
+  const { account, access } = useActive()
+  const school = schoolChallengesFor(world, account.id)
+  const own = world.challenges.filter((c) => c.clubId === null)
   return (
     <section aria-labelledby="challenges-title" className="flex flex-col gap-2">
       <h2 id="challenges-title" className="font-semibold">
         Challenges
       </h2>
-      <ul className="flex flex-col gap-2">
-        {world.challenges.map((c) => (
-          <ChallengeRow key={c.code} challenge={c} />
-        ))}
-      </ul>
+      {school.length > 0 && (
+        <ul className="flex flex-col gap-2" aria-label="From your school">
+          {school.map((c) => (
+            <ChallengeRow key={c.code} challenge={c} />
+          ))}
+        </ul>
+      )}
+      {can(access, 'progress.challenges') ? (
+        <ul className="flex flex-col gap-2">
+          {own.map((c) => (
+            <ChallengeRow key={c.code} challenge={c} />
+          ))}
+        </ul>
+      ) : (
+        <ProGate plan="Pilot Pro">Opt-in challenges like Five New Airports and the Three-State Passport. No leaderboards, no deadlines.</ProGate>
+      )}
     </section>
   )
 }
@@ -190,12 +200,14 @@ function ChallengeRow({ challenge }: { challenge: Challenge }) {
   const leave = useAppStore((s) => s.leaveChallenge)
   const entry = entryFor(world, account.id, challenge.code)
   const progress = entry ? challengeProgress(world, account.id, challenge, entry.joinedAt) : null
+  const club = challenge.clubId === null ? undefined : world.clubs.find((c) => c.id === challenge.clubId)
 
   return (
     <li>
       <Panel className="flex flex-col gap-2">
         <div className="flex items-start justify-between gap-2">
           <div>
+            {club && <p className="text-[13px] font-semibold text-chart-blue">{club.name}</p>}
             <p className="font-semibold">{challenge.title}</p>
             <p className="text-[14px] text-ink-muted">{challenge.description}</p>
           </div>

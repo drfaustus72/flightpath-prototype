@@ -12,6 +12,7 @@ import { useAppStore } from '../../store/storeContext'
 import { ProGate } from '../../ui/ProGate'
 import { Button, ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
 import { MissionToVerifyRow, SimSession } from './QueueRows'
+import { ChallengeBuilder } from './ChallengeBuilder'
 import { WallManager } from './WallManager'
 import { WeeklyFlightsChart } from './WeeklyFlightsChart'
 
@@ -184,8 +185,6 @@ function JoinRequests({ club }: { club: Club }) {
 const proTools: { feature: ClubFeature; name: string }[] = [
   { feature: 'school.feed', name: 'Club feed' },
   { feature: 'school.brandedPosts', name: 'Branded posts' },
-  { feature: 'school.customChallenges', name: 'Custom challenges' },
-  { feature: 'school.sponsorSeats', name: 'Sponsored Pilot Pro seats' },
 ]
 
 /** The school's public page as staff see it, with what admins can change. */
@@ -219,6 +218,7 @@ export function SchoolPageScreen() {
       )}
 
       {isAdmin && isPro && <WallManager club={club} />}
+      {isAdmin && isPro && <ChallengeBuilder club={club} />}
 
       {isAdmin &&
         (isPro ? (

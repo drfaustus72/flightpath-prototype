@@ -1,4 +1,5 @@
 import { airportEvents, flightsInOrder } from './recognition'
+import { accessContextFor, can, clubOffers } from './tiers'
 import type { Challenge, ChallengeEntry, World } from './types'
 
 /**
@@ -12,6 +13,24 @@ export interface ChallengeProgress {
   done: boolean
   /** What's counted so far, e.g. airport idents or states. */
   items: string[]
+}
+
+/**
+ * Whether this account can see and join the challenge. Flightpath's own challenges come with
+ * Pilot Pro; a school's challenges are free for its active members while the school is on School Pro.
+ */
+export function canJoinChallenge(world: World, accountId: string, challenge: Challenge): boolean {
+  const ctx = accessContextFor(world, accountId)
+  if (!ctx) return false
+  if (challenge.clubId === null) return can(ctx, 'progress.challenges')
+  const club = world.clubs.find((c) => c.id === challenge.clubId)
+  if (!club || !clubOffers(club, 'school.customChallenges')) return false
+  return world.memberships.some((m) => m.accountId === accountId && m.clubId === club.id && m.status === 'active')
+}
+
+/** School challenges this account can join, grouped with nothing else. */
+export function schoolChallengesFor(world: World, accountId: string): Challenge[] {
+  return world.challenges.filter((c) => c.clubId !== null && canJoinChallenge(world, accountId, c))
 }
 
 export function entryFor(world: World, pilotId: string, code: string): ChallengeEntry | undefined {

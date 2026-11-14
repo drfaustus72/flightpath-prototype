@@ -5,7 +5,8 @@
     "description": "Land at five airports you’ve never landed at before. Take as long as you like.",
     "kind": "new_airports",
     "target": 5,
-    "states": []
+    "states": [],
+    "clubId": null
   },
   {
     "code": "three_state_passport",
@@ -17,7 +18,8 @@
       "CA",
       "NV",
       "AZ"
-    ]
+    ],
+    "clubId": null
   },
   {
     "code": "good_call",
@@ -25,6 +27,7 @@
     "description": "Record a flight you decided not to make. Recognizing a no-go is part of good airmanship.",
     "kind": "no_go",
     "target": 1,
-    "states": []
+    "states": [],
+    "clubId": null
   }
 ]

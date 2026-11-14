@@ -2,18 +2,23 @@ import { describe, expect, it } from 'vitest'
 import { seedResult } from '../data/seed'
 import {
   answerRepost,
+  createSchoolChallenge,
   dismissNudge,
   missionWall,
   nudgesFor,
   pendingReposts,
   removeRepost,
+  removeSchoolChallenge,
   repostRequestsFor,
   requestRepost,
+  schoolChallenges,
   sendNudge,
   setSponsoredSeat,
   sponsoredSeatCount,
   wallCandidates,
 } from './schoolOps'
+import { canJoinChallenge } from './challenges'
+import { joinChallenge } from './missionOps'
 import { accessContextFor, hasPilotPro } from './tiers'
 import type { World } from './types'
 import { checkIntegrity } from './world'
@@ -118,5 +123,35 @@ describe('Mission Wall', () => {
     w = removeRepost(w, 'acct-alex', 'r1', ctx())
     expect(repostRequestsFor(w, 'acct-lena')).toEqual([])
     expect(() => removeRepost(w, 'acct-jordan', 'r1', ctx())).toThrow(/can’t do that/)
+  })
+})
+
+describe('school challenges', () => {
+  const args = { clubId: 'club-hfa', title: 'Hawthorne Explorer', description: 'Land at three new airports this season.', kind: 'new_airports' as const, target: 3 }
+
+  it('lets a School Pro admin make a challenge that free members can join', () => {
+    let w = createSchoolChallenge(seed(), 'acct-alex', args, ctx('abc-123'))
+    expect(checkIntegrity(w)).toEqual([])
+    const c = w.challenges.find((x) => x.clubId === 'club-hfa')
+    if (!c) throw new Error('challenge')
+    // Lena is a free member: Flightpath's own challenges need Pilot Pro, the school's don't.
+    expect(canJoinChallenge(w, 'acct-lena', c)).toBe(true)
+    const good = w.challenges.find((x) => x.code === 'good_call')
+    expect(good && canJoinChallenge(w, 'acct-lena', good)).toBe(false)
+    expect(canJoinChallenge(w, 'acct-jordan', c)).toBe(false)
+    w = joinChallenge(w, 'acct-lena', c.code, ctx())
+    expect(schoolChallenges(w, 'club-hfa')).toEqual([{ challenge: c, joined: 1 }])
+    expect(() => joinChallenge(w, 'acct-jordan', c.code, ctx())).toThrow(/isn’t open/)
+    w = removeSchoolChallenge(w, 'acct-alex', c.code)
+    expect(w.challengeEntries.some((e) => e.challengeCode === c.code)).toBe(false)
+  })
+
+  it('is for School Pro admins and only experience or good-call goals', () => {
+    expect(() => createSchoolChallenge(seed(), 'acct-dan', args, ctx())).toThrow(/can’t do that/)
+    expect(() => createSchoolChallenge(seed(), 'acct-kim', { ...args, clubId: 'club-coastal' }, ctx())).toThrow(/can’t do that/)
+    expect(() => createSchoolChallenge(seed(), 'acct-alex', { ...args, kind: 'fastest' as never }, ctx())).toThrow(/new-airport/)
+    expect(() => createSchoolChallenge(seed(), 'acct-alex', { ...args, target: 0 }, ctx())).toThrow(/between 1 and 50/)
+    expect(() => createSchoolChallenge(seed(), 'acct-alex', { ...args, title: ' ' }, ctx())).toThrow(/title/)
+    expect(() => removeSchoolChallenge(seed(), 'acct-alex', 'good_call')).toThrow(/not found/)
   })
 })

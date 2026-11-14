@@ -169,3 +169,51 @@ export function missionWall(world: World, clubId: string): WallItem[] {
 export function pendingReposts(world: World, clubId: string): WallItem[] {
   return world.repostRequests.filter((r) => r.clubId === clubId && r.status === 'pending').flatMap((r) => wallItem(world, r))
 }
+
+// --- School challenges --------------------------------------------------------------------------
+
+export const SCHOOL_CHALLENGE_KINDS = ['new_airports', 'no_go'] as const
+export type SchoolChallengeKind = (typeof SCHOOL_CHALLENGE_KINDS)[number]
+
+/**
+ * A School Pro admin makes a challenge for the school's members. Kinds are limited to experience
+ * (new airports) and good decisions (no-gos): no speed, altitude or risk, and no leaderboard.
+ */
+export function createSchoolChallenge(
+  world: World,
+  actorId: string,
+  args: { clubId: string; title: string; description: string; kind: SchoolChallengeKind; target: number },
+  ctx: OpContext,
+): World {
+  requireInClub(world, actorId, 'school.customChallenges', args.clubId)
+  const title = args.title.trim()
+  const description = args.description.trim()
+  if (title.length === 0 || title.length > 60) throw new Error('Give the challenge a short title (up to 60 characters)')
+  if (description.length === 0 || description.length > 200) throw new Error('Describe it in a sentence or two (up to 200 characters)')
+  if (!SCHOOL_CHALLENGE_KINDS.includes(args.kind)) throw new Error('Schools can make new-airport and good-call challenges')
+  if (!Number.isInteger(args.target) || args.target < 1 || args.target > 50) throw new Error('Pick a goal between 1 and 50')
+  const code = `school_${ctx.id.replace(/[^a-z0-9]/gi, '').toLowerCase().slice(0, 24)}`
+  if (world.challenges.some((c) => c.code === code)) throw new Error('Try again')
+  return {
+    ...world,
+    challenges: [...world.challenges, { code, title, description, kind: args.kind, target: args.target, states: [], clubId: args.clubId }],
+  }
+}
+
+/** Ends a school challenge: it and everyone's entries go away. */
+export function removeSchoolChallenge(world: World, actorId: string, code: string): World {
+  const challenge = world.challenges.find((c) => c.code === code)
+  if (!challenge || challenge.clubId === null) throw new Error('Challenge not found')
+  requireInClub(world, actorId, 'school.customChallenges', challenge.clubId)
+  return {
+    ...world,
+    challenges: world.challenges.filter((c) => c !== challenge),
+    challengeEntries: world.challengeEntries.filter((e) => e.challengeCode !== code),
+  }
+}
+
+export function schoolChallenges(world: World, clubId: string) {
+  return world.challenges
+    .filter((c) => c.clubId === clubId)
+    .map((challenge) => ({ challenge, joined: world.challengeEntries.filter((e) => e.challengeCode === challenge.code).length }))
+}

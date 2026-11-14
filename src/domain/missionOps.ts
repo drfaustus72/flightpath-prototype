@@ -1,3 +1,4 @@
+import { canJoinChallenge } from './challenges'
 import { canVerifyClaim, canVerifyMission, claimFor, claimVerificationClubs, missionByCode, verificationClubId } from './missions'
 import type { OpContext } from './socialOps'
 import type { World } from './types'
@@ -78,7 +79,9 @@ export function revokeMissionVerification(world: World, actorId: string, verific
 }
 
 export function joinChallenge(world: World, actorId: string, code: string, ctx: OpContext): World {
-  if (!world.challenges.some((c) => c.code === code)) throw new Error(`Unknown challenge ${code}`)
+  const challenge = world.challenges.find((c) => c.code === code)
+  if (!challenge) throw new Error(`Unknown challenge ${code}`)
+  if (!canJoinChallenge(world, actorId, challenge)) throw new Error('This challenge isn’t open to you')
   if (world.challengeEntries.some((e) => e.pilotId === actorId && e.challengeCode === code)) return world
   return { ...world, challengeEntries: [...world.challengeEntries, { pilotId: actorId, challengeCode: code, joinedAt: ctx.now }] }
 }

@@ -69,6 +69,9 @@ describe('self-reported missions', () => {
 describe('challenges and no-gos', () => {
   it('joins once, leaves, and records a no-go with a reason', () => {
     let w = seed()
+    // Flightpath's own challenges come with Pilot Pro.
+    expect(() => ops.joinChallenge(w, 'acct-marcus', 'good_call', ctx())).toThrow(/isn’t open/)
+    w = { ...w, accounts: w.accounts.map((a) => (a.id === 'acct-jordan' ? { ...a, subscription: { ...a.subscription, pilotPro: true } } : a)) }
     w = ops.joinChallenge(w, 'acct-jordan', 'good_call', ctx())
     w = ops.joinChallenge(w, 'acct-jordan', 'good_call', ctx())
     expect(w.challengeEntries.filter((e) => e.pilotId === 'acct-jordan')).toHaveLength(1)

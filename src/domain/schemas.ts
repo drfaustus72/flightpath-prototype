@@ -364,6 +364,8 @@ export const challengeSchema = z.object({
   target: z.number().int().positive().nullable(),
   /** states: all of these, from landings since joining. */
   states: z.array(z.string().length(2)),
+  /** Set for a challenge a School Pro school made for its members; null for Flightpath's own. */
+  clubId: id.nullable(),
 })
 
 export const challengeEntrySchema = z.object({ pilotId: id, challengeCode: missionCode, joinedAt: isoDateTime })
