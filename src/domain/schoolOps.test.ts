@@ -1,6 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import { seedResult } from '../data/seed'
-import { dismissNudge, nudgesFor, sendNudge, setSponsoredSeat, sponsoredSeatCount } from './schoolOps'
+import {
+  answerRepost,
+  dismissNudge,
+  missionWall,
+  nudgesFor,
+  pendingReposts,
+  removeRepost,
+  repostRequestsFor,
+  requestRepost,
+  sendNudge,
+  setSponsoredSeat,
+  sponsoredSeatCount,
+  wallCandidates,
+} from './schoolOps'
 import { accessContextFor, hasPilotPro } from './tiers'
 import type { World } from './types'
 import { checkIntegrity } from './world'
@@ -64,5 +77,46 @@ describe('sponsored seats', () => {
 
   it('is for admins only', () => {
     expect(() => setSponsoredSeat(seed(), 'acct-dan', { clubId: 'club-hfa', pilotId: 'acct-lena', on: true })).toThrow(/can’t do that/)
+  })
+})
+
+describe('Mission Wall', () => {
+  it('features a card only after the pilot approves, and drops it when they take it down', () => {
+    let w = seed()
+    expect(wallCandidates(w, 'club-hfa').map((v) => v.id).sort()).toEqual(['mv-lena-sba', 'mv-maya-burbank'])
+    w = requestRepost(w, 'acct-alex', 'mv-maya-burbank', ctx('r1'))
+    expect(checkIntegrity(w)).toEqual([])
+    expect(missionWall(w, 'club-hfa')).toEqual([])
+    expect(pendingReposts(w, 'club-hfa').map((i) => i.mission.title)).toEqual(['Class C Arrival'])
+    expect(repostRequestsFor(w, 'acct-maya').map((r) => r.id)).toEqual(['r1'])
+    // Asked once only.
+    expect(() => requestRepost(w, 'acct-alex', 'mv-maya-burbank', ctx('r2'))).toThrow(/can’t be featured/)
+    expect(() => answerRepost(w, 'acct-alex', 'r1', true, ctx())).toThrow(/not found/)
+
+    w = answerRepost(w, 'acct-maya', 'r1', true, ctx())
+    expect(missionWall(w, 'club-hfa').map((i) => i.pilot.displayName)).toEqual(['Maya Ortiz'])
+    w = removeRepost(w, 'acct-maya', 'r1', ctx())
+    expect(missionWall(w, 'club-hfa')).toEqual([])
+    expect(wallCandidates(w, 'club-hfa').map((v) => v.id)).toEqual(['mv-lena-sba'])
+  })
+
+  it('is for School Pro admins, never asks minors, and drops revoked missions', () => {
+    let w = seed()
+    expect(() => requestRepost(w, 'acct-dan', 'mv-maya-burbank', ctx())).toThrow(/can’t do that/)
+    w.accounts = w.accounts.map((a) => (a.id === 'acct-maya' ? { ...a, isMinor: true, profileLevel: 'private' as const } : a))
+    expect(wallCandidates(w, 'club-hfa').map((v) => v.id)).toEqual(['mv-lena-sba'])
+
+    w = requestRepost(seed(), 'acct-alex', 'mv-lena-sba', ctx('r1'))
+    w = answerRepost(w, 'acct-lena', 'r1', true, ctx())
+    expect(missionWall(w, 'club-hfa')).toHaveLength(1)
+    w.missionVerifications = w.missionVerifications.map((v) => ({ ...v, revoked: { at: '2026-11-14T00:00:00.000Z', reason: 'Wrong flight' } }))
+    expect(missionWall(w, 'club-hfa')).toEqual([])
+  })
+
+  it('lets the school withdraw a pending request', () => {
+    let w = requestRepost(seed(), 'acct-alex', 'mv-lena-sba', ctx('r1'))
+    w = removeRepost(w, 'acct-alex', 'r1', ctx())
+    expect(repostRequestsFor(w, 'acct-lena')).toEqual([])
+    expect(() => removeRepost(w, 'acct-jordan', 'r1', ctx())).toThrow(/can’t do that/)
   })
 })

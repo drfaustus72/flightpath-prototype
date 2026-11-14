@@ -270,6 +270,13 @@ function checkMissionIntegrity(
     for (const who of [n.fromAccountId, n.toAccountId]) if (!accounts.has(who)) errors.push(`nudge ${n.id}: unknown account ${who}`)
     if (n.missionCode !== null && !missions.has(n.missionCode)) errors.push(`nudge ${n.id}: unknown mission ${n.missionCode}`)
   }
+  for (const d of duplicates(world.repostRequests.map((r) => r.id))) errors.push(`repostRequests: duplicate id ${d}`)
+  for (const r of world.repostRequests) {
+    const v = world.missionVerifications.find((x) => x.id === r.verificationId)
+    if (!v) errors.push(`repostRequest ${r.id}: unknown verification ${r.verificationId}`)
+    else if (v.pilotId !== r.pilotId || v.clubId !== r.clubId) errors.push(`repostRequest ${r.id}: doesn't match its verification`)
+    if (accounts.get(r.pilotId)?.isMinor && r.status !== 'withdrawn') errors.push(`repostRequest ${r.id}: minors are never asked to repost`)
+  }
   for (const d of duplicates(world.missionVerifications.map((v) => v.id))) errors.push(`missionVerifications: duplicate id ${d}`)
   const active: string[] = []
   for (const v of world.missionVerifications) {

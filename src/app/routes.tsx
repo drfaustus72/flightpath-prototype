@@ -13,6 +13,7 @@ import { ProfileScreen } from '../features/profile/ProfileScreen'
 import { PublicProfileScreen } from '../features/profile/PublicProfileScreen'
 import { ProgressScreen } from '../features/progress/ProgressScreen'
 import { SchoolMemberScreen, SchoolMembersScreen } from '../features/school/MembersScreens'
+import { MissionWallScreen } from '../features/school/MissionWall'
 import { SchoolLayout } from '../features/school/SchoolLayout'
 import { SchoolDashboardScreen, SchoolHomeScreen, SchoolIndex, SchoolPageScreen, SchoolQueueScreen } from '../features/school/SchoolScreens'
 import { AppLayout } from './AppLayout'
@@ -31,6 +32,7 @@ export const routes: RouteObject[] = [
       { path: 'inbox', element: <InboxScreen /> },
       { path: 'missions', element: <MissionsScreen /> },
       { path: 'clubs/:clubId', element: <ClubScreen /> },
+      { path: 'clubs/:clubId/wall', element: <MissionWallScreen /> },
       { path: 'airports/:icao', element: <AirportScreen /> },
       { path: 'nearby', element: <NearbyScreen /> },
       { path: 'map', element: <MapScreen /> },

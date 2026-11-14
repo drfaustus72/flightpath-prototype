@@ -396,6 +396,22 @@ export const nudgeSchema = z.object({
 })
 
 /**
+ * A school asking a pilot to feature one of their school-verified missions on the school's public
+ * Mission Wall. Nothing is reposted until the pilot approves, and the pilot can take it down any time.
+ * Minors are never asked.
+ */
+export const repostRequestSchema = z.object({
+  id,
+  clubId: id,
+  verificationId: id,
+  pilotId: id,
+  requestedBy: id,
+  status: z.enum(['pending', 'approved', 'declined', 'withdrawn']),
+  at: isoDateTime,
+  answeredAt: isoDateTime.nullable(),
+})
+
+/**
  * A school (or, for CFI-only missions, the flight's instructor) verifying a completed mission.
  * Only this is stored; completion itself is worked out from the track. XP counts only when the
  * club is a claimed School Pro school and the flight was tagged to it (flown in its aircraft).
@@ -442,6 +458,7 @@ export const worldSchema = z.object({
   challengeEntries: z.array(challengeEntrySchema),
   noGos: z.array(noGoSchema),
   nudges: z.array(nudgeSchema),
+  repostRequests: z.array(repostRequestSchema),
   missionVerifications: z.array(missionVerificationSchema),
   missionClaims: z.array(missionClaimSchema),
 })

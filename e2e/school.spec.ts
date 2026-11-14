@@ -40,4 +40,26 @@ test.describe('M4b school space', () => {
     await expect(seat).toBeChecked()
     await expect(page.getByText(/2 seats in use/)).toBeVisible()
   })
+
+  test('the school asks to feature a mission; it goes on the wall only once the pilot says yes', async ({ page }) => {
+    await page.goto('/feed')
+    await viewAs(page, 'School admin', '/school/club-hfa/page')
+    await page.getByRole('button', { name: 'Ask Maya Ortiz to feature Class C Arrival' }).click()
+    await expect(page.getByText('Waiting for Maya Ortiz')).toBeVisible()
+    await page.getByRole('link', { name: 'Preview the wall' }).click()
+    await expect(page.getByText('Nothing on the wall yet.')).toBeVisible()
+
+    await viewAs(page, 'Student pilot', '/progress')
+    const ask = page.getByRole('region', { name: 'From your school' })
+    await expect(ask).toContainText('would like to feature your Class C Arrival')
+    await ask.getByRole('button', { name: 'Feature it' }).click()
+
+    await page.goto('/clubs/club-hfa')
+    await page.getByRole('link', { name: /Mission Wall/ }).click()
+    const card = page.getByRole('article').filter({ hasText: 'Class C Arrival' })
+    await expect(card).toContainText('Maya Ortiz')
+    await expect(card).toContainText('Verified by Hawthorne Flight Academy')
+    await card.getByRole('button', { name: 'Take Class C Arrival off the wall' }).click()
+    await expect(page.getByText('Nothing on the wall yet.')).toBeVisible()
+  })
 })

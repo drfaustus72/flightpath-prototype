@@ -12,6 +12,7 @@ import { useAppStore } from '../../store/storeContext'
 import { ProGate } from '../../ui/ProGate'
 import { Button, ButtonLink, EmptyState, Ident, Panel, ScreenTitle } from '../../ui/primitives'
 import { MissionToVerifyRow, SimSession } from './QueueRows'
+import { WallManager } from './WallManager'
 import { WeeklyFlightsChart } from './WeeklyFlightsChart'
 
 /** The school for the current /school/:clubId route. SchoolLayout has already checked staff access. */
@@ -182,8 +183,7 @@ function JoinRequests({ club }: { club: Club }) {
 
 const proTools: { feature: ClubFeature; name: string }[] = [
   { feature: 'school.feed', name: 'Club feed' },
-  { feature: 'school.brandedPosts', name: 'Branded posts and repost requests' },
-  { feature: 'school.missionWall', name: 'Mission Wall' },
+  { feature: 'school.brandedPosts', name: 'Branded posts' },
   { feature: 'school.customChallenges', name: 'Custom challenges' },
   { feature: 'school.sponsorSeats', name: 'Sponsored Pilot Pro seats' },
 ]
@@ -217,6 +217,8 @@ export function SchoolPageScreen() {
       ) : (
         <p className="text-ink-muted">Your school’s admins edit this page. As a staff CFI you work the queue.</p>
       )}
+
+      {isAdmin && isPro && <WallManager club={club} />}
 
       {isAdmin &&
         (isPro ? (

@@ -5,6 +5,7 @@ import { checkClaimEmail, claimDomain, currentMembership } from '../../domain/cl
 import { isStaffOfClub } from '../../domain/visibility'
 import { clubPlanName, offersSchoolPlans } from '../../domain/clubs'
 import { listedCfis } from '../../domain/directory'
+import { missionWall } from '../../domain/schoolOps'
 import { feedFor } from '../../domain/social'
 import { activeMemberCount, homeSchoolOf } from '../../domain/world'
 import { useActive, useWorld } from '../../store/hooks'
@@ -12,6 +13,7 @@ import { useAppStore } from '../../store/storeContext'
 import { Button, ButtonLink, EmptyState, Ident, Panel } from '../../ui/primitives'
 import { FlightCard } from '../feed/FlightCard'
 import { PersonRow } from '../social/PersonRow'
+import { LinkRow } from '../profile/OwnProfileSections'
 
 const TRAINING_NAMES: Record<string, string> = {
   private: 'Private',
@@ -33,6 +35,7 @@ export function ClubScreen() {
   const membership = currentMembership(world, account.id, club.id)
   const isMember = membership?.status === 'active'
   const hasFeed = club.plan === 'school_pro' || club.plan === 'community'
+  const wall = missionWall(world, club.id)
   const staff = listedCfis(world, account.id).filter((c) =>
     world.memberships.some((m) => m.accountId === c.id && m.clubId === club.id && m.status === 'active' && m.roles.includes('staff_cfi')),
   )
@@ -88,6 +91,10 @@ export function ClubScreen() {
       <MembershipActions clubId={club.id} />
 
       {isStaffOfClub(world, account.id, club.id) && <ButtonLink to={`/school/${club.id}`}>Act as this school</ButtonLink>}
+
+      {wall.length > 0 && (
+        <LinkRow to={`/clubs/${club.id}/wall`} title="Mission Wall" detail={`${wall.length} ${wall.length === 1 ? 'mission' : 'missions'} pilots flew with ${club.name}`} />
+      )}
 
       {staff.length > 0 && (
         <section aria-labelledby="staff-title" className="flex flex-col gap-2">

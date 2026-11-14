@@ -14,7 +14,7 @@ import { isBlocked } from '../domain/visibility'
 import { demoPersonas, loadWorld } from '../domain/world'
 
 /** Bump whenever the persisted shape changes. Old state is discarded and reset to seed. */
-export const STORAGE_VERSION = 9
+export const STORAGE_VERSION = 10
 export const STORAGE_KEY = 'flightpath-demo'
 
 export interface AppState {
@@ -71,6 +71,9 @@ export interface AppState {
   sendNudge: (args: { clubId: string; pilotId: string; message: string; missionCode: string | null }) => void
   dismissNudge: (nudgeId: string) => void
   setSponsoredSeat: (args: { clubId: string; pilotId: string; on: boolean }) => void
+  requestRepost: (verificationId: string) => void
+  answerRepost: (requestId: string, approve: boolean) => void
+  removeRepost: (requestId: string) => void
 
   resetDemo: () => void
 }
@@ -263,6 +266,9 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
         sendNudge: (args) => act((w, me, c) => schoolOps.sendNudge(w, me, args, c)),
         dismissNudge: (id) => act((w, me, c) => schoolOps.dismissNudge(w, me, id, c)),
         setSponsoredSeat: (args) => act((w, me) => schoolOps.setSponsoredSeat(w, me, args)),
+        requestRepost: (id) => act((w, me, c) => schoolOps.requestRepost(w, me, id, c)),
+        answerRepost: (id, approve) => act((w, me, c) => schoolOps.answerRepost(w, me, id, approve, c)),
+        removeRepost: (id) => act((w, me, c) => schoolOps.removeRepost(w, me, id, c)),
         answerJoinRequest: (id, approve) => act((w, me, c) => clubOps.answerJoinRequest(w, me, id, approve, c)),
         leaveClub: (clubId) => act((w, me, c) => clubOps.leaveClub(w, me, clubId, c)),
         setHomeSchool: (clubId) => act((w, me) => clubOps.setHomeSchool(w, me, clubId)),

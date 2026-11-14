@@ -1,7 +1,7 @@
 import { NUDGE_MAX } from './schemas'
 import type { OpContext } from './socialOps'
-import { accessContextFor, canInClub, type ClubFeature } from './tiers'
-import type { Nudge, World } from './types'
+import { accessContextFor, canInClub, type ClubFeature, clubOffers } from './tiers'
+import type { Account, Flight, Mission, MissionVerification, Nudge, RepostRequest, World } from './types'
 
 function requireInClub(world: World, actorId: string, feature: ClubFeature, clubId: string) {
   const ctx = accessContextFor(world, actorId)
@@ -72,4 +72,100 @@ export function setSponsoredSeat(world: World, actorId: string, args: { clubId: 
 /** Sponsored seats a school is paying for. */
 export function sponsoredSeatCount(world: World, clubId: string): number {
   return world.memberships.filter((m) => m.clubId === clubId && m.status === 'active' && m.sponsoredPilotPro).length
+}
+
+// --- Mission Wall -----------------------------------------------------------------------------
+
+export interface WallItem {
+  request: RepostRequest
+  verification: MissionVerification
+  mission: Mission
+  flight: Flight
+  pilot: Account
+}
+
+/**
+ * School-verified missions the school could ask to feature: a tracked flight, an adult pilot who is
+ * still a member, and no earlier request (a pilot who declined or took a card down isn't asked again).
+ */
+export function wallCandidates(world: World, clubId: string): MissionVerification[] {
+  return world.missionVerifications.filter((v) => {
+    if (v.clubId !== clubId || v.revoked !== null || v.flightId === null) return false
+    const pilot = world.accounts.find((a) => a.id === v.pilotId)
+    if (!pilot || pilot.isMinor) return false
+    if (!world.memberships.some((m) => m.clubId === clubId && m.accountId === v.pilotId && m.status === 'active')) return false
+    return !world.repostRequests.some((r) => r.verificationId === v.id)
+  })
+}
+
+export function requestRepost(world: World, actorId: string, verificationId: string, ctx: OpContext): World {
+  const v = world.missionVerifications.find((x) => x.id === verificationId)
+  if (!v || v.clubId === null) throw new Error('Mission not found')
+  requireInClub(world, actorId, 'school.repostRequests', v.clubId)
+  if (!wallCandidates(world, v.clubId).includes(v)) throw new Error('This mission can’t be featured')
+  const request: RepostRequest = {
+    id: ctx.id,
+    clubId: v.clubId,
+    verificationId: v.id,
+    pilotId: v.pilotId,
+    requestedBy: actorId,
+    status: 'pending',
+    at: ctx.now,
+    answeredAt: null,
+  }
+  return { ...world, repostRequests: [...world.repostRequests, request] }
+}
+
+/** The pilot says yes or no. Only the pilot can. */
+export function answerRepost(world: World, actorId: string, requestId: string, approve: boolean, ctx: OpContext): World {
+  const r = world.repostRequests.find((x) => x.id === requestId)
+  if (!r || r.pilotId !== actorId) throw new Error('Request not found')
+  if (r.status !== 'pending') throw new Error('This request was already answered')
+  const status = approve ? ('approved' as const) : ('declined' as const)
+  return { ...world, repostRequests: world.repostRequests.map((x) => (x === r ? { ...x, status, answeredAt: ctx.now } : x)) }
+}
+
+/** The pilot takes their card down, or the school withdraws its request or removes the card. */
+export function removeRepost(world: World, actorId: string, requestId: string, ctx: OpContext): World {
+  const r = world.repostRequests.find((x) => x.id === requestId)
+  if (!r) throw new Error('Request not found')
+  const access = accessContextFor(world, actorId)
+  const isSchool = access !== null && canInClub(access, 'school.repostRequests', r.clubId)
+  if (r.pilotId !== actorId && !isSchool) throw new Error('You can’t do that for this school')
+  if (r.status !== 'pending' && r.status !== 'approved') return world
+  return { ...world, repostRequests: world.repostRequests.map((x) => (x === r ? { ...x, status: 'withdrawn' as const, answeredAt: ctx.now } : x)) }
+}
+
+/** Requests waiting for this pilot's answer. */
+export function repostRequestsFor(world: World, pilotId: string): RepostRequest[] {
+  return world.repostRequests.filter((r) => r.pilotId === pilotId && r.status === 'pending' && !isMinor(world, pilotId))
+}
+
+function isMinor(world: World, accountId: string): boolean {
+  return world.accounts.find((a) => a.id === accountId)?.isMinor ?? true
+}
+
+function wallItem(world: World, request: RepostRequest): WallItem[] {
+  const verification = world.missionVerifications.find((v) => v.id === request.verificationId)
+  if (!verification || verification.revoked !== null || verification.flightId === null) return []
+  const mission = world.missions.find((m) => m.code === verification.missionCode)
+  const flight = world.flights.find((f) => f.id === verification.flightId)
+  const pilot = world.accounts.find((a) => a.id === request.pilotId)
+  if (!mission || !flight || !pilot || pilot.isMinor) return []
+  return [{ request, verification, mission, flight, pilot }]
+}
+
+/** The school's public Mission Wall: approved cards whose verification still stands, newest first. */
+export function missionWall(world: World, clubId: string): WallItem[] {
+  const club = world.clubs.find((c) => c.id === clubId)
+  if (!club || !clubOffers(club, 'school.missionWall')) return []
+  return world.repostRequests
+    .filter((r) => r.clubId === clubId && r.status === 'approved')
+    .flatMap((r) => wallItem(world, r))
+    .sort((a, b) => (b.request.answeredAt ?? b.request.at).localeCompare(a.request.answeredAt ?? a.request.at))
+}
+
+/** Requests the school is waiting on, for its staff. */
+export function pendingReposts(world: World, clubId: string): WallItem[] {
+  return world.repostRequests.filter((r) => r.clubId === clubId && r.status === 'pending').flatMap((r) => wallItem(world, r))
 }
