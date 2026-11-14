@@ -8,6 +8,43 @@ async function viewAs(page: Page, persona: string, path: string) {
   await page.goto(path)
 }
 
+test.describe('M4b script C: a school admin keeps pilots flying', () => {
+  test('Alex reads the dashboard, nudges a quiet pilot with a mission, and features Maya’s card on the Mission Wall', async ({ page }) => {
+    await page.goto('/feed')
+    await viewAs(page, 'School admin', '/feed')
+    await page.getByRole('link', { name: /^Act as Hawthorne Flight Academy/ }).click()
+
+    // Dashboard: who is flying and who has gone quiet.
+    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible()
+    await expect(page.getByText('As of Nov 12.')).toBeVisible()
+    const quietTile = page.locator('div', { has: page.getByText('Gone quiet', { exact: true }) }).filter({ hasText: 'no flight in 30+ days' }).last()
+    await expect(quietTile).toContainText('6')
+    await expect(page.getByRole('img', { name: /Week of .*: \d+ flights?/ }).first()).toBeVisible()
+    const quiet = page.locator('section', { has: page.getByRole('heading', { name: 'Gone quiet' }) })
+    await expect(quiet.getByRole('listitem')).toHaveCount(6)
+
+    // Nudge Liam with a mission.
+    await quiet.getByRole('link', { name: /Liam O’Connor/ }).click()
+    await page.getByLabel('Suggest a mission').selectOption({ label: 'Santa Paula' })
+    await page.getByRole('button', { name: 'Send nudge' }).click()
+    await expect(page.getByRole('heading', { name: 'Nudge sent' })).toBeVisible()
+    await expect(page.getByText('Suggested mission: Santa Paula')).toBeVisible()
+
+    // Ask Maya to feature her Class C Arrival.
+    await page.getByRole('navigation', { name: 'Hawthorne Flight Academy school' }).getByRole('link', { name: 'Page' }).click()
+    await page.getByRole('button', { name: 'Ask Maya Ortiz to feature Class C Arrival' }).click()
+    await expect(page.getByText('Waiting for Maya Ortiz')).toBeVisible()
+
+    // Maya says yes; the card appears on the public wall.
+    await viewAs(page, 'Student pilot', '/progress')
+    await page.getByRole('region', { name: 'From your school' }).getByRole('button', { name: 'Feature it' }).click()
+    await viewAs(page, 'School admin', '/school/club-hfa/page')
+    await page.getByRole('link', { name: 'Preview the wall' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Mission Wall' })).toBeVisible()
+    await expect(page.getByRole('article').filter({ hasText: 'Class C Arrival' })).toContainText('Verified by Hawthorne Flight Academy')
+  })
+})
+
 test.describe('M4b school space', () => {
   test('staff nudge a member with a mission; the pilot sees it on Progress and dismisses it', async ({ page }) => {
     await page.goto('/feed')
@@ -83,7 +120,8 @@ test.describe('M4b school space', () => {
     await page.goto('/feed')
     await viewAs(page, 'CFI', '/inbox')
     await page.getByRole('link', { name: 'Open your roster' }).click()
-    await page.getByRole('link', { name: /Maya Ortiz/ }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Your students' })).toBeVisible()
+    await page.getByRole('main').getByRole('link', { name: /Maya Ortiz/ }).click()
     await page.getByLabel('Mission').selectOption({ label: 'Santa Paula' })
     await page.getByLabel('Note (optional)').fill('Short runway practice before your long cross-country.')
     await page.getByRole('button', { name: 'Suggest mission' }).click()
