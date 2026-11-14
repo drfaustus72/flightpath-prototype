@@ -397,6 +397,22 @@ export const nudgeSchema = z.object({
   dismissedAt: isoDateTime.nullable(),
 })
 
+export const ASSIGNMENT_NOTE_MAX = 280
+
+/**
+ * A CFI Pro instructor suggesting a mission to a linked student. The advisor shows it first
+ * ("Dan suggests…"). A suggestion, never a readiness call: the CFI still decides on the day.
+ */
+export const missionAssignmentSchema = z.object({
+  id,
+  cfiId: id,
+  studentId: id,
+  missionCode,
+  note: z.string().trim().max(ASSIGNMENT_NOTE_MAX),
+  at: isoDateTime,
+  withdrawnAt: isoDateTime.nullable(),
+})
+
 /**
  * A school asking a pilot to feature one of their school-verified missions on the school's public
  * Mission Wall. Nothing is reposted until the pilot approves, and the pilot can take it down any time.
@@ -461,6 +477,7 @@ export const worldSchema = z.object({
   noGos: z.array(noGoSchema),
   nudges: z.array(nudgeSchema),
   repostRequests: z.array(repostRequestSchema),
+  missionAssignments: z.array(missionAssignmentSchema),
   missionVerifications: z.array(missionVerificationSchema),
   missionClaims: z.array(missionClaimSchema),
 })

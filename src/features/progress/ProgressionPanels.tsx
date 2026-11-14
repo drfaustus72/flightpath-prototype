@@ -1,7 +1,7 @@
 import { Check, Compass, Flag } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import { Link } from 'react-router'
-import { adviceFor, pathwaySteps } from '../../domain/advisor'
+import { adviceFor, pathwaySteps, suggestionAdvice } from '../../domain/advisor'
 import { challengeProgress, entryFor, schoolChallengesFor } from '../../domain/challenges'
 import { can } from '../../domain/tiers'
 import type { Challenge } from '../../domain/types'
@@ -15,8 +15,8 @@ import { Button, ButtonLink, Ident, Panel } from '../../ui/primitives'
 export function AdvisorCard() {
   const world = useWorld()
   const { account, access } = useActive()
-  if (!can(access, 'progress.advisor')) return null
-  const advice = adviceFor(world, account.id)
+  // Without the advisor, a pilot still sees a mission their own CFI suggested.
+  const advice = can(access, 'progress.advisor') ? adviceFor(world, account.id) : suggestionAdvice(world, account.id)
   if (!advice) return null
 
   return (

@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 import { SIGNOFF_DISCLAIMER, milestoneTitle } from '../../domain/milestones'
 import { inboxCount, inboxFor, linkedStudentsOf, signoffClubFor } from '../../domain/signoffs'
 import { accountById } from '../../domain/social'
-import { isVerifiedCfi } from '../../domain/tiers'
+import { can, isVerifiedCfi } from '../../domain/tiers'
 import { personalMissionsToVerify, schoolQueueCount, schoolQueues } from '../../domain/schoolAdmin'
 import type { Flight, SignoffRequest } from '../../domain/types'
 import { useActive, useWorld } from '../../store/hooks'
@@ -15,7 +15,7 @@ import { MissionToVerifyRow } from '../school/QueueRows'
 
 export function InboxScreen() {
   const world = useWorld()
-  const { account } = useActive()
+  const { account, access } = useActive()
 
   if (!isVerifiedCfi(account)) {
     return (
@@ -31,6 +31,7 @@ export function InboxScreen() {
   const missions = personalMissionsToVerify(world, account.id)
   const schools = schoolQueues(world, account.id)
   const students = linkedStudentsOf(world, account.id)
+  const hasRoster = can(access, 'cfi.roster')
 
   return (
     <div className="flex flex-col gap-6">
@@ -96,9 +97,14 @@ export function InboxScreen() {
 
       {students.length > 0 && (
         <Section title="Your students">
+          {hasRoster && (
+            <li>
+              <ButtonLink to="/roster">Open your roster</ButtonLink>
+            </li>
+          )}
           {students.map((s) => (
             <li key={s.id}>
-              <Link to={`/u/${s.handle}`} className="flex min-h-14 items-center gap-3 rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2">
+              <Link to={hasRoster ? `/roster/${s.id}` : `/u/${s.handle}`} className="flex min-h-14 items-center gap-3 rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2">
                 <Avatar account={s} />
                 <span className="font-semibold">{s.displayName}</span>
               </Link>

@@ -7,6 +7,7 @@ import { type AirportRecord, type Badge, newlyEarned, recognitionFor } from '../
 import { canTagInstructor } from '../domain/signoffs'
 import * as clubOps from '../domain/clubOps'
 import * as missionOps from '../domain/missionOps'
+import * as roster from '../domain/roster'
 import * as schoolOps from '../domain/schoolOps'
 import * as ops from '../domain/socialOps'
 import type { Flight, MilestoneCode, ProfileLevel, Report, World } from '../domain/types'
@@ -14,7 +15,7 @@ import { isBlocked } from '../domain/visibility'
 import { demoPersonas, loadWorld } from '../domain/world'
 
 /** Bump whenever the persisted shape changes. Old state is discarded and reset to seed. */
-export const STORAGE_VERSION = 11
+export const STORAGE_VERSION = 12
 export const STORAGE_KEY = 'flightpath-demo'
 
 export interface AppState {
@@ -76,6 +77,10 @@ export interface AppState {
   removeRepost: (requestId: string) => void
   createSchoolChallenge: (args: { clubId: string; title: string; description: string; kind: 'new_airports' | 'no_go'; target: number }) => void
   removeSchoolChallenge: (code: string) => void
+
+  // CFI Pro (domain/roster.ts).
+  assignMission: (args: { studentId: string; missionCode: string; note: string }) => void
+  withdrawAssignment: (assignmentId: string) => void
 
   resetDemo: () => void
 }
@@ -273,6 +278,8 @@ export function createAppStore(seedWorld: World, storage: StateStorage = safeLoc
         removeRepost: (id) => act((w, me, c) => schoolOps.removeRepost(w, me, id, c)),
         createSchoolChallenge: (args) => act((w, me, c) => schoolOps.createSchoolChallenge(w, me, args, c)),
         removeSchoolChallenge: (code) => act((w, me) => schoolOps.removeSchoolChallenge(w, me, code)),
+        assignMission: (args) => act((w, me, c) => roster.assignMission(w, me, args, c)),
+        withdrawAssignment: (id) => act((w, me, c) => roster.withdrawAssignment(w, me, id, c)),
         answerJoinRequest: (id, approve) => act((w, me, c) => clubOps.answerJoinRequest(w, me, id, approve, c)),
         leaveClub: (clubId) => act((w, me, c) => clubOps.leaveClub(w, me, clubId, c)),
         setHomeSchool: (clubId) => act((w, me) => clubOps.setHomeSchool(w, me, clubId)),

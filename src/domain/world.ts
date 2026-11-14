@@ -271,6 +271,11 @@ function checkMissionIntegrity(
     for (const who of [n.fromAccountId, n.toAccountId]) if (!accounts.has(who)) errors.push(`nudge ${n.id}: unknown account ${who}`)
     if (n.missionCode !== null && !missions.has(n.missionCode)) errors.push(`nudge ${n.id}: unknown mission ${n.missionCode}`)
   }
+  for (const d of duplicates(world.missionAssignments.map((a) => a.id))) errors.push(`missionAssignments: duplicate id ${d}`)
+  for (const a of world.missionAssignments) {
+    if (!missions.has(a.missionCode)) errors.push(`missionAssignment ${a.id}: unknown mission ${a.missionCode}`)
+    for (const who of [a.cfiId, a.studentId]) if (!accounts.has(who)) errors.push(`missionAssignment ${a.id}: unknown account ${who}`)
+  }
   for (const d of duplicates(world.repostRequests.map((r) => r.id))) errors.push(`repostRequests: duplicate id ${d}`)
   for (const r of world.repostRequests) {
     const v = world.missionVerifications.find((x) => x.id === r.verificationId)

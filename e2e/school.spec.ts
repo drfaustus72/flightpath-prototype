@@ -78,4 +78,21 @@ test.describe('M4b school space', () => {
     await row.getByRole('button', { name: 'Join challenge' }).click()
     await expect(row).toContainText('0 of 3')
   })
+
+  test('Dan suggests a mission from his roster and it leads Maya’s advisor', async ({ page }) => {
+    await page.goto('/feed')
+    await viewAs(page, 'CFI', '/inbox')
+    await page.getByRole('link', { name: 'Open your roster' }).click()
+    await page.getByRole('link', { name: /Maya Ortiz/ }).click()
+    await page.getByLabel('Mission').selectOption({ label: 'Santa Paula' })
+    await page.getByLabel('Note (optional)').fill('Short runway practice before your long cross-country.')
+    await page.getByRole('button', { name: 'Suggest mission' }).click()
+    await expect(page.getByRole('heading', { name: 'You suggested' })).toBeVisible()
+
+    await viewAs(page, 'Student pilot', '/progress')
+    const advisor = page.locator('section', { hasText: 'Dan suggests' }).first()
+    await expect(advisor).toContainText('Santa Paula')
+    await expect(advisor).toContainText('Short runway practice')
+    await expect(advisor).toContainText('Your CFI decides')
+  })
 })

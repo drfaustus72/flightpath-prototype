@@ -1,6 +1,7 @@
 import { distanceNm } from './geo'
 import { milestonesFor, linkedCfisOf } from './signoffs'
 import { type MissionStatus, missionStatuses } from './missions'
+import { openAssignmentsFor } from './roster'
 import type { Mission, Pathway, World } from './types'
 
 /**
@@ -45,20 +46,48 @@ function distanceFromHome(world: World, pilotId: string, mission: Mission): numb
   return from && to ? Math.round(distanceNm(from.lat, from.lon, to.lat, to.lon)) : null
 }
 
+function handoffFor(world: World, pilotId: string): string {
+  const cfi = linkedCfisOf(world, pilotId)[0]
+  return cfi
+    ? `Talk it over with ${cfi.displayName.split(' ')[0]} before you go. Your CFI decides when you’re ready.`
+    : 'Talk it over with a CFI before you go. Your CFI decides when you’re ready.'
+}
+
+function reasonsFor(world: World, pilotId: string, m: Mission, extra: string[]): string[] {
+  const home = world.accounts.find((a) => a.id === pilotId)?.homeAirport
+  const nm = distanceFromHome(world, pilotId, m)
+  const list = [...extra]
+  if (nm !== null && nm > 0 && home) list.push(`About ${nm} nm from ${home}.`)
+  return list
+}
+
+/**
+ * The newest mission the pilot's own CFI suggested and they haven't flown yet. Shown to every
+ * pilot with a CFI Pro instructor, even without the full advisor.
+ */
+export function suggestionAdvice(world: World, pilotId: string): Advice | null {
+  const assigned = openAssignmentsFor(world, pilotId)[0]
+  const mission = assigned && world.missions.find((m) => m.code === assigned.missionCode)
+  const by = assigned && world.accounts.find((a) => a.id === assigned.cfiId)
+  if (!assigned || !mission || !by) return null
+  return {
+    mission,
+    context: `${by.displayName.split(' ')[0]} suggests`,
+    reasons: reasonsFor(world, pilotId, mission, assigned.note ? [`“${assigned.note}”`] : []),
+    beforeYouGo: mission.prerequisites,
+    handoff: handoffFor(world, pilotId),
+  }
+}
+
 export function adviceFor(world: World, pilotId: string): Advice | null {
   const pilot = world.accounts.find((a) => a.id === pilotId)
   if (!pilot) return null
-  const cfi = linkedCfisOf(world, pilotId)[0]
-  const handoff = cfi
-    ? `Talk it over with ${cfi.displayName.split(' ')[0]} before you go. Your CFI decides when you’re ready.`
-    : 'Talk it over with a CFI before you go. Your CFI decides when you’re ready.'
+  const handoff = handoffFor(world, pilotId)
+  const reasons = (m: Mission, extra: string[]) => reasonsFor(world, pilotId, m, extra)
 
-  const reasons = (m: Mission, extra: string[]) => {
-    const nm = distanceFromHome(world, pilotId, m)
-    const list = [...extra]
-    if (nm !== null && nm > 0) list.push(`About ${nm} nm from ${pilot.homeAirport}.`)
-    return list
-  }
+  // A mission the pilot's own CFI suggested comes first.
+  const suggested = suggestionAdvice(world, pilotId)
+  if (suggested) return suggested
 
   const pathway = world.pathways[0]
   if (pathway) {

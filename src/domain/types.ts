@@ -32,6 +32,7 @@ import type {
   challengeEntrySchema,
   noGoSchema,
   nudgeSchema,
+  missionAssignmentSchema,
   repostRequestSchema,
   missionVerificationSchema,
   missionClaimSchema,
@@ -70,6 +71,7 @@ export type Challenge = z.infer<typeof challengeSchema>
 export type ChallengeEntry = z.infer<typeof challengeEntrySchema>
 export type NoGo = z.infer<typeof noGoSchema>
 export type Nudge = z.infer<typeof nudgeSchema>
+export type MissionAssignment = z.infer<typeof missionAssignmentSchema>
 export type RepostRequest = z.infer<typeof repostRequestSchema>
 export type MissionVerification = z.infer<typeof missionVerificationSchema>
 export type MissionClaim = z.infer<typeof missionClaimSchema>
