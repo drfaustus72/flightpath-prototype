@@ -47,16 +47,22 @@ test.describe('M4a discovery and school pages', () => {
     await viewAs(page, 'Free pilot', '/clubs/club-hfa')
     await page.getByRole('button', { name: 'Request to join' }).click()
     await viewAs(page, 'School admin', '/feed')
-    // The admin's fourth tab is School (not Progress), with a count of what's waiting.
-    const nav = page.getByRole('navigation', { name: 'Main' })
-    await expect(nav.getByRole('link', { name: 'Progress' })).toHaveCount(0)
-    await nav.getByRole('link', { name: /School.*2 waiting/ }).click()
-    await expect(page.getByRole('heading', { level: 1, name: 'Hawthorne Flight Academy' })).toBeVisible()
+    // Alex's own tabs stay personal; the school's work is one switch away, with a count of what's waiting.
+    await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Progress' })).toBeVisible()
+    await page.getByRole('link', { name: 'Act as Hawthorne Flight Academy, 2 waiting' }).click()
+    await expect(page.getByText('Acting as')).toBeVisible()
+    const schoolNav = page.getByRole('navigation', { name: 'Hawthorne Flight Academy school' })
+    await expect(schoolNav.getByRole('link', { name: /Queue.*2 waiting/ })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'Queue' })).toBeVisible()
     await page.getByRole('button', { name: 'Approve Jordan Reyes' }).click()
     await expect(page.getByText('No one is waiting.')).toBeVisible()
     // Admins confirm simulator sessions too.
     await page.getByRole('button', { name: 'Confirm session' }).click()
-    await expect(nav.getByRole('link', { name: 'School' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Confirm session' })).toHaveCount(0)
+    // Jordan is a member now, so his self-reported Santa Paula mission joins the queue.
+    await expect(page.getByText('says they flew Santa Paula')).toBeVisible()
+    await page.getByRole('link', { name: /Act as yourself/ }).click()
+    await expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible()
     await viewAs(page, 'Free pilot', '/clubs/club-hfa')
     await expect(page.getByText('You’re a member')).toBeVisible()
     // Now a School Pro member: missions open up without Pilot Pro.
@@ -75,7 +81,7 @@ test.describe('M4a discovery and school pages', () => {
     await page.getByLabel(/Your email at desertwings.example/).fill('jordan@desertwings.example')
     await page.getByRole('button', { name: 'Claim page' }).click()
     await expect(page.getByText('Verified school')).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Open school tools' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Act as this school' })).toBeVisible()
   })
 
   test('a CFI leaves the directory without losing sign-off authority', async ({ page }) => {

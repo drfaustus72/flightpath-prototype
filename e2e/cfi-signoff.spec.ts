@@ -64,7 +64,13 @@ test.describe('M2 script B: CFI debrief and sign-off', () => {
     await page.getByRole('button', { name: 'Accept tag on Pattern work at Hawthorne' }).click()
     await expect(page.getByRole('heading', { name: 'Tagged you as instructor' })).toHaveCount(0)
     await expect(page.getByRole('link', { name: /Pattern work at Hawthorne\s*Sam Patel/ })).toBeVisible()
-    await page.getByRole('button', { name: 'Confirm session' }).click()
+    // Simulator sessions are the school's work: Dan confirms it as a Hawthorne staff CFI.
     await expect(page.getByRole('heading', { name: 'Simulator sessions to confirm' })).toHaveCount(0)
+    await page.getByRole('link', { name: /Hawthorne Flight Academy\s*\d+ waiting/ }).click()
+    await expect(page.getByText('Acting as')).toBeVisible()
+    // Staff CFIs work the queue; join requests stay with admins.
+    await expect(page.getByRole('heading', { name: 'Join requests' })).toHaveCount(0)
+    await page.getByRole('button', { name: 'Confirm session' }).click()
+    await expect(page.getByText('Nothing waiting.').last()).toBeVisible()
   })
 })

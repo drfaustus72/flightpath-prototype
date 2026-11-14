@@ -1,7 +1,8 @@
 import { BadgeCheck, Globe } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import { Link, useParams } from 'react-router'
-import { checkClaimEmail, claimDomain, currentMembership, isAdminOf } from '../../domain/clubOps'
+import { checkClaimEmail, claimDomain, currentMembership } from '../../domain/clubOps'
+import { isStaffOfClub } from '../../domain/visibility'
 import { clubPlanName, offersSchoolPlans } from '../../domain/clubs'
 import { listedCfis } from '../../domain/directory'
 import { feedFor } from '../../domain/social'
@@ -86,7 +87,7 @@ export function ClubScreen() {
 
       <MembershipActions clubId={club.id} />
 
-      {isAdminOf(world, account.id, club.id) && <ButtonLink to={`/school/${club.id}`}>Open school tools</ButtonLink>}
+      {isStaffOfClub(world, account.id, club.id) && <ButtonLink to={`/school/${club.id}`}>Act as this school</ButtonLink>}
 
       {staff.length > 0 && (
         <section aria-labelledby="staff-title" className="flex flex-col gap-2">

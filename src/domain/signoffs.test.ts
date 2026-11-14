@@ -137,7 +137,7 @@ describe('instructors and inbox', () => {
     expect(signoffClubFor(w, 'dan', 'stu')).toBeNull()
   })
 
-  it('collects tag requests, flights to sign off, milestone requests and sim sessions', () => {
+  it('collects tag requests, flights to sign off and milestone requests (sim sessions go to the school queue)', () => {
     const memberships = [
       makeMembership({ id: 'm1', accountId: 'stu' }),
       makeMembership({ id: 'm2', accountId: 'dan', roles: ['staff_cfi'] }),
@@ -158,7 +158,7 @@ describe('instructors and inbox', () => {
     expect(inbox.tagRequests.map((f) => f.id)).toEqual(['tag'])
     expect(inbox.toSignOff.map((f) => f.id)).toEqual(['sign'])
     expect(inbox.milestoneRequests.map((r) => r.id)).toEqual(['r'])
-    expect(inbox.simSessions.map((f) => f.id)).toEqual(['sim'])
-    expect(inboxCount(inbox)).toBe(4)
+    expect(inbox).not.toHaveProperty('simSessions')
+    expect(inboxCount(inbox)).toBe(3)
   })
 })

@@ -33,12 +33,12 @@ test.describe('M3 script A: mission, card, Props and school-verified XP', () => 
     expect((await download).suggestedFilename()).toBe('flightpath-airport_in_the_sky.png')
     const flightUrl = page.url()
 
-    // Dan (follows Maya) gives Props, then verifies the mission from his inbox.
+    // Dan (follows Maya) gives Props, then verifies the mission as a Hawthorne staff CFI.
     await viewAs(page, 'CFI', '/feed')
     const post = page.getByRole('article').filter({ hasText: 'Catalina lunch run' })
     await post.getByRole('button', { name: /Props/ }).click()
     await expect(post.getByRole('button', { name: /Props/ })).toHaveAttribute('aria-pressed', 'true')
-    await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /Inbox/ }).click()
+    await page.getByRole('link', { name: /^Act as Hawthorne Flight Academy/ }).click()
     const row = page.getByRole('listitem').filter({ hasText: 'completed Airport in the Sky' })
     await row.getByRole('button', { name: 'Verify Airport in the Sky' }).click()
     await expect(page.getByText('completed Airport in the Sky')).toHaveCount(0)

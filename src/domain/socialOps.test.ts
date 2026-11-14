@@ -3,6 +3,7 @@ import { seedResult } from '../data/seed'
 import { feedFor } from './social'
 import * as ops from './socialOps'
 import { activeSignoffForMilestone, inboxFor, milestonesFor } from './signoffs'
+import { schoolQueues } from './schoolAdmin'
 import type { World } from './types'
 import { canSeeProfile } from './visibility'
 import { checkIntegrity } from './world'
@@ -22,7 +23,7 @@ describe('Script B: Dan debriefs and signs off', () => {
     expect(before.tagRequests.map((f) => f.id)).toEqual(['flt-sam-pattern'])
     expect(before.toSignOff.map((f) => f.id)).toEqual(['flt-maya-dual-xc'])
     expect(before.milestoneRequests.map((r) => r.milestone)).toEqual(['first_solo'])
-    expect(before.simSessions.map((f) => f.id)).toEqual(['flt-lena-sim'])
+    expect(schoolQueues(w, 'acct-dan')[0]?.simSessions.map((f) => f.id)).toEqual(['flt-lena-sim'])
 
     w = ops.addDebrief(w, 'acct-dan', 'flt-maya-dual-xc', 'Great pilotage. Work on the descent planning.', ctx())
     w = ops.signOffFlight(w, 'acct-dan', 'flt-maya-dual-xc', '', ctx())

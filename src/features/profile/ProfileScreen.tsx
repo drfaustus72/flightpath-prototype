@@ -1,6 +1,6 @@
 import { clubPlanName } from '../../domain/clubs'
 import { isVerifiedCfi, planLabels } from '../../domain/tiers'
-import { adminClubsOf } from '../../domain/world'
+import { staffSchoolsOf } from '../../domain/schoolAdmin'
 import { useActive, useWorld } from '../../store/hooks'
 import { LogbookPanel } from './LogbookPanel'
 import { CfiListingSwitch, LinkRow, ProfileLevelPicker, ShareProfile, WaitingForYou } from './OwnProfileSections'
@@ -9,7 +9,7 @@ import { LandedMap, ProfileFacts, ProfileHeader, TrainingTimeline, TrophyCase } 
 export function ProfileScreen() {
   const world = useWorld()
   const { account, access } = useActive()
-  const adminClubs = adminClubsOf(world, account.id)
+  const adminClubs = staffSchoolsOf(world, account.id)
 
   return (
     <div className="flex flex-col gap-5">
@@ -21,7 +21,7 @@ export function ProfileScreen() {
       {adminClubs.length > 0 && (
         <section aria-labelledby="manage-title">
           <h2 id="manage-title" className="mb-2 font-semibold">
-            Schools you manage
+            Your schools
           </h2>
           <ul className="flex flex-col gap-2">
             {adminClubs.map((c) => (

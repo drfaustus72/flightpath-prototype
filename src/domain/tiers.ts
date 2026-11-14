@@ -1,4 +1,5 @@
 import { offersSchoolPlans } from './clubs'
+import { roleAllows, schoolRolesOf } from './schoolPermissions'
 import type { Account, Club, Membership, World } from './types'
 
 /**
@@ -16,9 +17,10 @@ import type { Account, Club, Membership, World } from './types'
  *    come with School Pro membership, so free pilots at a School Pro school can earn XP
  *    (decided 13 Nov 2026).
  *
- * Club requirements (the account must be an active admin of that club):
- *  - school_admin:     any flight school page (School Basic or Pro)
- *  - school_pro_admin: School Pro only
+ * Club requirements are about the club's plan only:
+ *  - any_school: any claimed flight school or flying club page (School Basic or Pro)
+ *  - school_pro: School Pro only
+ * Which staff role (admin or staff CFI) may use each feature lives in `schoolPermissions.ts`.
  */
 export const ACCOUNT_FEATURES = {
   'flight.log': 'pilot_free',
@@ -51,22 +53,25 @@ export const ACCOUNT_FEATURES = {
 } as const satisfies Record<string, AccountRequirement>
 
 export const CLUB_FEATURES = {
-  'school.editPage': 'school_admin',
-  'school.approveMembers': 'school_admin',
-  'school.confirmStaffCfis': 'school_admin',
+  'school.editPage': 'any_school',
+  'school.approveMembers': 'any_school',
+  'school.confirmStaffCfis': 'any_school',
+  'school.queue': 'any_school',
 
-  'school.feed': 'school_pro_admin',
-  'school.dashboard': 'school_pro_admin',
-  'school.brandedPosts': 'school_pro_admin',
-  'school.repostRequests': 'school_pro_admin',
-  'school.missionWall': 'school_pro_admin',
-  'school.customChallenges': 'school_pro_admin',
-  'school.perks': 'school_pro_admin',
-  'school.sponsorSeats': 'school_pro_admin',
+  'school.members': 'school_pro',
+  'school.nudges': 'school_pro',
+  'school.feed': 'school_pro',
+  'school.dashboard': 'school_pro',
+  'school.brandedPosts': 'school_pro',
+  'school.repostRequests': 'school_pro',
+  'school.missionWall': 'school_pro',
+  'school.customChallenges': 'school_pro',
+  'school.perks': 'school_pro',
+  'school.sponsorSeats': 'school_pro',
 } as const satisfies Record<string, ClubRequirement>
 
 export type AccountRequirement = 'pilot_free' | 'pilot_pro' | 'cfi' | 'cfi_pro' | 'school_pro_member' | 'pilot_pro_or_school_pro_member'
-export type ClubRequirement = 'school_admin' | 'school_pro_admin'
+export type ClubRequirement = 'any_school' | 'school_pro'
 export type AccountFeature = keyof typeof ACCOUNT_FEATURES
 export type ClubFeature = keyof typeof CLUB_FEATURES
 
@@ -137,18 +142,24 @@ export function xpSchoolsOf(ctx: AccessContext): Club[] {
   return ctx.clubs.filter((c) => ids.has(c.id) && c.plan === 'school_pro' && c.claimed)
 }
 
-export function canInClub(ctx: AccessContext, feature: ClubFeature, clubId: string): boolean {
-  const club = clubById(ctx, clubId)
-  if (!club || !offersSchoolPlans(club) || !club.claimed) return false
-  const isAdmin = activeMembershipsOf(ctx).some((m) => m.clubId === clubId && m.roles.includes('admin'))
-  if (!isAdmin) return false
+/** Whether the club's plan includes this feature, whoever is asking. */
+export function clubOffers(club: Club, feature: ClubFeature): boolean {
+  if (!offersSchoolPlans(club) || !club.claimed) return false
   const requirement: ClubRequirement = CLUB_FEATURES[feature]
   switch (requirement) {
-    case 'school_admin':
+    case 'any_school':
       return true
-    case 'school_pro_admin':
+    case 'school_pro':
       return club.plan === 'school_pro'
   }
+}
+
+/** The club's plan includes the feature and the account's staff role there allows it. */
+export function canInClub(ctx: AccessContext, feature: ClubFeature, clubId: string): boolean {
+  const club = clubById(ctx, clubId)
+  if (!club || !clubOffers(club, feature)) return false
+  const roles = schoolRolesOf(activeMembershipsOf(ctx).find((m) => m.clubId === clubId))
+  return roleAllows(roles, feature)
 }
 
 /** Plan badges to show on a profile or settings screen. */

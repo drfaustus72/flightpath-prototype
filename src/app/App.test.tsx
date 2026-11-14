@@ -54,15 +54,17 @@ describe('app shell', () => {
     expect(await screen.findByText('Part of School Pro')).toBeInTheDocument()
   })
 
-  it('opens the School Pro console only for the school admin', async () => {
+  it("sends non-staff to the school's public page and lets the admin act as the school", async () => {
     renderApp('/school/club-hfa')
-    expect(await screen.findByText("You don't manage this school")).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Hawthorne Flight Academy' })).toBeInTheDocument()
+    expect(screen.queryByText('Acting as')).not.toBeInTheDocument()
     const user = await switchTo('School admin')
     await user.click(screen.getByRole('link', { name: 'Profile' }))
-    const manage = await screen.findByRole('region', { name: 'Schools you manage' })
-    await user.click(within(manage).getByRole('link', { name: /Hawthorne Flight Academy/ }))
+    const schools = await screen.findByRole('region', { name: 'Your schools' })
+    await user.click(within(schools).getByRole('link', { name: /Hawthorne Flight Academy/ }))
+    expect(await screen.findByText('Acting as')).toBeInTheDocument()
+    await user.click(screen.getByRole('link', { name: 'Page' }))
     expect(await screen.findByText('School Pro tools')).toBeInTheDocument()
-    expect(screen.getByText('Retention dashboard')).toBeInTheDocument()
   })
 
   it("shows a School Basic home school on the free pilot's profile", async () => {

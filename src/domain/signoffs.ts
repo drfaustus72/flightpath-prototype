@@ -1,4 +1,3 @@
-import { canConfirmSimSession } from './achievements'
 import { MILESTONES, milestoneAchievementCode } from './milestones'
 import { isVerifiedCfi } from './tiers'
 import type { Account, Achievement, Club, Flight, MilestoneCode, Signoff, SignoffRequest, World } from './types'
@@ -123,8 +122,6 @@ export interface CfiInbox {
   /** Flights this CFI instructed that don't have a sign-off yet. */
   toSignOff: Flight[]
   milestoneRequests: SignoffRequest[]
-  /** Simulator sessions tagged to a school where this CFI is admin or staff, waiting for confirmation. */
-  simSessions: Flight[]
 }
 
 export function inboxFor(world: World, cfiId: string): CfiInbox {
@@ -135,12 +132,9 @@ export function inboxFor(world: World, cfiId: string): CfiInbox {
     milestoneRequests: world.signoffRequests.filter(
       (r) => r.cfiId === cfiId && r.status === 'open' && canSignOffMilestone(world, cfiId, r.studentId, r.milestone),
     ),
-    simSessions: world.flights
-      .filter((f) => f.simConfirmation?.status === 'pending' && canConfirmSimSession(f, cfiId, world.memberships))
-      .sort(newest),
   }
 }
 
 export function inboxCount(inbox: CfiInbox): number {
-  return inbox.tagRequests.length + inbox.toSignOff.length + inbox.milestoneRequests.length + inbox.simSessions.length
+  return inbox.tagRequests.length + inbox.toSignOff.length + inbox.milestoneRequests.length
 }

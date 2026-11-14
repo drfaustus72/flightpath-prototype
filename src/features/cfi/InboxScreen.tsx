@@ -1,19 +1,17 @@
-import { MonitorPlay } from 'lucide-react'
 import { type ReactNode, useState } from 'react'
 import { Link } from 'react-router'
 import { SIGNOFF_DISCLAIMER, milestoneTitle } from '../../domain/milestones'
 import { inboxCount, inboxFor, linkedStudentsOf, signoffClubFor } from '../../domain/signoffs'
 import { accountById } from '../../domain/social'
 import { isVerifiedCfi } from '../../domain/tiers'
-import { type MissionToVerify, missionsToVerify } from '../../domain/missions'
-import { schoolQueues } from '../../domain/schoolAdmin'
+import { personalMissionsToVerify, schoolQueueCount, schoolQueues } from '../../domain/schoolAdmin'
 import type { Flight, SignoffRequest } from '../../domain/types'
 import { useActive, useWorld } from '../../store/hooks'
 import { useAppStore } from '../../store/storeContext'
 import { Avatar } from '../../ui/Avatar'
 import { Button, ButtonLink, EmptyState, Panel, ScreenTitle } from '../../ui/primitives'
-
-const day = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '')
+import { FlightLink } from '../flight/FlightLink'
+import { MissionToVerifyRow } from '../school/QueueRows'
 
 export function InboxScreen() {
   const world = useWorld()
@@ -30,7 +28,7 @@ export function InboxScreen() {
   }
 
   const inbox = inboxFor(world, account.id)
-  const missions = missionsToVerify(world, account.id)
+  const missions = personalMissionsToVerify(world, account.id)
   const schools = schoolQueues(world, account.id)
   const students = linkedStudentsOf(world, account.id)
 
@@ -41,7 +39,26 @@ export function InboxScreen() {
         <p className="mt-1 text-[14px] text-ink-muted">Sign-offs are {SIGNOFF_DISCLAIMER.charAt(0).toLowerCase() + SIGNOFF_DISCLAIMER.slice(1)}</p>
       </div>
 
-      {inboxCount(inbox) + missions.length === 0 && <EmptyState title="You’re all caught up" body="New sign-off requests, instructor tags and simulator sessions to confirm show up here." />}
+      {inboxCount(inbox) + missions.length === 0 && <EmptyState title="You’re all caught up" body="New sign-off requests, instructor tags and debriefs show up here." />}
+
+      {schools.length > 0 && (
+        <Section title="Your schools">
+          {schools.map((q) => {
+            const waiting = schoolQueueCount(q)
+            return (
+              <li key={q.club.id}>
+                <Link
+                  to={`/school/${q.club.id}`}
+                  className="flex min-h-14 items-center justify-between gap-3 rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2"
+                >
+                  <span className="font-semibold">{q.club.name}</span>
+                  <span className="text-[14px] text-ink-muted">{waiting > 0 ? `${waiting} waiting` : 'Nothing waiting'}</span>
+                </Link>
+              </li>
+            )
+          })}
+        </Section>
+      )}
 
       {inbox.milestoneRequests.length > 0 && (
         <Section title="Milestones to verify">
@@ -77,34 +94,6 @@ export function InboxScreen() {
         </Section>
       )}
 
-      {inbox.simSessions.length > 0 && (
-        <Section title="Simulator sessions to confirm">
-          {inbox.simSessions.map((f) => (
-            <SimSession key={f.id} flight={f} />
-          ))}
-        </Section>
-      )}
-
-      {schools.length > 0 && (
-        <Section title="Schools you manage">
-          {schools.map((q) => (
-            <li key={q.club.id}>
-              <Link
-                to={`/school/${q.club.id}`}
-                className="flex min-h-14 items-center justify-between gap-3 rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2"
-              >
-                <span className="font-semibold">{q.club.name}</span>
-                <span className="text-[14px] text-ink-muted">
-                  {q.joinRequests.length > 0
-                    ? `${q.joinRequests.length} join ${q.joinRequests.length === 1 ? 'request' : 'requests'}`
-                    : 'School tools'}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </Section>
-      )}
-
       {students.length > 0 && (
         <Section title="Your students">
           {students.map((s) => (
@@ -130,19 +119,6 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
       </h2>
       <ul className="flex flex-col gap-2">{children}</ul>
     </section>
-  )
-}
-
-function FlightLink({ flight }: { flight: Flight }) {
-  const world = useWorld()
-  const pilot = accountById(world, flight.pilotId)
-  return (
-    <Link to={`/flights/${flight.id}`} className="flex min-h-14 flex-col justify-center rounded-[var(--radius-panel)] border border-hairline bg-surface px-4 py-2">
-      <span className="font-semibold">{flight.title}</span>
-      <span className="text-[14px] text-ink-muted">
-        {pilot?.displayName} · {day(flight.startedAt)}
-      </span>
-    </Link>
   )
 }
 
@@ -206,76 +182,6 @@ function TagRequest({ flight }: { flight: Flight }) {
           Decline
         </Button>
       </div>
-    </li>
-  )
-}
-
-export function SimSession({ flight }: { flight: Flight }) {
-  const world = useWorld()
-  const review = useAppStore((s) => s.reviewSimSession)
-  const club = world.clubs.find((c) => c.id === flight.clubId)
-  return (
-    <li>
-      <Panel className="flex flex-col gap-3">
-        <p className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-chart-blue">
-          <MonitorPlay size={14} aria-hidden="true" /> {flight.source.gpsSource ?? 'Simulator'} at {club?.name}
-        </p>
-        <FlightLink flight={flight} />
-        <p className="text-[13px] text-ink-muted">Confirming records that this session took place in your school’s simulator. It isn’t an FAA logging of simulator time.</p>
-        <div className="flex gap-2">
-          <Button tone="primary" onClick={() => review(flight.id, 'confirmed')}>
-            Confirm session
-          </Button>
-          <Button onClick={() => review(flight.id, 'declined')}>Decline</Button>
-        </div>
-      </Panel>
-    </li>
-  )
-}
-
-export function MissionToVerifyRow({ item }: { item: MissionToVerify }) {
-  const world = useWorld()
-  const verifyMission = useAppStore((s) => s.verifyMission)
-  const verifyMissionClaim = useAppStore((s) => s.verifyMissionClaim)
-  const [schoolAircraft, setSchoolAircraft] = useState(true)
-  const pilot = accountById(world, item.pilotId)
-  const { mission } = item
-
-  if (item.kind === 'tracked') {
-    const club = world.clubs.find((c) => c.id === item.flight.clubId)
-    return (
-      <li>
-        <Panel className="flex flex-col gap-3">
-          <p>
-            <span className="font-semibold">{pilot?.displayName}</span> completed <span className="font-semibold">{mission.title}</span>.
-          </p>
-          <FlightLink flight={item.flight} />
-          <p className="text-[13px] text-ink-muted">Verifying adds {mission.xp} XP at {club?.name}. Open the flight to check the track first.</p>
-          <Button tone="primary" className="self-start" onClick={() => verifyMission(item.flight.id, mission.code)}>
-            Verify {mission.title}
-          </Button>
-        </Panel>
-      </li>
-    )
-  }
-
-  const club = item.clubs[0]
-  if (!club) return null
-  return (
-    <li>
-      <Panel className="flex flex-col gap-3">
-        <p>
-          <span className="font-semibold">{pilot?.displayName}</span> says they flew <span className="font-semibold">{mission.title}</span>.
-        </p>
-        <p className="text-[13px] text-ink-muted">Self-reported, with no track. Check with them before verifying. Verifying adds {mission.xp} XP at {club.name} if it was flown in your aircraft.</p>
-        <label className="flex min-h-11 items-center gap-3">
-          <input type="checkbox" checked={schoolAircraft} onChange={(e) => setSchoolAircraft(e.target.checked)} className="size-5 accent-chart-blue" />
-          Flown in a {club.name} aircraft
-        </label>
-        <Button tone="primary" className="self-start" onClick={() => verifyMissionClaim(item.pilotId, mission.code, club.id, schoolAircraft)}>
-          Verify {mission.title}
-        </Button>
-      </Panel>
     </li>
   )
 }

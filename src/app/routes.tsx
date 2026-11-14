@@ -12,7 +12,8 @@ import { LogFlightScreen } from '../features/log/LogFlightScreen'
 import { ProfileScreen } from '../features/profile/ProfileScreen'
 import { PublicProfileScreen } from '../features/profile/PublicProfileScreen'
 import { ProgressScreen } from '../features/progress/ProgressScreen'
-import { SchoolConsoleScreen, SchoolHomeScreen } from '../features/school/SchoolConsoleScreen'
+import { SchoolLayout } from '../features/school/SchoolLayout'
+import { SchoolHomeScreen, SchoolIndex, SchoolPageScreen, SchoolQueueScreen } from '../features/school/SchoolScreens'
 import { AppLayout } from './AppLayout'
 import { NotFoundScreen } from './NotFoundScreen'
 
@@ -36,7 +37,17 @@ export const routes: RouteObject[] = [
       { path: 'u/:handle', element: <PublicProfileScreen /> },
       { path: 'flights/:flightId', element: <FlightScreen /> },
       { path: 'school', element: <SchoolHomeScreen /> },
-      { path: 'school/:clubId', element: <SchoolConsoleScreen /> },
+      { path: '*', element: <NotFoundScreen /> },
+    ],
+  },
+  {
+    // A school's own space: its staff act as the school here, with the school's tabs.
+    path: 'school/:clubId',
+    element: <SchoolLayout />,
+    children: [
+      { index: true, element: <SchoolIndex /> },
+      { path: 'queue', element: <SchoolQueueScreen /> },
+      { path: 'page', element: <SchoolPageScreen /> },
       { path: '*', element: <NotFoundScreen /> },
     ],
   },
